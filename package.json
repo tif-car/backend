@@ -12,10 +12,6 @@
     "@heroicons/react": "2.0.18",
     "@material-tailwind/react": "2.1.4",
     "apexcharts": "3.44.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "mysql2": "^3.13.0",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
@@ -31,11 +27,6 @@
     "prettier": "3.0.3",
     "prettier-plugin-tailwindcss": "0.5.6",
     "tailwindcss": "3.3.4",
-    "vite": "4.5.0"
-  },
-  "description": "![version](https://img.shields.io/badge/version-2.1.0-blue.svg) [![GitHub issues open](https://img.shields.io/github/issues/creativetimofficial/material-tailwind-dashboard-react.svg)](https://github.com/creativetimofficial/material-tailwind-dashboard-react/issues?q=is%3Aopen+is%3Aissue) [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/creativetimofficial/material-tailwind-dashboard-react.svg)](https://github.com/creativetimofficial/material-tailwind-dashboard-react/issues?q=is%3Aissue+is%3Aclosed)",
-  "main": "vite.config.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "vite": "^4.5.9"
+  }
 }
