@@ -1,5 +1,5 @@
 //To Fetch data from the backend API
-
+/*
 async function fetchData() {
     try {
        //new one that needs to be applied.
@@ -25,7 +25,7 @@ async function fetchData() {
 // Run fetchData() when the page loads
 window.onload = fetchData;
 
-/*
+*/
 
 //Default domain:  zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net
 // To Fetch data from the backend API
@@ -76,4 +76,3 @@ async function fetchData() {
 
 // Run fetchData() when the page loads
 window.onload = fetchData;
-*/
