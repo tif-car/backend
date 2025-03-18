@@ -38,7 +38,7 @@ db.connect(err => {
 // API Route to Fetch Data from Database
 app.get('/api/data', (req, res) => {
     //db.query("SELECT * FROM table", (err, results) => {
-    db.query("SELECT Ticket_price FROM ticket", (err, results) => {
+    db.query("SELECT Animal_Name FROM animal", (err, results) => {
 
         if (err) {
             console.error("Data Retrieval Error: ", err);

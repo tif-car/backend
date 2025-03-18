@@ -1,9 +1,10 @@
 //To Fetch data from the backend API
 async function fetchData() {
     try {
-       
+       //new one that needs to be applied.
        const response = await fetch('https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api/data');
-
+        
+       //works but is empty
        //const response = await fetch('http://localhost:3000/api/data'); // Fetch from backend
         const data = await response.json();
 
