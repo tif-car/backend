@@ -1,7 +1,10 @@
 //To Fetch data from the backend API
 async function fetchData() {
     try {
-        const response = await fetch('http://localhost:3000/api/data'); // Fetch from backend
+       
+       const response = await fetch('https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api/data');
+
+       //const response = await fetch('http://localhost:3000/api/data'); // Fetch from backend
         const data = await response.json();
 
         const list = document.getElementById('data-list'); // Make sure your HTML has <ul id="data-list">
