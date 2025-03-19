@@ -69,16 +69,21 @@ app.listen(PORT, '0.0.0.0', () => {
 */
 
 import express from 'express';
-import mysql from 'mysql2'; 
+import mysql from 'mysql2';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import os from 'os';
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Load SSL Certificate for Azure MySQL
+const sslCertPath = './BaltimoreCyberTrustRoot.crt.pem'; // Ensure this file is in your backend directory
+const sslCert = fs.readFileSync(sslCertPath);
 
 // MySQL Connection with SSL
 const db = mysql.createConnection({
@@ -87,7 +92,9 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-    ssl: { rejectUnauthorized: true }
+    ssl: { 
+        ssl: { ca: sslCert }  // Set CA certificate
+    }
 });
 
 // Connect to MySQL
@@ -103,10 +110,11 @@ db.connect(err => {
 app.get('/api/data', (req, res) => {
     db.query("SELECT * FROM animal", (err, results) => {
         if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(results);
+            console.error("Data Retrieval Error:", err);
+            res.status(500).json({ error: "Database error" });
+            return;
         }
+        res.json(results);
     });
 });
 
@@ -114,18 +122,18 @@ app.get('/api/data', (req, res) => {
 const PORT = process.env.PORT || 8080;
 const localIP = Object.values(os.networkInterfaces())
     .flat()
-    .find((iface) => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
+    .find(iface => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
 
 const localURL = `http://${localIP}:${PORT}`;
-//const azureURL = `https://${process.env.AZURE_WEB_APP_DOMAIN || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
 const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
 
 // Start the Server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log("Server is running!");
-    console.log(`Local:  ${localURL}/api/data`);  // Fix: add `/api`
-    console.log(`Azure:  ${azureURL}/api/data\n`);  //add `/api`
+    console.log(`Local:  ${localURL}/api/data`);
+    console.log(`Azure:  ${azureURL}/api/data\n`);
 });
+
 
 
 
