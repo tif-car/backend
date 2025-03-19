@@ -69,7 +69,7 @@ app.listen(PORT, '0.0.0.0', () => {
 */
 
 import express from 'express';
-import mysql from 'mysql';
+import mysql from 'mysql'; 
 import cors from 'cors';
 import dotenv from 'dotenv';
 import os from 'os';
@@ -100,7 +100,7 @@ db.connect(err => {
 });
 
 // API Route to Fetch Data
-app.get('/data', (req, res) => {
+app.get('/api/data', (req, res) => {
     db.query("SELECT * FROM animal", (err, results) => {
         if (err) {
             res.status(500).send(err);

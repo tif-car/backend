@@ -29,8 +29,8 @@ window.onload = fetchData;
 //Default domain:  zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net
 
 */
-const localAPI = "http://localhost:8080/data"; // Now using port 8080
-const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/data"; // Azure backend
+const localAPI = "http://localhost:8080/api/data"; // Now using port 8080
+const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api/data"; // Azure backend
 
 // Detect environment dynamically
 const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
