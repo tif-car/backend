@@ -1,5 +1,5 @@
 //To Fetch data from the backend API
-
+/*
 async function fetchData() {
     try {
        //new one that needs to be applied.
@@ -25,6 +25,21 @@ async function fetchData() {
 // Run fetchData() when the page loads
 window.onload = fetchData;
 
-
+//testing
 //Default domain:  zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net
+
+*/
+const localAPI = "http://localhost:8080/data"; // Now using port 8080
+const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/data"; // Azure backend
+
+// Detect environment dynamically
+const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
+
+fetch(API_URL)
+    .then(response => response.json())
+    .then(data => {
+        console.log("Fetched data:", data);
+        document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+    })
+    .catch(error => console.error("Error fetching data:", error));
 

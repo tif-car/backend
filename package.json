@@ -12,6 +12,10 @@
     "@heroicons/react": "2.0.18",
     "@material-tailwind/react": "2.1.4",
     "apexcharts": "3.44.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql": "^2.18.1",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
@@ -28,6 +32,10 @@
     "prettier-plugin-tailwindcss": "0.5.6",
     "tailwindcss": "3.3.4",
     "vite": "^4.5.9"
-  }
-  
+  },
+  "description": "*Backend repository",
+  "main": "script.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
