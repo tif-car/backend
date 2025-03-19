@@ -50,7 +50,9 @@ app.get('/api/data', (req, res) => {
 });
 
 // Dynamic port for deployment
-const PORT = process.env.PORT || 3000;
+//const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;  // Use 8080 as fallback
+
 
 console.log("🛠️ Starting Node.js server...");
 console.log("📡 Listening on port:", PORT);
