@@ -11,7 +11,6 @@ app.use(cors());                // Allows frontend to communicate with backend
 app.use(express.json());        // Allows receiving JSON data
 
 // Secure MySQL Connection using 
-////work in progress////
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
