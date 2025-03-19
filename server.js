@@ -123,9 +123,10 @@ const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2
 // Start the Server
 app.listen(PORT, () => {
     console.log("Server is running!");
-    console.log(`Local:  ${localURL}/data`);
-    console.log(`Azure:  ${azureURL}/data\n`);
+    console.log(`Local:  ${localURL}/api/data`);  // Fix: add `/api`
+    console.log(`Azure:  ${azureURL}/api/data\n`);  //add `/api`
 });
+
 
 
 
