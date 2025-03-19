@@ -35,6 +35,11 @@ db.connect(err => {
     console.log("Connected to MySQL database");
 });
 
+app.get('/test', (req, res) => {
+    res.send("✅ Test route is working!");
+});
+
+
 // API Route to Fetch Data from Database
 app.get('/api/data', (req, res) => {
     //db.query("SELECT * FROM table", (err, results) => {
@@ -49,8 +54,15 @@ app.get('/api/data', (req, res) => {
     });
 });
 
-//port is dynamic
-const PORT = process.env.PORT || 3000;  // Allow dynamic port for deployment
+// Dynamic port for deployment
+const PORT = process.env.PORT || 3000;
+
+console.log("🛠️ Starting Node.js server...");
+console.log("📡 Listening on port:", PORT);
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+//8080
+//3000
