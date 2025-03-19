@@ -51,12 +51,6 @@ app.get('/api/data', (req, res) => {
 
 // Dynamic port for deployment
 //const PORT = process.env.PORT || 3000;
-const PORT = process.env.PORT || 8080;  // Use 8080 as fallback
-
-
-
-console.log("🛠️ Starting Node.js server...");
-console.log("📡 Listening on port:", PORT);
 
 /*
 app.listen(PORT, () => {
@@ -64,9 +58,12 @@ app.listen(PORT, () => {
 });
 */
 
+const PORT = process.env.PORT || 8080;
+
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port: http://localhost:${PORT}`);
+    console.log(`✅ Server running on port: ${PORT}`);
 });
+
 
 
 
