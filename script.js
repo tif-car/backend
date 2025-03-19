@@ -29,17 +29,32 @@ window.onload = fetchData;
 //Default domain:  zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net
 
 */
-const localAPI = "http://localhost:8080/api/data"; // Now using port 8080
-const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api/data"; // Azure backend
+const localAPI = "http://localhost:8080/api"; // Local API URL
+const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api"; // Azure backend URL
 
-// Detect environment dynamically
+// Dynamically detect the environment
 const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
 
-fetch(API_URL)
-    .then(response => response.json())
-    .then(data => {
-        console.log("Fetched data:", data);
-        document.getElementById("output").innerText = JSON.stringify(data, null, 2);
-    })
-    .catch(error => console.error("Error fetching data:", error));
+// Static email for the request
+const email = "employee1@email.com";
+
+// Function to fetch role type for the predefined email
+function fetchRole() {
+    const url = `${API_URL}/getUserRole?email=${encodeURIComponent(email)}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("output").innerText = `Error: ${data.error}`;
+            } else {
+                document.getElementById("output").innerText = `Role for ${email} is: ${data.role_type}`;
+            }
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+// Call the function when the page loads
+fetchRole();
+
 
