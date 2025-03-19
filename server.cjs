@@ -34,10 +34,6 @@ db.connect(err => {
     console.log("Connected to MySQL database");
 });
 
-app.get('/test', (req, res) => {
-    res.send("✅ Test route is working!");
-});
-
 
 // API Route to Fetch Data from Database
 app.get('/api/data', (req, res) => {
@@ -59,13 +55,10 @@ const PORT = process.env.PORT || 3000;
 console.log("🛠️ Starting Node.js server...");
 console.log("📡 Listening on port:", PORT);
 
-/*
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-*/
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
+
 
