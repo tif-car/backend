@@ -71,4 +71,10 @@ jobs:
           app-name: 'zooproject'
           slot-name: 'Production'
           package: .
+
+      - name: Start Node.js server
+        run: |
+          npm install
+          npm start
+
           
