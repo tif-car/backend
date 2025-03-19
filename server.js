@@ -69,7 +69,7 @@ app.listen(PORT, '0.0.0.0', () => {
 */
 
 import express from 'express';
-import mysql from 'mysql'; 
+import mysql from 'mysql2'; 
 import cors from 'cors';
 import dotenv from 'dotenv';
 import os from 'os';
@@ -117,7 +117,8 @@ const localIP = Object.values(os.networkInterfaces())
     .find((iface) => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
 
 const localURL = `http://${localIP}:${PORT}`;
-const azureURL = `https://${process.env.AZURE_WEB_APP_DOMAIN || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
+//const azureURL = `https://${process.env.AZURE_WEB_APP_DOMAIN || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
+const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
 
 // Start the Server
 app.listen(PORT, () => {
