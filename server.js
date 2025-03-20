@@ -6,6 +6,7 @@ import fs from 'fs';
 import url from 'url';
 import cors from "cors";
 
+
 dotenv.config();
 
 // Create a CORS middleware
@@ -45,9 +46,11 @@ const routes = {
     "/api/getUserRole": (req, res, queryParams) => {
         const email = queryParams.email;
 
-        // Static email for the request
-        if (email !== 'employee1@email.com') {
-            return sendResponse(res, 400, { error: "Invalid email" });
+        console.log("Received email parameter:", email); // Debugging log
+
+        // Validate email input
+        if (!email) {
+            return sendResponse(res, 400, { error: "Email parameter is required" });
         }
 
         // Updated SQL query based on new structure
@@ -57,8 +60,13 @@ const routes = {
                      WHERE e.email = ?`;
 
         db.query(sql, [email], (err, result) => {
-            if (err) return sendResponse(res, 500, { error: "Database error" });
-            if (result.length === 0) return sendResponse(res, 404, { error: "User not found" });
+            if (err) {
+                console.error("Database query error:", err); // Log database errors
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+            if (result.length === 0) {
+                return sendResponse(res, 404, { error: "User not found" });
+            }
 
             sendResponse(res, 200, { role_type: result[0].role_types });
         });
@@ -76,15 +84,15 @@ function sendResponse(res, statusCode, data) {
 // **Create the HTTP server with CORS and dynamic routing**
 const server = http.createServer((req, res) => {
     corsMiddleware(req, res, () => {
-    // **Handle API Routes**
-    const parsedUrl = url.parse(req.url, true);
-    const routeHandler = routes[parsedUrl.pathname];
+        // **Handle API Routes**
+        const parsedUrl = url.parse(req.url, true);
+        const routeHandler = routes[parsedUrl.pathname];
 
-    if (routeHandler) {
-        routeHandler(req, res, parsedUrl.query);
-    } else {
-        sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
-    }
+        if (routeHandler) {
+            routeHandler(req, res, parsedUrl.query);
+        } else {
+            sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
+        }
     });
 });
 
@@ -105,8 +113,6 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
-
-
 
 
 
