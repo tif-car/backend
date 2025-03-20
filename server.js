@@ -70,12 +70,15 @@ server.listen(PORT, '0.0.0.0', () => {
 });
 
 */
+
+
 import http from 'http';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import os from 'os';
 import fs from 'fs';
 import url from 'url';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -105,7 +108,16 @@ db.connect(err => {
     console.log("Connected to MySQL Database");
 });
 
-// **Dynamic Route Handlers**
+// CORS Middleware
+const corsMiddleware = cors({
+    origin: [
+        "https://zooteam7.netlify.app", // Update with actual frontend URL
+        "http://localhost:5173" // Local development
+    ],
+    optionsSuccessStatus: 200,
+});
+
+// Dynamic Route Handlers
 const routes = {
     "/api/getUserRole": (req, res, queryParams) => {
         const email = queryParams.email;
@@ -132,38 +144,29 @@ const routes = {
     // Other routes here...
 };
 
-// **Helper function to send JSON responses**
+// Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(data));
 }
 
-// **Create the HTTP server with CORS and dynamic routing**
+// Create the HTTP server with CORS and dynamic routing
 const server = http.createServer((req, res) => {
-    // 🔹 **Set CORS Headers**
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // Apply CORS middleware
+    corsMiddleware(req, res, () => {
+        // Handle API Routes
+        const parsedUrl = url.parse(req.url, true);
+        const routeHandler = routes[parsedUrl.pathname];
 
-    // 🔹 **Handle preflight (OPTIONS request)**
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
-
-    // **Handle API Routes**
-    const parsedUrl = url.parse(req.url, true);
-    const routeHandler = routes[parsedUrl.pathname];
-
-    if (routeHandler) {
-        routeHandler(req, res, parsedUrl.query);
-    } else {
-        sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
-    }
+        if (routeHandler) {
+            routeHandler(req, res, parsedUrl.query);
+        } else {
+            sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
+        }
+    });
 });
 
-// **Determine Local & Azure URLs**
+// Determine Local & Azure URLs
 const PORT = process.env.PORT || 8080;
 const localIP = Object.values(os.networkInterfaces())
     .flat()
@@ -172,7 +175,7 @@ const localIP = Object.values(os.networkInterfaces())
 const localURL = `http://${localIP}:${PORT}`;
 const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
 
-// **Start the server**
+// Start the server
 server.listen(PORT, '0.0.0.0', () => {
     console.log("Server is running!");
     Object.keys(routes).forEach(route => {
@@ -180,6 +183,7 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
+
 
 
 
