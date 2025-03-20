@@ -76,8 +76,15 @@ import dotenv from 'dotenv';
 import os from 'os';
 import fs from 'fs';
 import url from 'url';
+const cors  = require('cors');
 
 dotenv.config();
+
+// Create a CORS middleware
+const corsMiddleware = cors({
+	origin: ["https://frontend-blond-five.vercel.app", "http://localhost:5173"],
+	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+});
 
 // Load SSL Certificate for Azure MySQL
 const sslCertPath = './BaltimoreCyberTrustRoot.crt.pem';
@@ -140,18 +147,7 @@ function sendResponse(res, statusCode, data) {
 
 // **Create the HTTP server with CORS and dynamic routing**
 const server = http.createServer((req, res) => {
-    // 🔹 **Set CORS Headers**
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    // 🔹 **Handle preflight (OPTIONS request)**
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
-
+    corsMiddleware(req, res, () => {
     // **Handle API Routes**
     const parsedUrl = url.parse(req.url, true);
     const routeHandler = routes[parsedUrl.pathname];
@@ -161,6 +157,7 @@ const server = http.createServer((req, res) => {
     } else {
         sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
     }
+    });
 });
 
 // **Determine Local & Azure URLs**
