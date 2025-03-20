@@ -109,18 +109,23 @@ db.connect(err => {
 const routes = {
     "/api/getUserRole": (req, res, queryParams) => {
         const email = queryParams.email;
-        
+
         // Static email for the request
         if (email !== 'employee1@email.com') {
             return sendResponse(res, 400, { error: "Invalid email" });
         }
 
-        const sql = `SELECT r.role_type FROM employee e JOIN role r ON e.role_ID = r.role_ID WHERE e.email = ?`;
+        // Updated SQL query based on new structure
+        const sql = `SELECT r.role_types 
+                     FROM employee e 
+                     JOIN role r ON e.Role = r.role_typeID 
+                     WHERE e.email = ?`;
+
         db.query(sql, [email], (err, result) => {
             if (err) return sendResponse(res, 500, { error: "Database error" });
             if (result.length === 0) return sendResponse(res, 404, { error: "User not found" });
 
-            sendResponse(res, 200, { role_type: result[0].role_type });
+            sendResponse(res, 200, { role_type: result[0].role_types });
         });
     },
 
@@ -133,6 +138,7 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
+
 // **Create the HTTP server with dynamic routing**
 const server = http.createServer((req, res) => {
     const parsedUrl = url.parse(req.url, true);
@@ -141,9 +147,12 @@ const server = http.createServer((req, res) => {
     if (routeHandler) {
         routeHandler(req, res, parsedUrl.query);
     } else {
-        sendResponse(res, 404, { error: "Route not found" });
+        sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct. " });
     }
 });
+
+
+
 
 // **Determine Local & Azure URLs**
 const PORT = process.env.PORT || 8080;
@@ -162,6 +171,7 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
+
 
 
 

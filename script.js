@@ -29,6 +29,10 @@ window.onload = fetchData;
 //Default domain:  zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net
 
 */
+
+//version 2
+
+/*
 const localAPI = "http://localhost:8080/api"; // Local API URL
 const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api"; // Azure backend URL
 
@@ -48,13 +52,50 @@ function fetchRole() {
             if (data.error) {
                 document.getElementById("output").innerText = `Error: ${data.error}`;
             } else {
-                document.getElementById("output").innerText = `Role for ${email} is: ${data.role_type}`;
+                document.getElementById("output").innerText = `Role for ${email} is: ${data.role_types}`;
             }
         })
-        .catch(error => console.error("Error fetching data:", error));
+        .catch(error => console.error("Error fetching data:", error));    
+
 }
 
 // Call the function when the page loads
 fetchRole();
+*/
 
+const localAPI = "http://localhost:8080/api"; // Local API URL
+const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net/api"; // Azure backend URL
+
+// Dynamically detect the environment
+const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
+
+// Static email for the request
+const email = "employee1@email.com";
+
+// Construct the API endpoint **once**
+const requestURL = `${API_URL}/getUserRole?email=${encodeURIComponent(email)}`;
+
+// Function to fetch role type for the predefined email
+function fetchRole() {
+    fetch(requestURL, {
+        headers: { "Accept": "application/json" } // Ensure JSON response
+    })
+    .then(response => {
+        console.log("Response headers:", response.headers);
+        return response.json();
+    })
+    .then(data => {
+        console.log("Fetched data:", data); // Log the full response for debugging
+
+        if (data.error) {
+            document.getElementById("output").innerText = `Error: ${data.error}`;
+        } else {
+            document.getElementById("output").innerText = `Role for ${email} is: ${data.role_types}`;
+        }
+    })
+    .catch(error => console.error("Error fetching data:", error));
+}
+
+// Call the function when the page loads
+fetchRole();
 
