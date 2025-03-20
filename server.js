@@ -76,7 +76,7 @@ import dotenv from 'dotenv';
 import os from 'os';
 import fs from 'fs';
 import url from 'url';
-const cors  = require('cors');
+import cors from "cors";
 
 dotenv.config();
 
