@@ -6,6 +6,7 @@ const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites
 // Dynamically detect the environment
 const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
 
+/*
 //email for the request
 function fetchRole() {
     const email = document.getElementById("emailInput").value.trim();
@@ -28,11 +29,11 @@ function fetchRole() {
         .catch(error => console.error("Error fetching data:", error));
 }
 
+*/
 
-/*
 // Automatically fetch role when the page loads
 document.addEventListener("DOMContentLoaded", () => {
-    const email = "John.doe@email.com"; // Manually set the email here
+    const email = "john.doe@email.com"; // Manually set the email here
 
     const emailInput = document.getElementById("emailInput");
     if (emailInput) emailInput.value = email; // Pre-fill the input field
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => console.error("Error fetching data:", error));
 });
-*/
+
 
 // Call the function when the page loads
 //fetchRole();
