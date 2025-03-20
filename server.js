@@ -138,21 +138,30 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-
-// **Create the HTTP server with dynamic routing**
+// **Create the HTTP server with CORS and dynamic routing**
 const server = http.createServer((req, res) => {
+    // 🔹 **Set CORS Headers**
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    // 🔹 **Handle preflight (OPTIONS request)**
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    // **Handle API Routes**
     const parsedUrl = url.parse(req.url, true);
     const routeHandler = routes[parsedUrl.pathname];
 
     if (routeHandler) {
         routeHandler(req, res, parsedUrl.query);
     } else {
-        sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct. " });
+        sendResponse(res, 404, { error: "Route not found. Ensure the endpoint is correct." });
     }
 });
-
-
-
 
 // **Determine Local & Azure URLs**
 const PORT = process.env.PORT || 8080;
@@ -171,6 +180,7 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
+
 
 
 
