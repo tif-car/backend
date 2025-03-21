@@ -3,8 +3,8 @@ import http from 'http';
 import url from 'url';
 import dotenv from 'dotenv';
 import cors from "cors";
-import os from "os";
-import userRoutes from "./routes/userRoute.js";  // Import user routes
+import os from "os"; // Ensure 'os' module is imported
+import getRole from "./controllers/testing.js";
 
 dotenv.config();
 
@@ -14,8 +14,12 @@ const corsMiddleware = cors({
 	optionsSuccessStatus: 200,
 });
 
-// **Register All Routes**
-const routes = { ...userRoutes };  // Merge all routes
+// **Dynamic Route Handlers**
+const routes = {
+    "/api/getUserRole": (req, res) => {
+        getRole(req,res);
+    },
+};
 
 // **Helper function to handle requests**
 const server = http.createServer((req, res) => {
