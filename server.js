@@ -123,8 +123,8 @@ import http from 'http';
 import url from 'url';
 import dotenv from 'dotenv';
 import cors from "cors";
-import db from "./db.js";
 import os from "os"; // Ensure 'os' module is imported
+import getRole from "./controllers/testing.js";
 
 dotenv.config();
 
@@ -136,32 +136,8 @@ const corsMiddleware = cors({
 
 // **Dynamic Route Handlers**
 const routes = {
-    "/api/getUserRole": (req, res, queryParams) => {
-        const email = queryParams.email;
-
-        console.log("Received email parameter:", email); // Debugging log
-
-        if (!email) {
-            return sendResponse(res, 400, { error: "Email parameter is required" });
-        }
-
-        // Updated SQL query
-        const sql = `SELECT r.role_types 
-                     FROM employee e 
-                     JOIN role_type r ON e.Role = r.role_typeID 
-                     WHERE e.email = ?`;
-
-        db.query(sql, [email], (err, result) => {
-            if (err) {
-                console.error("Database query error:", err);
-                return sendResponse(res, 500, { error: "Database error" });
-            }
-            if (result.length === 0) {
-                return sendResponse(res, 404, { error: "User not found" });
-            }
-
-            sendResponse(res, 200, { role_type: result[0].role_types });
-        });
+    "/api/getUserRole": (req, res) => {
+        getRole(req,res);
     },
 };
 
