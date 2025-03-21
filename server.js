@@ -123,7 +123,8 @@ import http from 'http';
 import url from 'url';
 import dotenv from 'dotenv';
 import cors from "cors";
-import db from "./db.js"; // Import the database connection
+import db from "./db.js";
+import os from "os"; // Ensure 'os' module is imported
 
 dotenv.config();
 
@@ -132,6 +133,15 @@ const corsMiddleware = cors({
 	origin: ["https://frontend-blond-five.vercel.app", "http://localhost:5173"],
 	optionsSuccessStatus: 200,
 });
+
+// **Determine Local & Azure URLs**
+const PORT = process.env.PORT || 8080;
+const localIP = Object.values(os.networkInterfaces())
+    .flat()
+    .find(iface => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
+
+const localURL = `http://${localIP}:${PORT}`;
+const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
 
 // **Dynamic Route Handlers**
 const routes = {
@@ -185,10 +195,14 @@ const server = http.createServer((req, res) => {
 });
 
 // **Start the server**
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+    console.log("Server is running!");
+    Object.keys(routes).forEach(route => {
+        console.log(`Local:  ${localURL}${route}`);
+        console.log(`Azure:  ${azureURL}${route}\n`);
+    });
 });
+
 
 
 
