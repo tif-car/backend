@@ -1,10 +1,9 @@
 import http from 'http';
-import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import os from 'os';
-import fs from 'fs';
 import url from 'url';
 import cors from "cors";
+import { getRole } from './controllers/testing';
 
 
 dotenv.config();
@@ -15,63 +14,11 @@ const corsMiddleware = cors({
 	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 });
 
-// Load SSL Certificate for Azure MySQL
-const sslCertPath = './BaltimoreCyberTrustRoot.crt.pem';
-const sslCert = fs.readFileSync(sslCertPath);
-
-// MySQL Connection with SSL
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    ssl: {
-        ca: sslCert,
-        rejectUnauthorized: false
-    }
-});
-
-// Connect to MySQL
-db.connect(err => {
-    if (err) {
-        console.error("Database connection failed:", err);
-        return;
-    }
-    console.log("Connected to MySQL Database");
-});
-
 // **Dynamic Route Handlers**
 const routes = {
-    "/api/getUserRole": (req, res, queryParams) => {
-        const email = queryParams.email;
-
-        console.log("Received email parameter:", email); // Debugging log
-
-        // Validate email input
-        if (!email) {
-            return sendResponse(res, 400, { error: "Email parameter is required" });
-        }
-
-        // Updated SQL query based on new structure
-        const sql = `SELECT r.role_types 
-                     FROM employee e 
-                     JOIN role r ON e.Role = r.role_typeID 
-                     WHERE e.email = ?`;
-
-        db.query(sql, [email], (err, result) => {
-            if (err) {
-                console.error("Database query error:", err); // Log database errors
-                return sendResponse(res, 500, { error: "Database error" });
-            }
-            if (result.length === 0) {
-                return sendResponse(res, 404, { error: "User not found" });
-            }
-
-            sendResponse(res, 200, { role_type: result[0].role_types });
-        });
+    "/api/getUserRole": (req, res) => {
+        getRole(req, res);
     },
-
     // Other routes here...
 };
 
