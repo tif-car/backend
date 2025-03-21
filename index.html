@@ -3,17 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch User Role</title>
+    <title>User Login & Role Fetch</title>
+    <style>
+        .error {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+        }
+    </style>
 </head>
 <body>
-    <h2>Enter Email to Get Role</h2>
+    <h2>Login</h2>
     <input type="text" id="emailInput" placeholder="Enter email">
+    <input type="password" id="passwordInput" placeholder="Enter password">
+    <button id="loginButton">Login</button>
+
+    <h2>Fetch User Role</h2>
     <button onclick="fetchRole()">Get Role</button>
-    
-    <h3>Role:</h3>
-    <pre id="output"></pre> <!-- Updated to match script.js ID -->
+
+    <h3>Response:</h3>
+    <pre id="output"></pre> <!-- Matches script.js ID -->
 
     <script src="script.js"></script>
 </body>
 </html>
+
 

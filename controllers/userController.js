@@ -1,10 +1,11 @@
 import db from "../db.js";
 
-const getUserRole = (req, res, queryParams) => {
-    const email = queryParams.email;
+const getUserRole = (req, res) => {
+    if (req.method !== "GET") {
+        return sendResponse(res, 405, { error: "Method Not Allowed. Use GET instead." });
+    }
 
-    console.log("Received email parameter:", email); // Debugging log
-
+    const email = req.url.split("?email=")[1]; // Extract email from URL query params
     if (!email) {
         return sendResponse(res, 400, { error: "Email parameter is required" });
     }
@@ -27,9 +28,9 @@ const getUserRole = (req, res, queryParams) => {
     });
 };
 
-// Define sendResponse function inside this file
+// Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.writeHead(statusCode, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data));
 }
 
