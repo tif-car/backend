@@ -28,11 +28,12 @@ function loginUser() {
             document.getElementById("output").innerText = `Error: ${data.error}`;
         } else {
             console.log("Login successful!");
-            document.getElementById("output").innerText = `Login successful! Role: ${data.role_type}`;
+            document.getElementById("output").innerText = `Login successful! Role: ${data.role_types}`;
             localStorage.setItem("userEmail", email); // Store email for role checking
+            localStorage.setItem("userPassword", password); // Store password for role checking
 
             // **Fetch user role after successful login**
-            fetchRole(email);
+            fetchRole(email, password);
         }
     })
     .catch(error => {
@@ -42,12 +43,13 @@ function loginUser() {
 }
 
 // **Function to fetch user role**
-function fetchRole(email) {
-    if (!email) {
+function fetchRole(email, password) {
+    if (!email || !password) {
         email = localStorage.getItem("userEmail"); // Retrieve from storage if missing
-        if (!email) {
-            console.error("fetchRole() Error: No email provided.");
-            document.getElementById("output").innerText = "Error: No email found.";
+        password = localStorage.getItem("userPassword");
+        if (!email || !password) {
+            console.error("fetchRole() Error: Missing email or password.");
+            document.getElementById("output").innerText = "Error: No email or password found.";
             return;
         }
     }
@@ -62,7 +64,7 @@ function fetchRole(email) {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({ email }) // Send email in the body
+        body: JSON.stringify({ email, password }) // Send both email and password
     })
     .then(response => response.json())
     .then(data => {

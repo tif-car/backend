@@ -58,24 +58,13 @@ import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
-//import userRoutes from "./routes/userRoute.js";
-import loginRoutes from "./routes/loginRoute.js";
-import userRoleRoute from "./routes/getUserRoleRoute.js"; // Import the new user role route
+import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
 
 dotenv.config();
 
 // **Register All Routes**
 const routes = {
-   // ...userRoutes,
-    ...loginRoutes,
-    "/api/getUserRole": (req, res) => {
-        if (req.method === "POST") {
-            userRoleRoute(req, res);
-        } else {
-            res.writeHead(405, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Method Not Allowed" }));
-        }
-    }
+    ...authRoutes // This automatically handles "/api/getUserRole"
 };
 
 // **Helper function to handle requests**
@@ -120,6 +109,7 @@ server.listen(PORT, "0.0.0.0", () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
+
 
 
 
