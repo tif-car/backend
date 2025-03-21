@@ -54,30 +54,38 @@ server.listen(PORT, '0.0.0.0', () => {
     });
 });
 */
-
 import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
-import userRoutes from "./routes/userRoute.js";
+//import userRoutes from "./routes/userRoute.js";
 import loginRoutes from "./routes/loginRoute.js";
+import userRoleRoute from "./routes/getUserRoleRoute.js"; // Import the new user role route
 
 dotenv.config();
 
 // **Register All Routes**
 const routes = {
-    ...userRoutes,
-    ...loginRoutes
+   // ...userRoutes,
+    ...loginRoutes,
+    "/api/getUserRole": (req, res) => {
+        if (req.method === "POST") {
+            userRoleRoute(req, res);
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed" }));
+        }
+    }
 };
 
 // **Helper function to handle requests**
 const server = http.createServer((req, res) => {
     // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "https://frontend-blond-five.vercel.app, http://localhost:5173");
+    res.setHeader("Access-Control-Allow-Origin", "https://frontend-blond-five.vercel.app");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    // Handle preflight requests
+    // Handle preflight requests properly
     if (req.method === "OPTIONS") {
         res.writeHead(204);
         res.end();
@@ -88,7 +96,7 @@ const server = http.createServer((req, res) => {
     const routeHandler = routes[parsedUrl.pathname];
 
     if (routeHandler) {
-        routeHandler(req, res, parsedUrl.query);  // Let each route handle its own HTTP method
+        routeHandler(req, res, parsedUrl.query);
     } else {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Route not found. Ensure the endpoint is correct." }));
@@ -112,6 +120,9 @@ server.listen(PORT, "0.0.0.0", () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
+
+
+
 
 
 

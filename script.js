@@ -4,14 +4,14 @@ const azureAPI = "https://zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites
 // Dynamically detect the environment
 const API_URL = window.location.hostname === "localhost" ? localAPI : azureAPI;
 
-// For static testing
+// **Function to log in a user**
 function loginUser() {
     const email = "john.doe@email.com";  // Hardcoded test email
     const password = "hashed_password1"; // Hardcoded test password
 
     const requestURL = `${API_URL}/login`;
 
-    console.log(`Logging in with: ${email}`);
+    console.log(`Attempting login with: ${email}`);
 
     fetch(requestURL, {
         method: "POST",
@@ -27,11 +27,11 @@ function loginUser() {
             console.error(`Login error: ${data.error}`);
             document.getElementById("output").innerText = `Error: ${data.error}`;
         } else {
-            console.log("Login successful, fetching role...");
+            console.log("Login successful!");
             document.getElementById("output").innerText = `Login successful! Role: ${data.role_type}`;
-            localStorage.setItem("userRole", data.role_type);
+            localStorage.setItem("userEmail", email); // Store email for role checking
 
-            // Fetch user role after successful login
+            // **Fetch user role after successful login**
             fetchRole(email);
         }
     })
@@ -41,22 +41,28 @@ function loginUser() {
     });
 }
 
+// **Function to fetch user role**
 function fetchRole(email) {
     if (!email) {
-        console.error("fetchRole() Error: No email provided.");
-        return;
+        email = localStorage.getItem("userEmail"); // Retrieve from storage if missing
+        if (!email) {
+            console.error("fetchRole() Error: No email provided.");
+            document.getElementById("output").innerText = "Error: No email found.";
+            return;
+        }
     }
 
-    // Send email in the query string using a GET request
-    const requestURL = `${API_URL}/loginUser?email=${encodeURIComponent(email)}`;
+    const requestURL = `${API_URL}/getUserRole`; // Backend route
 
-    console.log(`Fetching role from: ${requestURL}`); // Debugging log
+    console.log(`Fetching role for: ${email}`);
 
     fetch(requestURL, {
-        method: "GET",
+        method: "POST", 
         headers: {
+            "Content-Type": "application/json",
             "Accept": "application/json"
-        }
+        },
+        body: JSON.stringify({ email }) // Send email in the body
     })
     .then(response => response.json())
     .then(data => {
@@ -64,17 +70,17 @@ function fetchRole(email) {
             console.error(`Error fetching role: ${data.error}`);
             document.getElementById("output").innerText = `Error: ${data.error}`;
         } else {
-            document.getElementById("output").innerText = `Role for ${email} is: ${data.role_type}`;
+            console.log(`Role retrieved: ${data.role_types}`);
+            document.getElementById("output").innerText = `Role for ${email}: ${data.role_types}`;
         }
     })
-    .catch(error => console.error("Error fetching data:", error));
+    .catch(error => {
+        console.error("Error fetching role:", error);
+        document.getElementById("output").innerText = "Failed to retrieve role.";
+    });
 }
 
-// Run loginUser() automatically when the page loads
+// Run `loginUser()` automatically when the page loads
 document.addEventListener("DOMContentLoaded", () => {
     loginUser();
 });
-
-/*for testing
-http://192.168.1.210:8080/api/loginUser?email=john.doe@email.com
-*/
