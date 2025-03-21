@@ -134,15 +134,6 @@ const corsMiddleware = cors({
 	optionsSuccessStatus: 200,
 });
 
-// **Determine Local & Azure URLs**
-const PORT = process.env.PORT || 8080;
-const localIP = Object.values(os.networkInterfaces())
-    .flat()
-    .find(iface => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
-
-const localURL = `http://${localIP}:${PORT}`;
-const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
-
 // **Dynamic Route Handlers**
 const routes = {
     "/api/getUserRole": (req, res, queryParams) => {
@@ -193,6 +184,17 @@ const server = http.createServer((req, res) => {
         }
     });
 });
+
+
+// **Determine Local & Azure URLs**
+const PORT = process.env.PORT || 8080;
+const localIP = Object.values(os.networkInterfaces())
+    .flat()
+    .find(iface => iface && iface.family === 'IPv4' && !iface.internal)?.address || 'localhost';
+
+const localURL = `http://${localIP}:${PORT}`;
+const azureURL = `https://${process.env.WEBSITE_HOSTNAME || 'zooproject-aqbue2e2e3cbh9ek.centralus-01.azurewebsites.net'}`;
+
 
 // **Start the server**
 server.listen(PORT, '0.0.0.0', () => {
