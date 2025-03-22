@@ -1,7 +1,7 @@
 import dbConnection from "../db.js";
 //import bcrypt from "bcrypt";
 
-// Login function taken from the testing.js
+// Login function that handles authentication and returns role and ID
 const loginUser = (req, res) => {
     const { email, password } = req.body || {};
 
@@ -12,35 +12,46 @@ const loginUser = (req, res) => {
         return sendResponse(res, 400, { error: "Email and password are required" });
     }
 
-    const sqlE = `select r.role_types, e.password
-                from employee e
-                join role_type r on e.Role = r.role_typeID
-                where e.email = ?`;
+    // Query to check employee credentials and get role
+    const sqlE = `SELECT e.employee_ID, r.role_types, r.role_typeID, e.password
+                FROM employee e
+                JOIN role_type r ON e.Role = r.role_typeID
+                WHERE e.email = ?`;
 
-    const sqlV = `select v.password
-                from visitor v
-                where v.email = ?`;            
+    // Query to check visitor/member credentials
+    const sqlV = `SELECT v.visitor_ID, v.password
+                FROM visitor v
+                WHERE v.email = ?`;            
                                 
-
+    // First check if the user is an employee
     dbConnection.query(sqlE, [email], (err, result) => {
         if (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
+        
         if (result.length === 0) {
-            dbConnection.query(sqlV, [email], (err, result) => {
+            // Not an employee, check if they're a visitor/member
+            dbConnection.query(sqlV, [email], (err, visitorResult) => {
                 if(err){
                     console.error("Database query error:", err);
                     return sendResponse(res, 500, { error: "Database error" });
                 }
-                if (result.length === 0) {
+                
+                if (visitorResult.length === 0) {
                     console.log("User not found");
                     return sendResponse(res, 404, { error: "User not found" });
                 }
         
-                if (password === result[0].password) {
-                    console.log("Sending role: member");
-                    sendResponse(res, 200, { user_type: "member" });
+                // Check visitor password
+                if (password === visitorResult[0].password) {
+                    console.log("Successful login as member");
+                    // Return role 0 for member and visitor_ID
+                    sendResponse(res, 200, { 
+                        id: visitorResult[0].visitor_ID, 
+                        role: 0,  // 0 represents member role
+                        role_name: "member" 
+                    });
                 } else {
                     sendResponse(res, 401, { error: "Invalid login credentials" });
                 }
@@ -48,9 +59,23 @@ const loginUser = (req, res) => {
             return;
         }
 
+        // Check employee password
         if (password === result[0].password) {
-            console.log("Sending role:", result[0].role_types);
-            sendResponse(res, 200, { user_type: result[0].role_types });
+            console.log("Successful login as employee with role:", result[0].role_types);
+            
+            // Determine numeric role value
+            let roleValue = 1; // Default for regular employee
+            
+            // If admin role, set to 2
+            if (result[0].role_types.toLowerCase().includes("admin")) {
+                roleValue = 2;
+            }
+            
+            sendResponse(res, 200, { 
+                id: result[0].employee_ID, 
+                role: roleValue,
+                role_name: result[0].role_types
+            });
         } else {
             sendResponse(res, 401, { error: "Invalid login credentials" });
         }
@@ -78,16 +103,47 @@ const getUserRole = (req, res) => {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
+        
         if (result.length === 0) {
-            console.log("User not found.");
-            return sendResponse(res, 404, { error: "User not found." });
+            // Check if user is a visitor/member
+            const visitorSql = `SELECT v.visitor_ID
+                               FROM visitor v
+                               WHERE v.email = ?`;
+            
+            dbConnection.query(visitorSql, [email], (err, visitorResult) => {
+                if (err) {
+                    console.error("Database query error:", err);
+                    return sendResponse(res, 500, { error: "Database error" });
+                }
+                
+                if (visitorResult.length === 0) {
+                    console.log("User not found.");
+                    return sendResponse(res, 404, { error: "User not found." });
+                }
+                
+                // Return member role (0)
+                sendResponse(res, 200, {
+                    id: visitorResult[0].visitor_ID,
+                    role: 0,
+                    role_name: "member"
+                });
+            });
+            return;
         }
 
+        // Determine numeric role value
+        let roleValue = 1; // Default for regular employee
+            
+        // If admin role, set to 2
+        if (result[0].role_types.toLowerCase().includes("admin")) {
+            roleValue = 2;
+        }
+        
         console.log("Sending employee_ID and role:", result[0].employee_ID, result[0].role_types);
         sendResponse(res, 200, {
-            employee_ID: result[0].employee_ID,
-            role_typeID: result[0].role_typeID,
-            role_types: result[0].role_types
+            id: result[0].employee_ID,
+            role: roleValue,
+            role_name: result[0].role_types
         });
     });
 };
