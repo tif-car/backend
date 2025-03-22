@@ -1,5 +1,18 @@
+//The main function of authRoutes.js is to handle user authentication
 import authController from "../controllers/authController.js";
 
+/* 
+api/loginUser returns role_types and employee_ID.
+Frontend Needs to Send:
+Method: POST
+Request Body (JSON format):
+{
+  "email": "user@example.com",
+  "password": "userpassword"
+}
+*/
+
+//API endpoint is api/loginUser
 const authRoutes = {
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
