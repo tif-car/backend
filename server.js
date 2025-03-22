@@ -58,6 +58,7 @@ import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
+import cors from "cors";
 import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
 import employeeRoutes from "./routes/employeeRoute.js";
 
@@ -70,10 +71,27 @@ const routes = {
     ...employeeRoutes,  // Add employee routes here
 };
 
+const corsMiddleware = cors({
+	origin: ["https://frontend-blond-five.vercel.app", "http://localhost:5173"],
+	optionsSuccessStatus: 200,
+});
+
 // **Helper function to handle requests**
 const server = http.createServer((req, res) => {
-    // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "https://frontend-blond-five.vercel.app");
+    corsMiddleware(req, res, () => {
+        const parsedUrl = url.parse(req.url, true);
+        const routeHandler = routes[parsedUrl.pathname];
+
+        if (routeHandler) {
+            routeHandler(req, res, parsedUrl.query);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: "Route not found. Ensure the endpoint is correct." }));
+        }
+    });
+    /* 
+    // Set CORS headers //https://frontend-blond-five.vercel.app,
+    res.setHeader("Access-Control-Allow-Origin", " localhost:1573");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
@@ -93,6 +111,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Route not found. Ensure the endpoint is correct." }));
     }
+    */
 });
 
 // **Determine Local & Azure URLs**

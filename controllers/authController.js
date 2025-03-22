@@ -12,24 +12,45 @@ const loginUser = (req, res) => {
         return sendResponse(res, 400, { error: "Email and password are required" });
     }
 
-    const sql = `SELECT r.role_types, e.password
-                 FROM employee e 
-                 JOIN role_type r ON e.Role = r.role_typeID 
-                 WHERE e.email = ?`;
+    const sqlE = `select r.role_types, e.password
+                from employee e
+                join role_type r on e.Role = r.role_typeID
+                where e.email = ?`;
 
-    dbConnection.query(sql, [email], (err, result) => {
+    const sqlV = `select v.password
+                from visitor v
+                where v.email = ?`;            
+                                
+
+    dbConnection.query(sqlE, [email], (err, result) => {
         if (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
         if (result.length === 0) {
-            console.log("User not found");
-            return sendResponse(res, 404, { error: "User not found" });
+            dbConnection.query(sqlV, [email], (err, result) => {
+                if(err){
+                    console.error("Database query error:", err);
+                    return sendResponse(res, 500, { error: "Database error" });
+                }
+                if (result.length === 0) {
+                    console.log("User not found");
+                    return sendResponse(res, 404, { error: "User not found" });
+                }
+        
+                if (password === result[0].password) {
+                    console.log("Sending role: member");
+                    sendResponse(res, 200, { user_type: "member" });
+                } else {
+                    sendResponse(res, 401, { error: "Invalid login credentials" });
+                }
+            });
+            return;
         }
 
         if (password === result[0].password) {
             console.log("Sending role:", result[0].role_types);
-            sendResponse(res, 200, { role_types: result[0].role_types });
+            sendResponse(res, 200, { user_type: result[0].role_types });
         } else {
             sendResponse(res, 401, { error: "Invalid login credentials" });
         }
