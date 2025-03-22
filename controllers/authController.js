@@ -1,7 +1,7 @@
 import dbConnection from "../db.js";
 //import bcrypt from "bcrypt";
 
-// Login function
+// Login function taken from the testing.js
 const loginUser = (req, res) => {
     const { email, password } = req.body || {};
 
@@ -46,7 +46,8 @@ const getUserRole = (req, res) => {
         return sendResponse(res, 400, { error: "Email is required" });
     }
 
-    const sql = `SELECT r.role_typeID, r.role_types
+    //returns the employeeID, their role_type, and role_typeID
+    const sql = `SELECT e.employee_ID, r.role_typeID, r.role_types
                  FROM employee e 
                  JOIN role_type r ON e.Role = r.role_typeID 
                  WHERE e.email = ?`;
@@ -61,13 +62,15 @@ const getUserRole = (req, res) => {
             return sendResponse(res, 404, { error: "User not found." });
         }
 
-        console.log("Sending role:", result[0].role_types);
+        console.log("Sending employee_ID and role:", result[0].employee_ID, result[0].role_types);
         sendResponse(res, 200, {
+            employee_ID: result[0].employee_ID,
             role_typeID: result[0].role_typeID,
             role_types: result[0].role_types
         });
     });
 };
+
 
 // Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
