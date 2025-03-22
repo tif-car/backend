@@ -2,13 +2,20 @@
 import authController from "../controllers/authController.js";
 
 /* 
-api/loginUser returns role_types and employee_ID.
+api/loginUser returns user id and role information
 Frontend Needs to Send:
 Method: POST
 Request Body (JSON format):
 {
   "email": "user@example.com",
   "password": "userpassword"
+}
+
+Response Format:
+{
+  "id": 123,           // user ID (employee_ID or visitor_ID)
+  "role": 0,           // 0: member, 1: employee, 2: admin
+  "role_name": "member" // textual role description
 }
 */
 
