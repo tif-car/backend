@@ -169,7 +169,7 @@ const routes = {
         // Updated SQL query based on new structure
         const sql = `SELECT r.role_types 
                      FROM employee e 
-                     JOIN role r ON e.Role = r.role_typeID 
+                     JOIN role_type r ON e.Role = r.role_typeID 
                      WHERE e.email = ?`;
 
         db.query(sql, [email], (err, result) => {
