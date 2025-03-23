@@ -1,8 +1,9 @@
+//main file for backend
 import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
-import cors from "cors";
+import cors from "cors";   
 import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
 import employeeRoutes from "./routes/employeeRoute.js";
 import adminRoutes from "./routes/adminRoute.js";
