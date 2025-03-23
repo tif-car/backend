@@ -4,7 +4,7 @@ import url from "url";
 import dotenv from "dotenv";
 import os from "os";
 import cors from "cors";   
-import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
+//import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
 import employeeRoutes from "./routes/employeeRoute.js";
 import adminRoutes from "./routes/adminRoute.js";
 
@@ -12,7 +12,7 @@ dotenv.config();
 
 // **Register All Routes**
 const routes = {
-    ...authRoutes,
+    //...authRoutes,
     ...adminRoutes,
     ...employeeRoutes,  // Add employee routes here
 };
