@@ -13,7 +13,7 @@ const loginUser = (req, res) => {
     }
 
     // First check if email exists in employee table
-    const employeeQuery = `SELECT e.employee_ID, e.password, r.role_types, r.role_typeID
+    const employeeQuery = `SELECT e.employee_ID, e.password, r.role_types
                            FROM employee e
                            JOIN role_type r ON e.Role = r.role_typeID
                            WHERE e.email = ?`;
@@ -29,16 +29,10 @@ const loginUser = (req, res) => {
             if (password === employeeResult[0].password) {
                 // Determine role number - assuming role_typeID already has appropriate values
                 // If not, we need to map role_types to numbers (1 for employee, 2 for admin)
-                let roleNumber = 1; // Default to employee
-                
-                // Check if admin role
-                if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
-                    roleNumber = 2;
-                }
                 
                 return sendResponse(res, 200, { 
                     id: employeeResult[0].employee_ID,
-                    role: roleNumber,
+                    user_type: employeeResult[0].role_types,
                     message: "Login successful"
                 });
             } else {
@@ -63,7 +57,7 @@ const loginUser = (req, res) => {
                 if (password === visitorResult[0].password) {
                     return sendResponse(res, 200, { 
                         id: visitorResult[0].visitor_ID,
-                        role: 0, // 0 indicates member role
+                        user_type: "member",
                         message: "Login successful"
                     });
                 } else {

@@ -61,6 +61,7 @@ import os from "os";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js"; // Ensure authRoutes is correctly imported
 import employeeRoutes from "./routes/employeeRoute.js";
+import memberRoutes from "./routes/memberRoutes.js";
 
 
 dotenv.config();
@@ -69,6 +70,7 @@ dotenv.config();
 const routes = {
     ...authRoutes,
     ...employeeRoutes,  // Add employee routes here
+    ...memberRoutes,
 };
 
 const corsMiddleware = cors({
