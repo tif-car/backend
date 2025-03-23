@@ -1,114 +1,131 @@
 import dbConnection from "../db.js";
-//import bcrypt from "bcrypt";
 
 // Login function that authenticates users and returns role number
 const loginUser = (req, res) => {
-    const { email, password } = req.body || {};
-
-    console.log("Received email:", email);
-    console.log("Received password:", password);
-
-    if (!email || !password) {
-        return sendResponse(res, 400, { error: "Email and password are required" });
+    if (req.method !== "POST") {
+        return sendResponse(res, 405, { error: "Method Not Allowed. Use POST instead." });
     }
 
-    // First check if email exists in employee table
-    const employeeQuery = `SELECT e.employee_ID, e.password, r.role_types, r.role_typeID
-                           FROM employee e
-                           JOIN role_type r ON e.Role = r.role_typeID
-                           WHERE e.email = ?`;
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
 
-    dbConnection.query(employeeQuery, [email], (err, employeeResult) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
-        }
-        
-        // If found in employee table
-        if (employeeResult.length > 0) {
-            if (password === employeeResult[0].password) {
-                // Determine role number - assuming role_typeID already has appropriate values
-                // If not, we need to map role_types to numbers (1 for employee, 2 for admin)
-                let roleNumber = 1; // Default to employee
-                
-                // Check if admin role
-                if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
-                    roleNumber = 2;
-                }
-                
-                return sendResponse(res, 200, { 
-                    id: employeeResult[0].employee_ID,
-                    role: roleNumber,
-                    message: "Login successful"
-                });
-            } else {
-                return sendResponse(res, 401, { error: "Invalid password" });
+    req.on("end", () => {
+        try {
+            const { email, password } = JSON.parse(body);
+            console.log("Received email:", email);
+            console.log("Received password:", password);
+
+            if (!email || !password) {
+                return sendResponse(res, 400, { error: "Email and password are required" });
             }
-        } else {
-            // If not found in employee table, check visitor/member table
-            const memberQuery = `SELECT visitor_ID, password, email
-                               FROM visitor
-                               WHERE email = ?`;
-            
-            dbConnection.query(memberQuery, [email], (visitorErr, visitorResult) => {
-                if (visitorErr) {
-                    console.error("Database query error:", visitorErr);
+
+            // First check if email exists in employee table
+            const employeeQuery = `SELECT e.employee_ID, e.password, r.role_types, r.role_typeID
+                                   FROM employee e
+                                   JOIN role_type r ON e.Role = r.role_typeID
+                                   WHERE e.email = ?`;
+
+            dbConnection.query(employeeQuery, [email], (err, employeeResult) => {
+                if (err) {
+                    console.error("Database query error:", err);
                     return sendResponse(res, 500, { error: "Database error" });
                 }
-                
-                if (visitorResult.length === 0) {
-                    return sendResponse(res, 404, { error: "Email not found" });
-                }
-                
-                if (password === visitorResult[0].password) {
-                    return sendResponse(res, 200, { 
-                        id: visitorResult[0].visitor_ID,
-                        role: 0, // 0 indicates member role
-                        message: "Login successful"
-                    });
+
+                if (employeeResult.length > 0) {
+                    if (password === employeeResult[0].password) {
+                        let roleNumber = 1;
+                        if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
+                            roleNumber = 2;
+                        }
+                        return sendResponse(res, 200, { 
+                            id: employeeResult[0].employee_ID,
+                            role: roleNumber,
+                            message: "Login successful"
+                        });
+                    } else {
+                        return sendResponse(res, 401, { error: "Invalid password" });
+                    }
                 } else {
-                    return sendResponse(res, 401, { error: "Invalid password" });
+                    // If not found in employee table, check visitor/member table
+                    const memberQuery = `SELECT visitor_ID, password, email FROM visitor WHERE email = ?`;
+
+                    dbConnection.query(memberQuery, [email], (visitorErr, visitorResult) => {
+                        if (visitorErr) {
+                            console.error("Database query error:", visitorErr);
+                            return sendResponse(res, 500, { error: "Database error" });
+                        }
+
+                        if (visitorResult.length === 0) {
+                            return sendResponse(res, 404, { error: "Email not found" });
+                        }
+
+                        if (password === visitorResult[0].password) {
+                            return sendResponse(res, 200, { 
+                                id: visitorResult[0].visitor_ID,
+                                role: 0,
+                                message: "Login successful"
+                            });
+                        } else {
+                            return sendResponse(res, 401, { error: "Invalid password" });
+                        }
+                    });
                 }
             });
+        } catch (error) {
+            return sendResponse(res, 400, { error: "Invalid JSON format" });
         }
     });
 };
 
 // Get User Role function
 const getUserRole = (req, res) => {
-    const { email } = req.body || {};
-
-    console.log("Received email:", email);
-
-    if (!email) {
-        return sendResponse(res, 400, { error: "Email is required" });
+    if (req.method !== "POST") {
+        return sendResponse(res, 405, { error: "Method Not Allowed. Use POST instead." });
     }
 
-    //returns the employeeID, their role_type, and role_typeID
-    const sql = `SELECT e.employee_ID, r.role_typeID, r.role_types
-                 FROM employee e 
-                 JOIN role_type r ON e.Role = r.role_typeID 
-                 WHERE e.email = ?`;
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
 
-    dbConnection.query(sql, [email], (err, result) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
-        }
-        if (result.length === 0) {
-            console.log("User not found.");
-            return sendResponse(res, 404, { error: "User not found." });
-        }
+    req.on("end", () => {
+        try {
+            const { email } = JSON.parse(body);
+            console.log("Received email:", email);
 
-        console.log("Sending employee_ID and role:", result[0].employee_ID, result[0].role_types);
-        sendResponse(res, 200, {
-            employee_ID: result[0].employee_ID,
-            role_typeID: result[0].role_typeID,
-            role_types: result[0].role_types
-        });
+            if (!email) {
+                return sendResponse(res, 400, { error: "Email is required" });
+            }
+
+            const sql = `SELECT e.employee_ID, r.role_typeID, r.role_types
+                         FROM employee e 
+                         JOIN role_type r ON e.Role = r.role_typeID 
+                         WHERE e.email = ?`;
+
+            dbConnection.query(sql, [email], (err, result) => {
+                if (err) {
+                    console.error("Database query error:", err);
+                    return sendResponse(res, 500, { error: "Database error" });
+                }
+                if (result.length === 0) {
+                    console.log("User not found.");
+                    return sendResponse(res, 404, { error: "User not found." });
+                }
+
+                console.log("Sending employee_ID and role:", result[0].employee_ID, result[0].role_types);
+                sendResponse(res, 200, {
+                    employee_ID: result[0].employee_ID,
+                    role_typeID: result[0].role_typeID,
+                    role_types: result[0].role_types
+                });
+            });
+        } catch (error) {
+            return sendResponse(res, 400, { error: "Invalid JSON format" });
+        }
     });
 };
-
 
 // Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
@@ -116,4 +133,5 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
+// Export authentication functions
 export default { loginUser, getUserRole };
