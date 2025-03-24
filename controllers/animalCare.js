@@ -8,11 +8,12 @@ const getAnimalCareTasks = (req, res) => {
         return sendResponse(res, 400, { error: "Employee ID is required" });
     }
 
-    // Single query to get the animal name using JOIN between feeding_log and animal tables
+    // Query to get animal_ID, animal_name, habitat_ID, habitat_Name
     const sql = `
-        SELECT a.animal_name
+        SELECT a.animal_ID, a.animal_name, a.habitat_ID, h.Habitat_Name
         FROM feeding_log f
         JOIN animal a ON f.animal_ID = a.animal_ID
+        JOIN habitat h ON a.habitat_ID = h.Habitat_ID
         WHERE f.employee_ID = ?`;
 
     dbConnection.query(sql, [employee_ID], (err, result) => {
@@ -25,8 +26,15 @@ const getAnimalCareTasks = (req, res) => {
             return sendResponse(res, 404, { error: "No animal found for this employee." });
         }
 
-        const animalName = result[0].animal_name;
-        sendResponse(res, 200, { animal_name: animalName });
+        // Return all assigned animals with their details
+        const animals = result.map(row => ({
+            animal_ID: row.animal_ID,
+            animal_name: row.animal_name,
+            habitat_ID: row.habitat_ID,
+            habitat_name: row.Habitat_Name // New field added
+        }));
+
+        sendResponse(res, 200, { animals });
     });
 };
 
@@ -37,5 +45,3 @@ function sendResponse(res, statusCode, data) {
 }
 
 export default { getAnimalCareTasks };
-
-//work in progress

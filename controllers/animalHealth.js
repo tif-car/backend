@@ -1,5 +1,12 @@
 import dbConnection from "../db.js"; 
 
+/*
+Endpoints:
+- `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
+- `POST /api/createMedicalRecord`: Creates a new medical record entry based on `Animal_ID`, `Employee_ID`, `Checkup_Date`, `Diagnosis`, and `Treatment`.
+- `POST /api/editMedicalRecord`: Updates an existing medical record based on `Record_ID` and other relevant details.
+*/
+
 // Function to update the wellness status of an animal.
 // Frontend would need to include the animal_ID and wellness_status. Maybe from a dropdown box?
 const updateAnimalWellness = (req, res) => {

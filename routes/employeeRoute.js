@@ -10,17 +10,6 @@ Info:
   respective function from the corresponding controller.
 */
 
-/*
-Endpoints:
-- `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
-- `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
-- `POST /api/createMedicalRecord`: Creates a new medical record entry based on `Animal_ID`, `Employee_ID`, `Checkup_Date`, `Diagnosis`, and `Treatment`.
-- `POST /api/editMedicalRecord`: Updates an existing medical record based on `Record_ID` and other relevant details.
-- `POST /api/getFeedingDetails`: Fetches feeding details such as `food_Types`, `feeding_Time`, and `Quantity`, based on `employee_ID` and `animal_ID`.
-- `POST /api/loginUser`: Authenticates an employee and returns their role.
-- `POST /api/getUserRole`: Fetches the role of a given user.
-*/
-
 const employeeRoutes = {
     // Route to get animal care tasks (requires Employee_ID from frontend)
     "/api/getAnimalCareTasks": (req, res) => {
