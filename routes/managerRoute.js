@@ -7,12 +7,6 @@ Info:
   respective function from the corresponding controller.
 */
 
-/*
-Endpoints:
-- `POST /api/getAttractionStatus`: Fetches `status_Type` based on `Attraction_Name`.
-- `POST /api/updateAttractionStatus`: Updates the `status_Type` based on `status_typeID`.
-*/
-
 const managerRoutes = {
     // Route to get the status type of an attraction (requires Attraction_Name from frontend)
     "/api/getAttractionStatus": (req, res) => {
