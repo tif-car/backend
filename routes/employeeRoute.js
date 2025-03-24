@@ -11,7 +11,7 @@ getAnimalCareTasks function from the animalCare.js controller.
 
 /*
 Endpoints:
-- `POST /api/getAnimalCareTasks`: Fetches animal care tasks based on `employee_ID`.
+- `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
 - `POST /api/loginUser`: Authenticates an employee and returns their role.
 - `POST /api/getUserRole`: Fetches the role of a given user.
 */
