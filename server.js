@@ -3,22 +3,19 @@ import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
-import cors from "cors";
-import authRoutes from "./routes/authRoutes.js";
+import cors from "cors";   
+//routes added
 import employeeRoutes from "./routes/employeeRoute.js";
 import adminRoutes from "./routes/adminRoute.js";
-import managerRoutes from "./routes/managerRoute.js";
-import animalRoutes from "./routes/animalRoutes.js";
+import managerRoutes from "./routes/managerRoute.js"; 
 
 dotenv.config();
 
 // **Register All Routes**
 const routes = {
-    ...authRoutes,
     ...adminRoutes,
-    ...employeeRoutes,
-    ...managerRoutes,
-    ...animalRoutes,
+    ...employeeRoutes,  // Employee routes
+    ...managerRoutes,   // Manager routes
 };
 
 const corsMiddleware = cors({
