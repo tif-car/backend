@@ -47,7 +47,7 @@ const employeeRoutes = {
         }
     },
 
-    // Authentication Routes
+    // Authentication Routes. will need email and password from the frontend
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
             authController.loginUser(req, res);
@@ -56,6 +56,7 @@ const employeeRoutes = {
         }
     },
 
+    //needs email from the frontend. Retrieves a users role
     "/api/getUserRole": (req, res) => {
         if (req.method === "POST") {
             authController.getUserRole(req, res);
