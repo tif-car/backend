@@ -47,7 +47,7 @@ const employeeRoutes = {
         }
     },
 
-    // Authentication Routes, requires email and password
+    // Authentication Routes
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
             authController.loginUser(req, res);
@@ -56,7 +56,6 @@ const employeeRoutes = {
         }
     },
 
-    //requires email from the frontend
     "/api/getUserRole": (req, res) => {
         if (req.method === "POST") {
             authController.getUserRole(req, res);
