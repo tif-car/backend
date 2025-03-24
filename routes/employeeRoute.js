@@ -1,5 +1,6 @@
 import animalCareController from "../controllers/animalCare.js";
 import animalHealthController from "../controllers/animalHealth.js";
+import animalFeedingController from "../controllers/animalFeeding.js";  // Added animalFeedingController
 import authController from "../controllers/authController.js";
 
 /*
@@ -13,12 +14,13 @@ Info:
 Endpoints:
 - `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
 - `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
+- `POST /api/feedingDetails`: Fetches feeding details such as `food_Types`, `feeding_Time`, and `Quantity`, based on `employee_ID` and `animal_ID`.
 - `POST /api/loginUser`: Authenticates an employee and returns their role.
 - `POST /api/getUserRole`: Fetches the role of a given user.
 */
 
 const employeeRoutes = {
-    // Route to get animal care tasks. will need to receive Employee_ID from frontend
+    // Route to get animal care tasks (requires Employee_ID from frontend)
     "/api/getAnimalCareTasks": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalCareController.getAnimalCareTasks);
@@ -27,8 +29,7 @@ const employeeRoutes = {
         }
     },
 
-    // Route to update animal wellness status
-    //will need to receive animal_ID and wellness_status(maybe dropdown menu?) from the frontend
+    // Route to update animal wellness status (requires animal_ID and wellness_status from frontend)
     "/api/updateAnimalWellness": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.updateAnimalWellness);
@@ -37,8 +38,16 @@ const employeeRoutes = {
         }
     },
 
+    // Route to get feeding details (requires employee_ID and animal_ID from frontend)
+    "/api/GetFeedingDetails": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalFeedingController.getFeedingDetails);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     // Authentication Routes
-    //will receive email and password from the frontend
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
             authController.loginUser(req, res);
@@ -47,7 +56,6 @@ const employeeRoutes = {
         }
     },
 
-    //will receive email from the frontend
     "/api/getUserRole": (req, res) => {
         if (req.method === "POST") {
             authController.getUserRole(req, res);
