@@ -1,23 +1,24 @@
 import animalCareController from "../controllers/animalCare.js";
+import animalHealthController from "../controllers/animalHealth.js";
 import authController from "../controllers/authController.js";
 
 /*
 Info:
-Frontend will send a POST request to the /api/getAnimalCareTasks endpoint, 
-containing the employee_ID.
-The route extracts the request body, parses it as JSON, and calls the 
-getAnimalCareTasks function from the animalCare.js controller.
+- Frontend will send a POST request to the appropriate endpoint.
+- The route extracts the request body, parses it as JSON, and calls the 
+  respective function from the corresponding controller.
 */
 
 /*
 Endpoints:
 - `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
+- `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
 - `POST /api/loginUser`: Authenticates an employee and returns their role.
 - `POST /api/getUserRole`: Fetches the role of a given user.
 */
 
 const employeeRoutes = {
-    // Route to get animal care tasks (fetch animal name)
+    // Route to get animal care tasks. will need to receive Employee_ID from frontend
     "/api/getAnimalCareTasks": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalCareController.getAnimalCareTasks);
@@ -26,7 +27,18 @@ const employeeRoutes = {
         }
     },
 
+    // Route to update animal wellness status
+    //will need to receive animal_ID and wellness_status(maybe dropdown menu?) from the frontend
+    "/api/updateAnimalWellness": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.updateAnimalWellness);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     // Authentication Routes
+    //will receive email and password from the frontend
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
             authController.loginUser(req, res);
@@ -35,6 +47,7 @@ const employeeRoutes = {
         }
     },
 
+    //will receive email from the frontend
     "/api/getUserRole": (req, res) => {
         if (req.method === "POST") {
             authController.getUserRole(req, res);
@@ -68,6 +81,3 @@ function sendMethodNotAllowed(res) {
 }
 
 export default employeeRoutes;
-
-
-//work in progress
