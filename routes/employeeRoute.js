@@ -14,7 +14,7 @@ Info:
 Endpoints:
 - `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
 - `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
-- `POST /api/feedingDetails`: Fetches feeding details such as `food_Types`, `feeding_Time`, and `Quantity`, based on `employee_ID` and `animal_ID`.
+- `POST /api/getFeedingDetails`: Fetches feeding details such as `food_Types`, `feeding_Time`, and `Quantity`, based on `employee_ID` and `animal_ID`.
 - `POST /api/loginUser`: Authenticates an employee and returns their role.
 - `POST /api/getUserRole`: Fetches the role of a given user.
 */
@@ -39,7 +39,7 @@ const employeeRoutes = {
     },
 
     // Route to get feeding details (requires employee_ID and animal_ID from frontend)
-    "/api/GetFeedingDetails": (req, res) => {
+    "/api/getFeedingDetails": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalFeedingController.getFeedingDetails);
         } else {
