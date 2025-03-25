@@ -34,5 +34,5 @@ pool.getConnection((err, connection) => {
     connection.release(); // Release test connection
 });
 
-// Export the connection pool as a promise-based interface
-export default pool.promise();
+// Export the connection pool directly
+export default pool; // Use pool directly

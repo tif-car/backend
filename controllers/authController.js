@@ -1,4 +1,4 @@
-import db from "../db.js";
+import pool from "../db.js"; // Use pool directly
 
 /*
 Endpoints:
@@ -33,8 +33,8 @@ const loginUser = async (req, res) => {
                 JOIN role_type r ON e.Role = r.role_typeID
                 WHERE e.email = ?`;
 
-            // Query database using async/await
-            const [employeeResult] = await db.query(employeeQuery, [email]);
+            // Query database using async/await and pool.query()
+            const [employeeResult] = await pool.promise().query(employeeQuery, [email]);
 
             if (employeeResult.length > 0) {
                 if (password === employeeResult[0].password) {
@@ -53,7 +53,7 @@ const loginUser = async (req, res) => {
             } else {
                 // If not found in employee table, check visitor/member table
                 const memberQuery = `SELECT visitor_ID, password FROM visitor WHERE email = ?`;
-                const [visitorResult] = await db.query(memberQuery, [email]);
+                const [visitorResult] = await pool.promise().query(memberQuery, [email]);
 
                 if (visitorResult.length === 0) {
                     return sendResponse(res, 404, { error: "Email not found" });
@@ -102,7 +102,7 @@ const getUserRole = async (req, res) => {
                 JOIN role_type r ON e.Role = r.role_typeID 
                 WHERE e.email = ?`;
 
-            const [result] = await db.query(sql, [email]);
+            const [result] = await pool.promise().query(sql, [email]);
 
             if (result.length === 0) {
                 console.log("User not found.");
