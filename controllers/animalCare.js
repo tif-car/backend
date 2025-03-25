@@ -1,4 +1,10 @@
+
 import dbConnection from "../db.js";
+
+/*
+Endpoints:
+- `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
+*/
 
 // Get animal care tasks based on employee_ID
 const getAnimalCareTasks = (req, res) => {
