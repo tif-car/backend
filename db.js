@@ -1,3 +1,4 @@
+//changed to test connection
 import fs from "fs";
 import mysql from "mysql2";
 import dotenv from "dotenv";

@@ -50,6 +50,12 @@ const employeeRoutes = {
     // Route to get feeding details (requires employee_ID and animal_ID from frontend)
     "/api/getFeedingDetails": (req, res) => {
         if (req.method === "POST") {
+            const { employee_ID, animal_ID } = req.body;
+            if (!employee_ID || !animal_ID) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Both employee_ID and animal_ID are required" }));
+                return;
+            }
             handleRequestBody(req, res, animalFeedingController.getFeedingDetails);
         } else {
             sendMethodNotAllowed(res);
