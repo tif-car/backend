@@ -56,6 +56,24 @@ const employeeRoutes = {
         }
     },
 
+    // Route to get details for the form (requires employee_ID from frontend)
+    "/api/FeedingFormInfo": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalFeedingController.getFeedingFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    // Route to get details for the form (requires employee_ID from frontend)
+    "/api/CreateFeedingLog": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalFeedingController.createFeedingLog);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     // Authentication Routes. Will need email and password from the frontend
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {

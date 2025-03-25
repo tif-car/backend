@@ -35,13 +35,9 @@ const loginUser = (req, res) => {
 
                 if (employeeResult.length > 0) {
                     if (password === employeeResult[0].password) {
-                        let roleNumber = 1;
-                        if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
-                            roleNumber = 2;
-                        }
                         return sendResponse(res, 200, { 
                             id: employeeResult[0].employee_ID,
-                            role: roleNumber,
+                            role: employeeResult[0].role_types,
                             message: "Login successful"
                         });
                     } else {
@@ -64,7 +60,7 @@ const loginUser = (req, res) => {
                         if (password === visitorResult[0].password) {
                             return sendResponse(res, 200, { 
                                 id: visitorResult[0].visitor_ID,
-                                role: 0,
+                                role: "member",
                                 message: "Login successful"
                             });
                         } else {

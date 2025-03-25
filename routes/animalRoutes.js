@@ -1,6 +1,4 @@
 import animalController from "../controllers/animalController.js";
-<<<<<<< HEAD
-=======
 
 const animalRoutes = {
     "/api/animals": (req, res) => {
@@ -63,4 +61,3 @@ const animalRoutes = {
 };
 
 export default animalRoutes; 
->>>>>>> main
