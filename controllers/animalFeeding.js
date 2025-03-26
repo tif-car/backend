@@ -39,13 +39,13 @@ const animalFeedingController = {
             SELECT a.Animal_ID, a.Animal_Name
             FROM employee e
             JOIN works_at w ON w.E_ID = e.Employee_ID
-            JOIN habitat h ON h.Habitat_ID = w.Hab_ID
+            JOIN habitat h ON h.Habitat_ID = w.Hab_ID 
             JOIN animal a ON a.Habitat_ID = h.Habitat_ID
             WHERE e.Employee_ID = ?;
         `;
 
-        const unitSql = `SELECT * FROM unit;`;
-        const foodSql = `SELECT * FROM food_type;`;
+        const unitSql = `SELECT * FROM unit;`; // Units[0].id or .unit_text
+        const foodSql = `SELECT * FROM food_type;`;//Food_types[n].foodID or food_text 
 
         try {
             const [aniResult] = await pool.promise().query(animalSql, [employee_ID]);
@@ -57,9 +57,9 @@ const animalFeedingController = {
             }
 
             const combinedResults = {
-                Animals: aniResult,
-                Units: uniResult,
-                Food_types: fResult
+                Animals: aniResult, // [Animal_ID, Animal_name]
+                Units: uniResult, // [Unit_ID, Unit_text]
+                Food_types: fResult // [Food_ID, Food_text]
             };
 
             sendResponse(res, 200, combinedResults);
