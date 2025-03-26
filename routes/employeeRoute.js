@@ -70,6 +70,22 @@ const employeeRoutes = {
             sendMethodNotAllowed(res);
         }
     },
+    // Route to get feeding query form details
+    "/api/getFeedingQueryDetails": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalFeedingController.getFeedingQueryFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+    // Route to Query feeding logs
+    "/api/getFeedingQueryDetails": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalFeedingController.QueryFeedingLogs);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
     /////////////////////////////
     // Route for /api/animals (GET to fetch all, POST to create new)
     "/api/animals": (req, res) => {
