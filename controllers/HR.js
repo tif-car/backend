@@ -88,7 +88,61 @@ const createEmployee = (req, res) => {
 /*
 ********work in progress
 const getEmployeeInfo = (req, res) => {
+    let body = "";
+    
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
 
+    req.on("end", async () => {
+        try {
+            const { employee_ID, employee_name, department_name } = JSON.parse(body);
+
+            // Base query to fetch employee details and department
+            let query = `
+                SELECT e.Employee_ID, e.Name AS employee_name, e.Role, r.role_types, 
+                       e.Salary, e.Work_Location_ID, e.Phone_number, e.Email, d.Name AS department_name
+                FROM employee e
+                JOIN role_type r ON e.Role = r.role_typeID
+                JOIN works_at w ON e.Employee_ID = w.E_ID
+                JOIN department d ON w.Dept_ID = d.Department_ID
+            `;
+
+            let conditions = [];
+            let values = [];
+
+            if (employee_ID) {
+                conditions.push("e.Employee_ID = ?");
+                values.push(employee_ID);
+            }
+            if (employee_name) {
+                conditions.push("e.Name LIKE ?");
+                values.push(`%${employee_name}%`);
+            }
+            if (department_name) {
+                conditions.push("d.Name LIKE ?");
+                values.push(`%${department_name}%`);
+            }
+
+            // Add WHERE clause if filters exist
+            if (conditions.length > 0) {
+                query += " WHERE " + conditions.join(" AND ");
+            }
+
+            const [result] = await pool.promise().query(query, values);
+
+            // If no employee is found
+            if (result.length === 0) {
+                return sendResponse(res, 404, { error: "No employees found." });
+            }
+
+            sendResponse(res, 200, { employees: result });
+
+        } catch (error) {
+            console.error("Database query error:", error);
+            return sendResponse(res, 500, { error: "Internal Server Error" });
+        }
+    });
 };
 */
 
