@@ -1,7 +1,7 @@
 import animalCareController from "../controllers/animalCare.js";
 import animalHealthController from "../controllers/animalHealth.js";
 import animalFeedingController from "../controllers/animalFeeding.js";  // Added animalFeedingController
-import authController from "../controllers/authController.js";
+import animalController from "../controllers/animalController.js";
 
 /*
 Info:
@@ -61,22 +61,54 @@ const employeeRoutes = {
             sendMethodNotAllowed(res);
         }
     },
+/////////////////////////////
+    // Route for /api/animals (GET to fetch all, POST to create new)
+    "/api/animals": (req, res) => {
+        if (req.method === "GET") {
+            animalController.getAllAnimals(req, res);
+        } else if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk.toString();
+            });
 
-    // Authentication Routes. Will need email and password from the frontend
-    "/api/loginUser": (req, res) => {
-        if (req.method === "POST") {
-            authController.loginUser(req, res);
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch (error) {
+                    req.body = {};
+                }
+                animalController.createAnimal(req, res);
+            });
         } else {
-            sendMethodNotAllowed(res);
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or POST." }));
         }
     },
 
-    // Needs email from the frontend. Retrieves a user's role
-    "/api/getUserRole": (req, res) => {
-        if (req.method === "POST") {
-            authController.getUserRole(req, res);
+    // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
+    "/api/animals/:id": (req, res) => {
+        const animalId = req.url.split("/")[3]; // Extract ID from URL
+        
+        if (req.method === "GET") {
+            animalController.getAnimalById(req, res, animalId); // Pass ID to controller
+        } else if (req.method === "PUT") {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch (error) {
+                    req.body = {};
+                }
+                animalController.updateAnimal(req, res, animalId); // Pass ID to controller
+            });
         } else {
-            sendMethodNotAllowed(res);
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
         }
     }
 };

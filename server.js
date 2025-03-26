@@ -8,6 +8,10 @@ import cors from "cors";
 import employeeRoutes from "./routes/employeeRoute.js";
 import adminRoutes from "./routes/adminRoute.js";
 import managerRoutes from "./routes/managerRoute.js"; 
+import authRoutes from "./routes/authRoute.js";
+import feedingLogRoutes from "./routes/feedingLogRoutes.js"
+
+
 
 dotenv.config();
 
@@ -15,7 +19,10 @@ dotenv.config();
 const routes = {
     ...adminRoutes,
     ...employeeRoutes,  // Employee routes
-    ...managerRoutes,   // Manager routes
+    ...managerRoutes,   // Manager 
+    ...authRoutes,
+    ...feedingLogRoutes,
+
 };
 
 const corsMiddleware = cors({

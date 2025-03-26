@@ -1,3 +1,4 @@
+/*
 import animalController from "../controllers/animalController.js";
 
 const animalRoutes = {
@@ -61,3 +62,4 @@ const animalRoutes = {
 };
 
 export default animalRoutes; 
+*/
