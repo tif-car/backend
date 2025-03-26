@@ -7,6 +7,16 @@ Endpoints:
 
 // Get animal care tasks based on employee_ID
 const getAnimalCareTasks = async (req, res) => {
+/*
+    Function: GetAnimalCareTasks
+    Ex: Frontend provides:
+    {
+        "employee_ID": 5
+    };
+    Output:
+    [ { "animal_ID": 1, "animal_name": "Lion", "habitat_ID": 2, "habitat_name": "Savanna" } ]
+*/
+
     const { employee_ID } = req.body || {};
 
     if (!employee_ID) {

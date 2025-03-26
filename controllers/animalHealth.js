@@ -1,15 +1,20 @@
 import pool from "../db.js";  // Assuming pool is the connection pool object.
 
-/*
-Endpoints:
-- `POST /api/updateAnimalWellness`: Updates the wellness status of an animal based on `animal_ID` and `wellness_status`.
-- `POST /api/createMedicalRecord`: Creates a new medical record entry based on `Animal_ID`, `Employee_ID`, `Checkup_Date`, `Diagnosis`, and `Treatment`.
-- `POST /api/editMedicalRecord`: Updates an existing medical record based on `Record_ID` and other relevant details.
-*/
 
 // Function to update the wellness status of an animal.
 // Frontend would need to include the animal_ID and wellness_status. Maybe from a dropdown box?
 const updateAnimalWellness = (req, res) => {
+
+/*
+ Function: updateAnimalWellness
+Ex: Frontend provides:
+{
+    "animal_ID": 3,
+    "wellness_status": "Healthy"
+}
+Output:
+ { "message": "Wellness status updated successfully" }
+*/
     const { animal_ID, wellness_status } = req.body || {};
 
     if (!animal_ID || !wellness_status) {
@@ -35,6 +40,19 @@ const updateAnimalWellness = (req, res) => {
 // Function to create a new medical record for an animal.
 // Frontend must provide: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment.
 const createMedicalRecord = (req, res) => {
+    /*
+        Function: createMedicalRecord
+        Ex: Frontend provides:
+        {
+            "Animal_ID": 10,
+            "Employee_ID": 2,
+            "Checkup_Date": "2025-03-25",
+            "Diagnosis": "Mild fever",
+            "Treatment": "Medication prescribed"
+        }
+        Output:
+        { "message": "Medical record created successfully", "Record_ID": 45 }
+    */
     const { Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment } = req.body || {};
 
     if (!Animal_ID || !Employee_ID || !Checkup_Date || !Diagnosis || !Treatment) {
@@ -59,6 +77,17 @@ const createMedicalRecord = (req, res) => {
 //Functoin to edit medical record row
 //Only updates the fields provided by the frontend
 const editMedicalRecord = (req, res) => {
+    /*
+        Function: editMedicalRecord
+        Ex: Frontend provides:
+        {
+            "Record_ID": 12,
+            "Diagnosis": "Updated diagnosis",
+            "Treatment": "Updated treatment"
+        }
+        Output:
+        { "message": "Medical record updated successfully" }
+    */
     let body = "";
     
     req.on("data", (chunk) => {

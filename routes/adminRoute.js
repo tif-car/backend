@@ -16,6 +16,7 @@ const adminRoutes = {
         }
     },
 
+    //might not be needed, may delete later
     "/api/editAllEmployeeRow": (req, res) => {
         if (req.method === "POST") {
             HRController.editAllEmployeeRow(req, res);  // Full row update

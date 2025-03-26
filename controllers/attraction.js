@@ -1,14 +1,19 @@
 import pool from "../db.js";
 
-/*
-Endpoints:
-- `POST /api/getAttractionStatus`: Retrieves the status type of an attraction based on its name.
-- `POST /api/updateAttractionStatus`: Updates the status type of an attraction.
-*/
+
 
 const attractionController = {
     // Function to get the status_Type. Frontend will give the Attraction_Name
     async getAttractionStatus(req, res) {
+    /*
+        Function: getAttractionStatus
+        Ex: Frontend provides:
+        {
+            "Attraction_Name": "Ferris Wheel"
+        }
+        Output:
+        { "status_Type": "Operational" }
+    */
         const { Attraction_Name } = req.body;
 
         if (!Attraction_Name) {
@@ -42,6 +47,16 @@ const attractionController = {
 
     // Function to update the status_Type in attrstatus_type table
     async updateAttractionStatus(req, res) {
+ /*
+        Function: updateAttractionStatus
+        Ex: Frontend provides:
+        {
+            "status_typeID": 1,
+            "newStatusType": "Under Maintenance"
+        }
+        Output:
+        { "message": "Status type updated successfully" }
+ */
         const { status_typeID, newStatusType } = req.body;
 
         if (!status_typeID || !newStatusType) {

@@ -8,6 +8,20 @@ Endpoints:
 
 // Login function that authenticates users and returns role number
 const loginUser = async (req, res) => {
+/*
+    Function: loginUser
+    Ex: Frontend provides:
+    {
+        "email": "employee@example.com",
+        "password": "password123"
+    }
+    Output for employee:
+    {
+        "id": 1,
+        "user_type": "admin",
+        "message": "Login successful"
+    }
+ */
     if (req.method !== "POST") {
         return sendResponse(res, 405, { error: "Method Not Allowed. Use POST instead." });
     }
@@ -74,6 +88,19 @@ const loginUser = async (req, res) => {
 
 // Get User Role function
 const getUserRole = async (req, res) => {
+/*
+    Function: getUserRole
+    Ex: Frontend provides:
+    {
+        "email": "employee@example.com"
+    }
+    Output:
+    {
+        "employee_ID": 1,
+        "role_typeID": 2,
+        "role_types": "admin"
+    }
+*/
     if (req.method !== "POST") {
         return sendResponse(res, 405, { error: "Method Not Allowed. Use POST instead." });
     }

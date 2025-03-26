@@ -1,13 +1,13 @@
 import pool from "../db.js"; // Use pool instead of dbConnection
 
+
+const editEmployee = (req, res) => {
 /*
-editEmployee:
-Frontend send:
-{ "Salary": 60000 }
- Query becomes: UPDATE employee SET Salary = 60000 WHERE Employee_ID = 5;
+Function: editEmployee
+Frontend send: { "Salary": 60000 }
+Query becomes: UPDATE employee SET Salary = 60000 WHERE Employee_ID = 5;
 
 */
-const editEmployee = (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -55,6 +55,7 @@ const editEmployee = (req, res) => {
 
 
 //Edit an existing employee, this expects all fields to be present
+//might delete later if does not fit with frontend design
 const editAllEmployeeRow = (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
@@ -120,6 +121,13 @@ const createEmployee = (req, res) => {
         }
     });
 };
+
+/*
+********work in progress
+const getEmployeeInfo = (req, res) => {
+
+};
+*/
 
 // Helper function for sending responses
 function sendResponse(res, statusCode, data) {

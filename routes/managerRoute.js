@@ -1,10 +1,9 @@
 import attractionController from "../controllers/attraction.js";
 
 /*
-Info:
-- Frontend will send a POST request to the appropriate endpoint.
-- The route extracts the request body, parses it as JSON, and calls the 
-  respective function from the corresponding controller.
+Endpoints:
+- `POST /api/getAttractionStatus`: Retrieves the status type of an attraction based on its name.
+- `POST /api/updateAttractionStatus`: Updates the status type of an attraction.
 */
 
 const managerRoutes = {
