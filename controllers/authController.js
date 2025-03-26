@@ -41,7 +41,7 @@ const loginUser = (req, res) => {
                         }
                         return sendResponse(res, 200, { 
                             id: employeeResult[0].employee_ID,
-                            role: roleNumber,
+                            user_type: employeeResult[0].role_types,
                             message: "Login successful"
                         });
                     } else {
@@ -64,7 +64,7 @@ const loginUser = (req, res) => {
                         if (password === visitorResult[0].password) {
                             return sendResponse(res, 200, { 
                                 id: visitorResult[0].visitor_ID,
-                                role: 0,
+                                user_type: "member",
                                 message: "Login successful"
                             });
                         } else {
