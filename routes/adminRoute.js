@@ -3,7 +3,6 @@ import HRController from "../controllers/HR.js";
 /**
     Endpoints Available:
     - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
-    - `POST /api/editAllEmployeeRow` : Edits an entire row of an employee. Requires all fields.
     - `POST /api/createEmployee` : Creates a new employee in the employee table.
 */
 
@@ -16,14 +15,6 @@ const adminRoutes = {
         }
     },
 
-    //might not be needed, may delete later
-    "/api/editAllEmployeeRow": (req, res) => {
-        if (req.method === "POST") {
-            HRController.editAllEmployeeRow(req, res);  // Full row update
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
 
     "/api/createEmployee": (req, res) => {
         if (req.method === "POST") {

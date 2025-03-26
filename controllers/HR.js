@@ -54,43 +54,6 @@ Query becomes: UPDATE employee SET Salary = 60000 WHERE Employee_ID = 5;
 };
 
 
-//Edit an existing employee, this expects all fields to be present
-//might delete later if does not fit with frontend design
-const editAllEmployeeRow = (req, res) => {
-    let body = "";
-    req.on("data", (chunk) => {
-        body += chunk.toString();
-    });
-
-    req.on("end", async () => {
-        const { Employee_ID, Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = JSON.parse(body);
-
-        // Employee_ID needs to be provided
-        if (!Employee_ID) {
-            return sendResponse(res, 400, { error: "Employee_ID is required for updating an employee." });
-        }
-
-        // Update the table employee
-        const sql = `UPDATE employee 
-                     SET Name = ?, Role = ?, Salary = ?, Work_Location_ID = ?, Phone_number = ?, Email = ?, Password = ?
-                     WHERE Employee_ID = ?`;
-
-        try {
-            const [result] = await pool.promise().query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password, Employee_ID]);
-
-            // If no rows are affected, that means the employee wasn't found
-            if (result.affectedRows === 0) {
-                return sendResponse(res, 404, { error: "Employee not found." });
-            }
-
-            sendResponse(res, 200, { message: "Employee updated successfully." });
-        } catch (err) {
-            console.error("Database update error:", err);
-            sendResponse(res, 500, { error: "Database error while updating employee." });
-        }
-    });
-};
-
 // Create a new employee
 const createEmployee = (req, res) => {
     let body = "";
@@ -135,4 +98,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { editAllEmployeeRow, createEmployee, editEmployee };
+export default { createEmployee, editEmployee };

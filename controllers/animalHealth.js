@@ -89,7 +89,7 @@ const editMedicalRecord = (req, res) => {
         { "message": "Medical record updated successfully" }
     */
     let body = "";
-    
+    //reading input from the frontend
     req.on("data", (chunk) => {
         body += chunk.toString();
     });
