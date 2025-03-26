@@ -47,6 +47,15 @@ const employeeRoutes = {
         }
     },
 
+    // New route to edit all fields of a medical record (requires Record_ID and all updated fields)
+    "/api/editAllMedicalRow": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.editAllMedicalRow);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     // Route to get feeding details (requires employee_ID and animal_ID from frontend)
     "/api/getFeedingDetails": (req, res) => {
         if (req.method === "POST") {
@@ -61,7 +70,7 @@ const employeeRoutes = {
             sendMethodNotAllowed(res);
         }
     },
-/////////////////////////////
+    /////////////////////////////
     // Route for /api/animals (GET to fetch all, POST to create new)
     "/api/animals": (req, res) => {
         if (req.method === "GET") {

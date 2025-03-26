@@ -55,9 +55,78 @@ const createMedicalRecord = (req, res) => {
     });
 };
 
+
+//Functoin to edit medical record row
+//Only updates the fields provided by the frontend
+const editMedicalRecord = (req, res) => {
+    let body = "";
+    
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
+
+    req.on("end", async () => {
+        const data = JSON.parse(body);
+        const { Record_ID } = data;
+
+        //Record_ID is required
+        if (!Record_ID) {
+            return sendResponse(res, 400, { error: "Record_ID is required for updating a medical record." });
+        }
+
+        // Remove Record_ID from the update fields
+        delete data.Record_ID;
+
+        // If no other fields are provided, return an error
+        if (Object.keys(data).length === 0) {
+            return sendResponse(res, 400, { error: "No fields provided for update." });
+        }
+
+        // Dynamically build the SET clause for SQL query
+        const setClause = Object.keys(data).map((key) => `${key} = ?`).join(", ");
+        const values = Object.values(data);
+
+        // Final SQL query
+        const sql = `UPDATE medical_record SET ${setClause} WHERE Record_ID = ?`;
+
+        try {
+            const [result] = await pool.promise().query(sql, [...values, Record_ID]);
+
+            // If no rows were affected, record not found
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "Medical record not found." });
+            }
+
+            sendResponse(res, 200, { message: "Medical record updated successfully." });
+        } catch (err) {
+            console.error("Database update error:", err);
+            sendResponse(res, 500, { error: "Database error while updating medical record." });
+        }
+    });
+};
+
+/*
+Function: EditMedicalRecords
+Ex: frontend provides:
+{
+    "Record_ID": 12,
+    "Diagnosis": "Minor infection",
+    "Treatment": "Antibiotics prescribed"
+}
+
+Query: 
+UPDATE medical_record 
+SET Diagnosis = ?, Treatment = ?
+WHERE Record_ID = ?;
+
+output:
+["Minor infection", "Antibiotics prescribed", 12]
+ */
+
+
 // Function to update an existing medical record.
 // Frontend must provide a valid Record_ID along with updated fields: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment.
-const editMedicalRecord = (req, res) => {
+const editAllMedicalRow = (req, res) => {
     const { Record_ID, Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment } = req.body || {};
 
     if (!Record_ID || !Animal_ID || !Employee_ID || !Checkup_Date || !Diagnosis || !Treatment) {
@@ -83,10 +152,38 @@ const editMedicalRecord = (req, res) => {
     });
 };
 
+/*
+Function: editAllMedicalRow
+Example input from the frontend:
+{
+    "Record_ID": 12,
+    "Animal_ID": 101,
+    "Employee_ID": 5,
+    "Checkup_Date": "2025-03-20",
+    "Diagnosis": "Minor infection",
+    "Treatment": "Antibiotics prescribed"
+}
+
+Query: 
+UPDATE medical_record 
+SET Animal_ID = ?, Employee_ID = ?, Checkup_Date = ?, Diagnosis = ?, Treatment = ?
+WHERE Record_ID = ?;
+
+Expected output:
+[
+    101, 
+    5, 
+    "2025-03-20", 
+    "Minor infection", 
+    "Antibiotics prescribed", 
+    12
+]
+ */
+
 // Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(data));
 }
 
-export default { updateAnimalWellness, createMedicalRecord, editMedicalRecord };
+export default { updateAnimalWellness, createMedicalRecord, editMedicalRecord, editAllMedicalRow };

@@ -1,7 +1,61 @@
 import pool from "../db.js"; // Use pool instead of dbConnection
 
-// Edit an existing employee
+/*
+editEmployee:
+Frontend send:
+{ "Salary": 60000 }
+ Query becomes: UPDATE employee SET Salary = 60000 WHERE Employee_ID = 5;
+
+*/
 const editEmployee = (req, res) => {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
+
+    req.on("end", async () => {
+        const data = JSON.parse(body);
+        const { Employee_ID } = data;
+
+        // Ensure Employee_ID is provided
+        if (!Employee_ID) {
+            return sendResponse(res, 400, { error: "Employee_ID is required for updating an employee." });
+        }
+
+        // Remove Employee_ID from the data object (since we don’t update it)
+        delete data.Employee_ID;
+
+        // If no other fields are provided, return an error
+        if (Object.keys(data).length === 0) {
+            return sendResponse(res, 400, { error: "No fields provided for update." });
+        }
+
+        // Dynamically build the SET clause of the SQL query
+        const setClause = Object.keys(data).map((key) => `${key} = ?`).join(", ");
+        const values = Object.values(data);
+
+        // Final SQL query
+        const sql = `UPDATE employee SET ${setClause} WHERE Employee_ID = ?`;
+
+        try {
+            const [result] = await pool.promise().query(sql, [...values, Employee_ID]);
+
+            // If no rows were affected, employee not found
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "Employee not found." });
+            }
+
+            sendResponse(res, 200, { message: "Employee updated successfully." });
+        } catch (err) {
+            console.error("Database update error:", err);
+            sendResponse(res, 500, { error: "Database error while updating employee." });
+        }
+    });
+};
+
+
+//Edit an existing employee, this expects all fields to be present
+const editAllEmployeeRow = (req, res) => {
     let body = "";
     req.on("data", (chunk) => {
         body += chunk.toString();
@@ -44,6 +98,7 @@ const createEmployee = (req, res) => {
     });
 
     req.on("end", async () => {
+        //JSON data is converted into a JavaScript object using JSON.parse(body)
         const { Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = JSON.parse(body);
 
         // This is to make sure all required fields are provided
@@ -72,4 +127,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { editEmployee, createEmployee };
+export default { editAllEmployeeRow, createEmployee, editEmployee };

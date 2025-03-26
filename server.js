@@ -9,7 +9,7 @@ import employeeRoutes from "./routes/employeeRoute.js";
 import adminRoutes from "./routes/adminRoute.js";
 import managerRoutes from "./routes/managerRoute.js"; 
 import authRoutes from "./routes/authRoute.js";
-import feedingLogRoutes from "./routes/feedingLogRoutes.js"
+import feedingLogRoutes from "./routes/LogRoutes.js"
 
 
 
