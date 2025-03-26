@@ -23,6 +23,7 @@ const routes = {
     ...managerRoutes,   // Manager 
     ...authRoutes,
     ...logRoutes,
+    ...memberRoutes,
 
 };
 
