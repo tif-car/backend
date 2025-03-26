@@ -1,23 +1,17 @@
 import animalCareController from "../controllers/animalCare.js";
-import authController from "../controllers/authController.js";
+import animalHealthController from "../controllers/animalHealth.js";
+import animalFeedingController from "../controllers/animalFeeding.js";  // Added animalFeedingController
+import animalController from "../controllers/animalController.js";
 
 /*
 Info:
-Frontend will send a POST request to the /api/getAnimalCareTasks endpoint, 
-containing the employee_ID.
-The route extracts the request body, parses it as JSON, and calls the 
-getAnimalCareTasks function from the animalCare.js controller.
-*/
-
-/*
-Endpoints:
-- `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
-- `POST /api/loginUser`: Authenticates an employee and returns their role.
-- `POST /api/getUserRole`: Fetches the role of a given user.
+- Frontend will send a POST request to the appropriate endpoint.
+- The route extracts the request body, parses it as JSON, and calls the 
+  respective function from the corresponding controller.
 */
 
 const employeeRoutes = {
-    // Route to get animal care tasks (fetch animal name)
+    // Route to get animal care tasks (requires Employee_ID from frontend)
     "/api/getAnimalCareTasks": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalCareController.getAnimalCareTasks);
@@ -26,20 +20,95 @@ const employeeRoutes = {
         }
     },
 
-    // Authentication Routes
-    "/api/loginUser": (req, res) => {
+    // Route to update animal wellness status (requires animal_ID and wellness_status from frontend)
+    "/api/updateAnimalWellness": (req, res) => {
         if (req.method === "POST") {
-            authController.loginUser(req, res);
+            handleRequestBody(req, res, animalHealthController.updateAnimalWellness);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-    "/api/getUserRole": (req, res) => {
+    // Route to create a new medical record (requires Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment)
+    "/api/createMedicalRecord": (req, res) => {
         if (req.method === "POST") {
-            authController.getUserRole(req, res);
+            handleRequestBody(req, res, animalHealthController.createMedicalRecord);
         } else {
             sendMethodNotAllowed(res);
+        }
+    },
+
+    // Route to edit an existing medical record (requires Record_ID and updated fields)
+    "/api/editMedicalRecord": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.editMedicalRecord);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    // Route to get feeding details (requires employee_ID and animal_ID from frontend)
+    "/api/getFeedingDetails": (req, res) => {
+        if (req.method === "POST") {
+            const { employee_ID, animal_ID } = req.body;
+            if (!employee_ID || !animal_ID) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Both employee_ID and animal_ID are required" }));
+                return;
+            }
+            handleRequestBody(req, res, animalFeedingController.getFeedingDetails);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+/////////////////////////////
+    // Route for /api/animals (GET to fetch all, POST to create new)
+    "/api/animals": (req, res) => {
+        if (req.method === "GET") {
+            animalController.getAllAnimals(req, res);
+        } else if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch (error) {
+                    req.body = {};
+                }
+                animalController.createAnimal(req, res);
+            });
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or POST." }));
+        }
+    },
+
+    // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
+    "/api/animals/:id": (req, res) => {
+        const animalId = req.url.split("/")[3]; // Extract ID from URL
+        
+        if (req.method === "GET") {
+            animalController.getAnimalById(req, res, animalId); // Pass ID to controller
+        } else if (req.method === "PUT") {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch (error) {
+                    req.body = {};
+                }
+                animalController.updateAnimal(req, res, animalId); // Pass ID to controller
+            });
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
         }
     }
 };
@@ -68,6 +137,3 @@ function sendMethodNotAllowed(res) {
 }
 
 export default employeeRoutes;
-
-
-//work in progress

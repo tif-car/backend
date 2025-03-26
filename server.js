@@ -1,24 +1,34 @@
-//main file for backend
+// Main file for backend
 import http from "http";
 import url from "url";
 import dotenv from "dotenv";
 import os from "os";
 import cors from "cors";   
+//routes added
 import employeeRoutes from "./routes/employeeRoute.js";
 import memberRoutes from "./routes/memberRoutes.js";
 import adminRoutes from "./routes/adminRoute.js";
+import managerRoutes from "./routes/managerRoute.js"; 
+import authRoutes from "./routes/authRoute.js";
+import feedingLogRoutes from "./routes/feedingLogRoutes.js"
+
+
+
 dotenv.config();
 
 // **Register All Routes**
 const routes = {
     ...adminRoutes,
-    ...employeeRoutes,  // Add employee routes here
-    ...memberRoutes,
+    ...employeeRoutes,  // Employee routes
+    ...managerRoutes,   // Manager 
+    ...authRoutes,
+    ...feedingLogRoutes,
+
 };
 
 const corsMiddleware = cors({
-	origin: ["https://frontend-blond-five.vercel.app", "http://localhost:5173"],
-	optionsSuccessStatus: 200,
+    origin: ["https://frontend-blond-five.vercel.app", "http://localhost:5173"],
+    optionsSuccessStatus: 200,
 });
 
 // **Helper function to handle requests**
@@ -34,29 +44,6 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({ error: "Route not found. Ensure the endpoint is correct." }));
         }
     });
-    /* 
-    // Set CORS headers //https://frontend-blond-five.vercel.app,
-    res.setHeader("Access-Control-Allow-Origin", " localhost:1573");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-    // Handle preflight requests properly
-    if (req.method === "OPTIONS") {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
-
-    const parsedUrl = url.parse(req.url, true);
-    const routeHandler = routes[parsedUrl.pathname];
-
-    if (routeHandler) {
-        routeHandler(req, res, parsedUrl.query);
-    } else {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Route not found. Ensure the endpoint is correct." }));
-    }
-    */
 });
 
 // **Determine Local & Azure URLs**
@@ -76,11 +63,3 @@ server.listen(PORT, "0.0.0.0", () => {
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
 });
-
-
-
-
-
-
-
-
