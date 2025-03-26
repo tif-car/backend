@@ -1,15 +1,15 @@
-import dbConnection from "../db.js";
+import pool from "../db.js"; // Using the connection pool for query handling
 
 // Get all animals
 const getAllAnimals = (req, res) => {
     const sql = `SELECT * FROM animal`;
-    
-    dbConnection.query(sql, (err, result) => {
+
+    pool.query(sql, (err, result) => {
         if (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
-        
+
         sendResponse(res, 200, { animals: result });
     });
 };
@@ -23,17 +23,17 @@ const getAnimalById = (req, res) => {
     }
 
     const sql = `SELECT * FROM animal WHERE Animal_ID = ?`;
-    
-    dbConnection.query(sql, [Animal_ID], (err, result) => {
+
+    pool.query(sql, [Animal_ID], (err, result) => {
         if (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
-        
+
         if (result.length === 0) {
             return sendResponse(res, 404, { error: "Animal not found" });
         }
-        
+
         sendResponse(res, 200, { animal: result[0] });
     });
 };
@@ -48,19 +48,18 @@ const createAnimal = (req, res) => {
 
     const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status) 
                  VALUES (?, ?, ?, ?, ?)`;
-    
-    dbConnection.query(sql, [Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status], 
-        (err, result) => {
-            if (err) {
-                console.error("Database query error:", err);
-                return sendResponse(res, 500, { error: "Database error" });
-            }
-            
-            sendResponse(res, 201, { 
-                message: "Animal created successfully",
-                Animal_ID: result.insertId
-            });
+
+    pool.query(sql, [Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status], (err, result) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        sendResponse(res, 201, { 
+            message: "Animal created successfully",
+            Animal_ID: result.insertId
         });
+    });
 };
 
 // Update an animal's information
@@ -111,17 +110,17 @@ const updateAnimal = (req, res) => {
     updateValues.push(Animal_ID);
 
     const sql = `UPDATE animal SET ${updateFields.join(", ")} WHERE Animal_ID = ?`;
-    
-    dbConnection.query(sql, updateValues, (err, result) => {
+
+    pool.query(sql, updateValues, (err, result) => {
         if (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
         }
-        
+
         if (result.affectedRows === 0) {
             return sendResponse(res, 404, { error: "Animal not found" });
         }
-        
+
         sendResponse(res, 200, { message: "Animal updated successfully" });
     });
 };
@@ -137,4 +136,4 @@ export default {
     getAnimalById, 
     createAnimal, 
     updateAnimal 
-}; 
+};

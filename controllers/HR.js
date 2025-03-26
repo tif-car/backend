@@ -1,4 +1,4 @@
-import dbConnection from "../db.js";
+import pool from "../db.js"; // Use pool instead of dbConnection
 
 // Edit an existing employee
 const editEmployee = (req, res) => {
@@ -7,29 +7,32 @@ const editEmployee = (req, res) => {
         body += chunk.toString();
     });
 
-       //will parse the JSON body sent by frontend
-    req.on("end", () => {
+    req.on("end", async () => {
         const { Employee_ID, Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = JSON.parse(body);
 
-        //Employee_ID needs to be provided
+        // Employee_ID needs to be provided
         if (!Employee_ID) {
             return sendResponse(res, 400, { error: "Employee_ID is required for updating an employee." });
         }
 
-        //update the table employee
+        // Update the table employee
         const sql = `UPDATE employee 
                      SET Name = ?, Role = ?, Salary = ?, Work_Location_ID = ?, Phone_number = ?, Email = ?, Password = ?
                      WHERE Employee_ID = ?`;
 
-        //will execute query with the new values
-        dbConnection.query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password, Employee_ID], (err, result) => {
-            if (err) {
-                console.error("Database update error:", err);
-                return sendResponse(res, 500, { error: "Database error while updating employee." });
+        try {
+            const [result] = await pool.promise().query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password, Employee_ID]);
+
+            // If no rows are affected, that means the employee wasn't found
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "Employee not found." });
             }
 
             sendResponse(res, 200, { message: "Employee updated successfully." });
-        });
+        } catch (err) {
+            console.error("Database update error:", err);
+            sendResponse(res, 500, { error: "Database error while updating employee." });
+        }
     });
 };
 
@@ -40,28 +43,26 @@ const createEmployee = (req, res) => {
         body += chunk.toString();
     });
 
-    //will parse the JSON body sent by frontend
-    req.on("end", () => {
+    req.on("end", async () => {
         const { Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = JSON.parse(body);
 
-        //This is to make sure all required fields are provided
+        // This is to make sure all required fields are provided
         if (!Name || !Role || !Salary || !Work_Location_ID || !Phone_number || !Email || !Password) {
             return sendResponse(res, 400, { error: "All fields are required to create a new employee." });
         }
-        
-        //add new information into the employee table
+
+        // Add new information into the employee table
         const sql = `INSERT INTO employee (Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password) 
                      VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-        //Execute the query with provided values
-        dbConnection.query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password], (err, result) => {
-            if (err) {
-                console.error("Database insertion error:", err);
-                return sendResponse(res, 500, { error: "Database error while adding employee." });
-            }
+        try {
+            const [result] = await pool.promise().query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password]);
 
             sendResponse(res, 201, { message: "Employee created successfully.", Employee_ID: result.insertId });
-        });
+        } catch (err) {
+            console.error("Database insertion error:", err);
+            sendResponse(res, 500, { error: "Database error while adding employee." });
+        }
     });
 };
 

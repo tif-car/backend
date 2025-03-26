@@ -1,4 +1,4 @@
-import dbConnection from "../db.js"; 
+import pool from "../db.js";  // Assuming pool is the connection pool object.
 
 /*
 Endpoints:
@@ -17,11 +17,13 @@ const updateAnimalWellness = (req, res) => {
     }
 
     const sql = `UPDATE animal SET Wellness_status = ? WHERE animal_ID = ?`;
-    dbConnection.query(sql, [wellness_status, animal_ID], (err, result) => {
+    
+    pool.query(sql, [wellness_status, animal_ID], (err, result) => {
         if (err) {
             console.error("Database update error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
+            return sendResponse(res, 500, { error: "Database error occurred while updating wellness status." });
         }
+
         if (result.affectedRows === 0) {
             return sendResponse(res, 404, { error: "Animal not found or no changes made." });
         }
@@ -43,10 +45,10 @@ const createMedicalRecord = (req, res) => {
         INSERT INTO medical_record (Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment)
         VALUES (?, ?, ?, ?, ?)`;
 
-    dbConnection.query(insertQuery, [Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment], (err, result) => {
+    pool.query(insertQuery, [Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment], (err, result) => {
         if (err) {
             console.error("Database insert error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
+            return sendResponse(res, 500, { error: "Database error occurred while creating medical record." });
         }
 
         sendResponse(res, 201, { message: "Medical record created successfully.", Record_ID: result.insertId });
@@ -67,10 +69,10 @@ const editMedicalRecord = (req, res) => {
         SET Animal_ID = ?, Employee_ID = ?, Checkup_Date = ?, Diagnosis = ?, Treatment = ?
         WHERE Record_ID = ?`;
 
-    dbConnection.query(updateQuery, [Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment, Record_ID], (err, result) => {
+    pool.query(updateQuery, [Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment, Record_ID], (err, result) => {
         if (err) {
             console.error("Database update error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
+            return sendResponse(res, 500, { error: "Database error occurred while updating medical record." });
         }
 
         if (result.affectedRows === 0) {

@@ -1,5 +1,4 @@
-
-import dbConnection from "../db.js";
+import pool from "../db.js"; // Use pool for database queries
 
 /*
 Endpoints:
@@ -7,7 +6,7 @@ Endpoints:
 */
 
 // Get animal care tasks based on employee_ID
-const getAnimalCareTasks = (req, res) => {
+const getAnimalCareTasks = async (req, res) => {
     const { employee_ID } = req.body || {};
 
     if (!employee_ID) {
@@ -22,11 +21,10 @@ const getAnimalCareTasks = (req, res) => {
         JOIN habitat h ON a.habitat_ID = h.Habitat_ID
         WHERE f.employee_ID = ?`;
 
-    dbConnection.query(sql, [employee_ID], (err, result) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
-        }
+    try {
+        // Use pool.query() with promise
+        const [result] = await pool.promise().query(sql, [employee_ID]);
+
         if (result.length === 0) {
             console.log("No animal found for the employee.");
             return sendResponse(res, 404, { error: "No animal found for this employee." });
@@ -41,7 +39,10 @@ const getAnimalCareTasks = (req, res) => {
         }));
 
         sendResponse(res, 200, { animals });
-    });
+    } catch (err) {
+        console.error("Database query error:", err);
+        return sendResponse(res, 500, { error: "Database error" });
+    }
 };
 
 // Helper function to send JSON responses
