@@ -38,10 +38,6 @@ const loginUser = async (req, res) => {
 
             if (employeeResult.length > 0) {
                 if (password === employeeResult[0].password) {
-                    let roleNumber = 1;
-                    if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
-                        roleNumber = 2;
-                    }
                     return sendResponse(res, 200, { 
                         id: employeeResult[0].employee_ID,
                         user_type: employeeResult[0].role_types,
@@ -62,7 +58,7 @@ const loginUser = async (req, res) => {
                 if (password === visitorResult[0].password) {
                     return sendResponse(res, 200, { 
                         id: visitorResult[0].visitor_ID,
-                        user_type: "member",
+                        user_type: "visitor",
                         message: "Login successful"
                     });
                 } else {
