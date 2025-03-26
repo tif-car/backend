@@ -27,24 +27,20 @@ const loginUser = async (req, res) => {
                 return sendResponse(res, 400, { error: "Email and password are required" });
             }
 
-            const employeeQuery = `
-                SELECT e.employee_ID, e.password, r.role_types, r.role_typeID
-                FROM employee e
-                JOIN role_type r ON e.Role = r.role_typeID
-                WHERE e.email = ?`;
+    // First check if email exists in employee table
+    const employeeQuery = `SELECT e.employee_ID, e.password, r.role_types
+                           FROM employee e
+                           JOIN role_type r ON e.Role = r.role_typeID
+                           WHERE e.email = ?`;
 
             // Query database using async/await and pool.query()
             const [employeeResult] = await pool.promise().query(employeeQuery, [email]);
 
             if (employeeResult.length > 0) {
                 if (password === employeeResult[0].password) {
-                    let roleNumber = 1;
-                    if (employeeResult[0].role_types.toLowerCase().includes('admin')) {
-                        roleNumber = 2;
-                    }
                     return sendResponse(res, 200, { 
                         id: employeeResult[0].employee_ID,
-                        role: roleNumber,
+                        user_type: employeeResult[0].role_types,
                         message: "Login successful"
                     });
                 } else {
@@ -62,7 +58,7 @@ const loginUser = async (req, res) => {
                 if (password === visitorResult[0].password) {
                     return sendResponse(res, 200, { 
                         id: visitorResult[0].visitor_ID,
-                        role: 0,
+                        user_type: "visitor",
                         message: "Login successful"
                     });
                 } else {
