@@ -1,18 +1,24 @@
 import HRController from "../controllers/HR.js";
-import authController from "../controllers/authController.js";
 
 /**
     Endpoints Available:
-    - `POST /api/editEmployee` : Edits an existing employee. This requires Employee_ID
-    - `POST /api/createEmployee` : Creates a new employee in the employee table
-    - `POST /api/loginUser` : Authenticates a user and returns role details
-    - `POST /api/getUserRole` : Fetches the role of a given user
+    - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
+    - `POST /api/editAllEmployeeRow` : Edits an entire row of an employee. Requires all fields.
+    - `POST /api/createEmployee` : Creates a new employee in the employee table.
 */
 
 const adminRoutes = {
     "/api/editEmployee": (req, res) => {
         if (req.method === "POST") {
-            HRController.editEmployee(req, res);
+            HRController.editEmployee(req, res);  // Partial updates
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    "/api/editAllEmployeeRow": (req, res) => {
+        if (req.method === "POST") {
+            HRController.editAllEmployeeRow(req, res);  // Full row update
         } else {
             sendMethodNotAllowed(res);
         }
@@ -21,22 +27,6 @@ const adminRoutes = {
     "/api/createEmployee": (req, res) => {
         if (req.method === "POST") {
             HRController.createEmployee(req, res);
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
-
-    "/api/loginUser": (req, res) => {
-        if (req.method === "POST") {
-            authController.loginUser(req, res);
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
-
-    "/api/getUserRole": (req, res) => {
-        if (req.method === "POST") {
-            authController.getUserRole(req, res);
         } else {
             sendMethodNotAllowed(res);
         }

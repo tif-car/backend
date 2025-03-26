@@ -10,7 +10,7 @@ import memberRoutes from "./routes/memberRoutes.js";
 import adminRoutes from "./routes/adminRoute.js";
 import managerRoutes from "./routes/managerRoute.js"; 
 import authRoutes from "./routes/authRoute.js";
-import feedingLogRoutes from "./routes/feedingLogRoutes.js"
+import logRoutes from "./routes/LogRoutes.js"
 
 
 
@@ -22,7 +22,8 @@ const routes = {
     ...employeeRoutes,  // Employee routes
     ...managerRoutes,   // Manager 
     ...authRoutes,
-    ...feedingLogRoutes,
+    ...logRoutes,
+    ...memberRoutes,
 
 };
 
