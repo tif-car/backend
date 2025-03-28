@@ -92,12 +92,8 @@ const animalFeedingController = {
 
     getFeedingQueryFormInfo: async (req, res) => {
 
-        if (!employee_ID) {
-            return sendResponse(res, 400, { error: "employee_ID is required" });
-        }
-
         const empSql = `
-            select distinct e.Name ,e.Employee_ID
+            select distinct e.first_name, last_name ,e.Employee_ID
             from employee e
             join Feeding_log Fl on e.Employee_ID = Fl.Employee_ID;`;
 
@@ -139,67 +135,78 @@ const animalFeedingController = {
     QueryFeedingLogs: async (req, res) => {
         const { animal_ID, employee_ID, date, time, foodtID, species_ID, Habitat_ID } = req.body || {} ;
 
-        const query = `select A.Animal_Name, s.Name, e.Name, ft.food_Types, u.Unit_text, fl.Feeding_Date, fl.Feeding_Time
+        let query = `select
+                        A.Animal_Name,
+                        s.Name,
+                        e.first_name,
+                        e.last_name,
+                        ft.food_Types,
+                        fl.Quantity,
+                        u.Unit_text,
+                        fl.Feeding_Date,
+                        fl.Feeding_Time
                     from feeding_log fl
                     join Animal A on fl.Animal_ID = A.Animal_ID
                     join employee e on fl.Employee_ID = e.Employee_ID
                     join Species S on A.Species_ID = S.Species_ID
                     join unit u on u.Unit_ID = fl.Q_Unit
-                    join food_type ft on ft.foodtype_ID = fl.Food_Type
-                    where fl.Q_Unit= 1;`;
+                    join food_type ft on ft.foodtype_ID = fl.Food_Type `;
         
         // Initialize conditions and parameters
-    const conditions = [];
-    const parameters = [];
+        const conditions = [];
+        const parameters = [];
 
-    // Dynamically add conditions based on provided parameters
-    if (animal_ID) {
-        conditions.push("fl.Animal_ID = ?");
-        parameters.push(animal_ID);
-    }
-    
-    if (employee_ID) {
-        conditions.push("fl.Employee_ID = ?");
-        parameters.push(employee_ID);
-    }
-    
-    if (date) {
-        conditions.push("fl.Feeding_Date = ?");
-        parameters.push(date);
-    }
-    
-    if (time) {
-        conditions.push("fl.Feeding_Time = ?");
-        parameters.push(time);
-    }
-    
-    if (foodtID) {
-        conditions.push("fl.Food_Type = ?");
-        parameters.push(foodtID);
-    }
-    
-    if (species_ID) {
-        conditions.push("A.Species_ID = ?");
-        parameters.push(species_ID);
-    }
-    
-    if (Habitat_ID) {
-        conditions.push("A.Habitat_ID = ?");
-        parameters.push(Habitat_ID);
-    }
-
-    // Add WHERE clause if any conditions exist
-    if (conditions.length > 0) {
-        query += " WHERE " + conditions.join(" AND ");
-    } 
+        // Dynamically add conditions based on provided parameters
+        if (animal_ID) {
+            conditions.push("fl.Animal_ID = ?");
+            parameters.push(animal_ID);
+        }
         
-    try{
-        const [logs] = await pool.promise().query(conditions, parameters);
-        sendResponse(res, 200, logs);
-    } catch(error){
-        console.error('Error in getFeedingLogsByEmployee:', error);
-        sendResponse(res, 500, { error: "Internal server error" });
-    }
+        if (employee_ID) {
+            conditions.push("fl.Employee_ID = ?");
+            parameters.push(employee_ID);
+        }
+        
+        if (date) {
+            conditions.push("fl.Feeding_Date = ?");
+            parameters.push(date);
+        }
+        
+        if (time) {
+            conditions.push("fl.Feeding_Time = ?");
+            parameters.push(time);
+        }
+        
+        if (foodtID) {
+            conditions.push("fl.Food_Type = ?");
+            parameters.push(foodtID);
+        }
+        
+        if (species_ID) {
+            conditions.push("A.Species_ID = ?");
+            parameters.push(species_ID);
+        }
+        
+        if (Habitat_ID) {
+            conditions.push("A.Habitat_ID = ?");
+            parameters.push(Habitat_ID);
+        }
+
+        // Add WHERE clause if any conditions exist
+        if (conditions.length > 0) {
+            query += " WHERE " + conditions.join(" AND ");
+        } 
+            
+        try{
+            // Only pass parameters if they exist
+            const [logs] = parameters.length > 0 
+                ? await pool.promise().query(query, parameters)
+                : await pool.promise().query(query);
+            sendResponse(res, 200, logs);
+        } catch(error){
+            console.error('Error in getFeedingLogsByEmployee:', error);
+            sendResponse(res, 500, { error: "Internal server error" });
+        }
 
     },
 
