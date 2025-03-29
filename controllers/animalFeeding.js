@@ -1,7 +1,7 @@
 import pool from "../db.js";
 
 const animalFeedingController = {
-    // Existing functions from your friend's code
+   
     getFeedingDetails: async (req, res) => {
         const { employee_ID, animal_ID } = req.body;
 
@@ -44,8 +44,8 @@ const animalFeedingController = {
             WHERE e.Employee_ID = ?;
         `;
 
-        const unitSql = `SELECT * FROM unit;`; // Units[0].id or .unit_text
-        const foodSql = `SELECT * FROM food_type;`;//Food_types[n].foodID or food_text 
+        const unitSql = `SELECT * FROM unit;`;
+        const foodSql = `SELECT * FROM food_type;`;
 
         try {
             const [aniResult] = await pool.promise().query(animalSql, [employee_ID]);
@@ -57,9 +57,9 @@ const animalFeedingController = {
             }
 
             const combinedResults = {
-                Animals: aniResult, // [Animal_ID, Animal_name]
-                Units: uniResult, // [Unit_ID, Unit_text]
-                Food_types: fResult // [Food_ID, Food_text]
+                Animals: aniResult,
+                Units: uniResult,
+                Food_types: fResult
             };
 
             sendResponse(res, 200, combinedResults);
@@ -100,8 +100,8 @@ const animalFeedingController = {
 
         const aniSql = `select a.Animal_Name, a.Animal_ID from animal a;`;
         const habSql = `select h.Habitat_Name, h.Habitat_ID from habitat h;`; 
-        const unitSql = `SELECT * FROM unit;`; // Units[0].id or .unit_text
-        const foodSql = `SELECT * FROM food_type;`;//Food_types[n].foodID or food_text
+        const unitSql = `SELECT * FROM unit;`;
+        const foodSql = `SELECT * FROM food_type;`;
         const speSql = `select s.Species_ID, s.Name from species s;`;
 
         try {
@@ -117,12 +117,12 @@ const animalFeedingController = {
             }
 
             const combinedResults = {
-                Animals: aniResult, // [Animal_ID, Animal_name]
-                Units: uniResult, // [Unit_ID, Unit_text]
-                Food_types: fResult, // [Food_ID, Food_text]
-                Employees: empResult, // [employee_id, name]
-                Habitats: habResult, // [habitat_id, habitat_name]
-                Species: speResult, // [species_id, species_name]
+                Animals: aniResult,
+                Units: uniResult,
+                Food_types: fResult,
+                Employees: empResult,
+                Habitats: habResult,
+                Species: speResult
             };
 
             sendResponse(res, 200, combinedResults);
@@ -152,11 +152,9 @@ const animalFeedingController = {
                     join unit u on u.Unit_ID = fl.Q_Unit
                     join food_type ft on ft.foodtype_ID = fl.Food_Type `;
         
-        // Initialize conditions and parameters
         const conditions = [];
         const parameters = [];
 
-        // Dynamically add conditions based on provided parameters
         if (animal_ID) {
             conditions.push("fl.Animal_ID = ?");
             parameters.push(animal_ID);
@@ -192,13 +190,11 @@ const animalFeedingController = {
             parameters.push(Habitat_ID);
         }
 
-        // Add WHERE clause if any conditions exist
         if (conditions.length > 0) {
             query += " WHERE " + conditions.join(" AND ");
         } 
             
         try{
-            // Only pass parameters if they exist
             const [logs] = parameters.length > 0 
                 ? await pool.promise().query(query, parameters)
                 : await pool.promise().query(query);
@@ -210,7 +206,6 @@ const animalFeedingController = {
 
     },
 
-    // Our new functions for retrieving feeding logs
     getFeedingLogsByEmployee: async (req, res) => {
         try {
             const { Employee_ID } = req.body;
@@ -352,7 +347,6 @@ const animalFeedingController = {
     }
 };
 
-// Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
     res.writeHead(statusCode, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data));
