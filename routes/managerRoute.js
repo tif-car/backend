@@ -1,4 +1,5 @@
 import attractionController from "../controllers/attraction.js";
+import vendorReportController from "../controllers/vendorReport.js"
 
 /*
 Endpoints:
@@ -20,6 +21,14 @@ const managerRoutes = {
     "/api/updateAttractionStatus": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, attractionController.updateAttractionStatus);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    "/api/getReportFormInfo": (req,res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, vendorReportController.getVendorQueryFormInfo);
         } else {
             sendMethodNotAllowed(res);
         }
