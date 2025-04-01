@@ -92,16 +92,17 @@ const vendorReportController = {
             if (!Merchandise_ID) {
                 let vendorQuery = `
                     SELECT 
-                        DATE(o.Order_date) AS sale_date,
-                        CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
-                        o.vendor_ID
+                      MIN(DATE(o.Order_date)) AS start_date,
+                      MAX(DATE(o.Order_date)) AS end_date,
+                      CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
+                      o.vendor_ID
+                      
                     FROM orders o
                     JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
                     JOIN vendor v ON o.vendor_ID = v.Vendor_ID
                     ${whereClause}
-                    GROUP BY sale_date, o.vendor_ID
-                    ORDER BY o.vendor_ID, sale_date
+                    GROUP BY o.vendor_ID
+                    ORDER BY o.vendor_ID
                 `;
                 
                 let [vendorResults] = await pool.promise().query(vendorQuery, params);
@@ -110,16 +111,16 @@ const vendorReportController = {
 
             let itemQuery = `
                 SELECT 
-                    DATE(o.Order_date) AS sale_date,
+                    MIN(DATE(o.Order_date)) AS start_date,
+                    MAX(DATE(o.Order_date)) AS end_date,
                     CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                    SUM(o.Total_Amount) AS raw_total,
                     o.Merch_ItemID
                 FROM orders o
                 JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
                 JOIN vendor v ON o.vendor_ID = v.Vendor_ID
                 ${whereClause}
-                GROUP BY sale_date, o.Merch_ItemID
-                ORDER BY o.Merch_ItemID, sale_date
+                GROUP BY  o.Merch_ItemID
+                ORDER BY o.Merch_ItemID
             `;
             
             let [itemResults] = await pool.promise().query(itemQuery, params);
@@ -128,16 +129,16 @@ const vendorReportController = {
             if (!Merchandise_ID) {
                 let deptQuery = `
                     SELECT 
-                        DATE(o.Order_date) AS sale_date,
+                        MIN(DATE(o.Order_date)) AS start_date,
+                        MAX(DATE(o.Order_date)) AS end_date,
                         CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
                         v.Dept_ID
                     FROM orders o
                     JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
                     JOIN vendor v ON o.vendor_ID = v.Vendor_ID
                     ${whereClause}
-                    GROUP BY sale_date, v.Dept_ID
-                    ORDER BY v.Dept_ID, sale_date
+                    GROUP BY  v.Dept_ID
+                    ORDER BY v.Dept_ID
                 `;
                 
                 let [deptResults] = await pool.promise().query(deptQuery, params);
@@ -147,16 +148,16 @@ const vendorReportController = {
             if (!Merchandise_ID) {
                 let itemTypeQuery = `
                     SELECT 
-                        DATE(o.Order_date) AS sale_date,
+                        MIN(DATE(o.Order_date)) AS start_date,
+                        MAX(DATE(o.Order_date)) AS end_date,
                         CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
                         m.Item_Type
                     FROM orders o
                     JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
                     JOIN vendor v ON o.vendor_ID = v.Vendor_ID
                     ${whereClause}
-                    GROUP BY sale_date, m.Item_Type
-                    ORDER BY m.Item_Type, sale_date
+                    GROUP BY  m.Item_Type
+                    ORDER BY m.Item_Type
                 `;
                 
                 let [itemTypeResults] = await pool.promise().query(itemTypeQuery, params);
