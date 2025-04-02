@@ -1,9 +1,11 @@
 import HRController from "../controllers/HR.js";
+import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 
 /**
     Endpoints Available:
     - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
     - `POST /api/createEmployee` : Creates a new employee in the employee table.
+    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
 */
 
 const adminRoutes = {
@@ -22,6 +24,15 @@ const adminRoutes = {
         } else {
             sendMethodNotAllowed(res);
         }
+    },
+
+     //maintenance trigger
+    "/api/getMaintenanceNotifications": (req, res) => {
+        if (req.method === "POST") {
+            maintenanceTrigger(req, res);
+        } else {
+            sendMethodNotAllowed(res);
+        }
     }
 };
 
@@ -32,3 +43,5 @@ function sendMethodNotAllowed(res) {
 }
 
 export default adminRoutes;
+
+
