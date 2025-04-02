@@ -1,4 +1,5 @@
 import attractionController from "../controllers/attraction.js";
+import vendorReportController from "../controllers/vendorReportController.js"
 
 /*
 Endpoints:
@@ -23,7 +24,22 @@ const managerRoutes = {
         } else {
             sendMethodNotAllowed(res);
         }
-    }
+    },
+
+    "/api/getVendMerchReportFormInfo": (req,res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, vendorReportController.getVendorQueryFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+    "/api/getVendMerchReport": (req,res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, vendorReportController.getReport);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
 };
 
 // Helper function to parse request body and call the appropriate controller

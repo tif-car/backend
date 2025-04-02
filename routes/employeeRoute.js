@@ -79,7 +79,7 @@ const employeeRoutes = {
         }
     },
     // Route to Query feeding logs
-    "/api/getFeedingQueryDetails": (req, res) => {
+    "/api/QueryFeedingLogs": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalFeedingController.QueryFeedingLogs);
         } else {
