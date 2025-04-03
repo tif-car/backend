@@ -1,9 +1,5 @@
 import pool from "../db.js"; // Use pool for database queries
 
-/*
-Endpoints:
-- `POST /api/getAnimalCareTasks`: Fetches animal care information such as `animal_ID`, `animal_name`, and `habitat_ID`, based on `employee_ID`.
-*/
 
 // Get animal care tasks based on employee_ID
 const getAnimalCareTasks = async (req, res) => {
@@ -30,6 +26,13 @@ const getAnimalCareTasks = async (req, res) => {
         JOIN animal a ON f.animal_ID = a.animal_ID
         JOIN habitat h ON a.habitat_ID = h.Habitat_ID
         WHERE f.employee_ID = ?`;
+        /*
+SELECT A.animal_ID, A.animal_name, A.habitat_ID, H.Habitat_Name 
+FROM feeding_log F, animal A, habitat H 
+WHERE A.habitat_ID = H.Habitat_ID 
+AND F.animal_ID = A.animal_ID 
+AND F.employee_ID = ?;
+ */
 
     try {
         // Use pool.query() with promise

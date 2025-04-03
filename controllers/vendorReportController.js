@@ -1,33 +1,6 @@
 import pool from "../db.js";
 
 const vendorReportController = {
-    getVendorQueryFormInfo: async (req, res) => {
-
-        const deptSql = `select d.Department_ID, d.name from department d;`;
-        const vendSql = `select v.Vendor_ID, v.name, v.Dept_ID from vendor v;`; 
-        const itemTSql = `select i.item_typeID, i.item_types from item_types i;`; 
-        const merchSql = `select m.Merchandise_ID, m.Item_Name, m.Item_Type from merchandise m;`;
-
-        try {
-            const [deptResult] = await pool.promise().query(deptSql);
-            const [vendResult] = await pool.promise().query(vendSql);
-            const [itemTResult] = await pool.promise().query(itemTSql);
-            const [merchResult] = await pool.promise().query(merchSql);
-
-            const combinedResults = {
-                Departments: deptResult, // [Department_ID, name]
-                Vendors: vendResult, // [Vendor_ID, name, Dept_ID]
-                Item_types: itemTResult, // [item_typeID, item_types]
-                Merchandise: merchResult, // [Merchandise_ID, Item_Name, Item_Type]
-            };
-
-            sendResponse(res, 200, combinedResults);
-        } catch (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
-        }
-    },
-    
     getReport: async (req, res) => {
         try {
             const {
@@ -44,10 +17,7 @@ const vendorReportController = {
             }
 
             let conditions = [];
-            let params = [];
-
-            conditions.push("o.Order_date BETWEEN ? AND ?");
-            params.push(start_date, end_date);
+            let params = [start_date, end_date];
 
             if (Dept_ID) {
                 conditions.push("v.Dept_ID = ?");
@@ -69,12 +39,10 @@ const vendorReportController = {
                 params.push(Merchandise_ID);
             }
 
-            let whereClause = conditions.length > 0 
-                ? "WHERE " + conditions.join(" AND ") 
-                : "";
+            const whereClause = conditions.length ? "AND " + conditions.join(" AND ") : "";
 
             let reportData = {
-                title: "Vendor and Merchandise Sales",
+                title: "Vendor and Merchandise Sales Report",
                 parameters: {
                     start_date,
                     end_date,
@@ -89,90 +57,94 @@ const vendorReportController = {
                 itemTypeSales: []
             };
 
-            if (!Merchandise_ID) {
-                let vendorQuery = `
-                    SELECT 
-                        DATE(o.Order_date) AS sale_date,
-                        CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
-                        o.vendor_ID
-                    FROM orders o
-                    JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
-                    JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                    ${whereClause}
-                    GROUP BY sale_date, o.vendor_ID
-                    ORDER BY o.vendor_ID, sale_date
-                `;
-                
-                let [vendorResults] = await pool.promise().query(vendorQuery, params);
-                reportData.vendorSales = vendorResults;
-            }
-
-            let itemQuery = `
-                SELECT 
-                    DATE(o.Order_date) AS sale_date,
-                    CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                    SUM(o.Total_Amount) AS raw_total,
-                    o.Merch_ItemID
+           
+            const vendorQuery = `
+               SELECT
+                    DATE(o.Order_Date) AS sale_date,
+                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+                    o.vendor_ID
                 FROM orders o
-                JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
+                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
+                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
                 JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                ${whereClause}
-                GROUP BY sale_date, o.Merch_ItemID
-                ORDER BY o.Merch_ItemID, sale_date
-            `;
+                WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+
+                GROUP BY sale_date, o.vendor_ID
+                ORDER BY o.vendor_ID, sale_date;
             
-            let [itemResults] = await pool.promise().query(itemQuery, params);
+            `;
+            const [vendorResults] = await pool.promise().query(vendorQuery, params);
+            reportData.vendorSales = vendorResults;
+
+            
+            const itemQuery = `
+                 SELECT
+                    DATE(o.Order_Date) AS sale_date,
+                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+                    m.Merchandise_ID
+                FROM orders o
+                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
+                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
+                JOIN vendor v ON o.vendor_ID = v.Vendor_ID
+               WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+
+                GROUP BY sale_date, m.Merchandise_ID
+                ORDER BY m.Merchandise_ID, sale_date;
+            `;
+            const [itemResults] = await pool.promise().query(itemQuery, params);
             reportData.itemSales = itemResults;
 
-            if (!Merchandise_ID) {
-                let deptQuery = `
-                    SELECT 
-                        DATE(o.Order_date) AS sale_date,
-                        CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
-                        v.Dept_ID
-                    FROM orders o
-                    JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
-                    JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                    ${whereClause}
-                    GROUP BY sale_date, v.Dept_ID
-                    ORDER BY v.Dept_ID, sale_date
-                `;
+           
+            const deptQuery = `
                 
-                let [deptResults] = await pool.promise().query(deptQuery, params);
-                reportData.deptSales = deptResults;
-            }
+                   SELECT
+                    DATE(o.Order_Date) AS sale_date,
+                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+                    v.Dept_ID
+                FROM orders o
+                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
+                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
+                JOIN vendor v ON o.vendor_ID = v.Vendor_ID
+                WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
 
+                GROUP BY sale_date, v.Dept_ID
+                ORDER BY v.Dept_ID, sale_date;
+            `;
+            const [deptResults] = await pool.promise().query(deptQuery, params);
+            reportData.deptSales = deptResults;
+
+           
             if (!Merchandise_ID) {
-                let itemTypeQuery = `
-                    SELECT 
-                        DATE(o.Order_date) AS sale_date,
-                        CONCAT('$', FORMAT(SUM(o.Total_Amount), 2)) AS total_sales,
-                        SUM(o.Total_Amount) AS raw_total,
+                const itemTypeQuery = `
+                   SELECT
+                        DATE(o.Order_Date) AS sale_date,
+                        CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
                         m.Item_Type
                     FROM orders o
-                    JOIN merchandise m ON o.Merch_ItemID = m.Merchandise_ID
+                    JOIN bought_item bi ON o.Order_ID = bi.Order_ID
+                    JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
                     JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                    ${whereClause}
+                    WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+                    ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+
                     GROUP BY sale_date, m.Item_Type
-                    ORDER BY m.Item_Type, sale_date
+                    ORDER BY m.Item_Type, sale_date;
                 `;
-                
-                let [itemTypeResults] = await pool.promise().query(itemTypeQuery, params);
+                const [itemTypeResults] = await pool.promise().query(itemTypeQuery, params);
                 reportData.itemTypeSales = itemTypeResults;
             }
 
             sendResponse(res, 200, reportData);
         } catch (error) {
-            console.error('Error generating sales report:', error);
+            console.error("Error generating sales report:", error);
             sendResponse(res, 500, { error: "Internal server error" });
         }
     }
-
 };
 
-// Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
     res.writeHead(statusCode, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data));
