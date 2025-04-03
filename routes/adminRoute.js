@@ -1,11 +1,13 @@
 import HRController from "../controllers/HR.js";
 import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
+import vendorTrigger from "../controllers/vendorTrigger.js";
 
 /**
     Endpoints Available:
     - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
     - `POST /api/createEmployee` : Creates a new employee in the employee table.
     - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
+    - `POST /api/getVendorNotifications` : Fetches new vendor notifications.
 */
 
 const adminRoutes = {
@@ -30,6 +32,14 @@ const adminRoutes = {
     "/api/getMaintenanceNotifications": (req, res) => {
         if (req.method === "POST") {
             maintenanceTrigger(req, res);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    "/api/getVendorNotifications": (req, res) => {
+        if (req.method === "POST") {
+            getVendorNotifications(req, res);
         } else {
             sendMethodNotAllowed(res);
         }
