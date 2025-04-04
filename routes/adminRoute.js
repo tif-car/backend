@@ -1,7 +1,7 @@
 import HRController from "../controllers/HR.js";
 import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 import vendorTrigger from "../controllers/vendorTrigger.js";
-import purchaseController from "../controllers/purchaseController.js";
+import purchaseController from "../controllers/purchases.js";
 
 /*
     Endpoints Available:
@@ -50,14 +50,14 @@ const adminRoutes = {
         }
     },
 
-        //insert into bulk_purchase
-        "/api/updateBulkPurchase": (req, res) => {
-            if (req.method === "POST") {
-                purchaseController.updateBulkPurchase(req, res);
-            } else {
-                sendMethodNotAllowed(res);
+            //insert into bulk_purchase
+            "/api/updateBulkPurchase": (req, res) => {
+                if (req.method === "POST") {
+                    purchaseController.updateBulkPurchase(req, res);
+                } else {
+                    sendMethodNotAllowed(res);
+                }
             }
-        }
 
 };
 

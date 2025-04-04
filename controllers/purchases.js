@@ -1,4 +1,4 @@
-import pool from "../db.js"; // Use pool for database queries
+import pool from "../db.js";                   // Use pool for database queries
 
 // Update the amount_of_items in bulk_purchase table
 const updateBulkPurchase = async (req, res) => {
@@ -45,4 +45,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { updateBulkPurchase };
+export default {updateBulkPurchase};
