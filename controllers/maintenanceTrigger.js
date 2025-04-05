@@ -3,7 +3,7 @@ import dbConnection from "../db.js";
 const getMaintenanceNotifications = (req, res) => {
     const sql = `SELECT maintenance_messageID, maintenance_employeeID, message 
                  FROM maintenance_notifications 
-                 WHERE sent = FALSE
+                 WHERE message_sent = FALSE
                  ORDER BY maintenance_messageID DESC`;
 
     dbConnection.query(sql, (err, result) => {
@@ -20,7 +20,7 @@ const getMaintenanceNotifications = (req, res) => {
         sendResponse(res, 200, { notifications: result });
 
         // Mark notifications as "sent"
-        const updateSql = `UPDATE maintenance_notifications SET sent = TRUE 
+        const updateSql = `UPDATE maintenance_notifications SET message_sent = TRUE 
                            WHERE maintenance_messageID IN (?)`;
 
         const notificationIds = result.map(row => row.maintenance_messageID);
@@ -33,7 +33,7 @@ const getMaintenanceNotifications = (req, res) => {
                     console.log("Notifications marked as sent.");
                 }
             });
-        }
+        } 
     });
 };
 

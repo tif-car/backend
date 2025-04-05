@@ -1,6 +1,33 @@
 import pool from "../db.js";
 
 const vendorReportController = {
+    getVendorReportFormInfo: async (req, res) => {
+    
+            const deptSql = `select d.Department_ID, d.name AS Department_name from department d;`;
+            const vendSql = `select a.Attraction_Name, a.Attraction_ID, a.Dept_ID  from attraction a;`; 
+            const itemTSql = `select i.item_typeID, i.item_types from item_types i;`; 
+            const merchSql = `select m.Merchandise_ID, m.Item_Name, m.Item_Type from merchandise m;`;
+    
+            try {
+                const [deptResult] = await pool.promise().query(deptSql);
+                const [vendResult] = await pool.promise().query(vendSql);
+                const [itemTResult] = await pool.promise().query(itemTSql);
+                const [merchResult] = await pool.promise().query(merchSql);
+    
+                const combinedResults = {
+                    Departments: deptResult, // [Department_ID, name]
+                    Vendors: vendResult, // [Vendor_ID, name, Dept_ID]
+                    ItemTypes: itemTResult, // [item_typeID, item_types]
+                    Merchandise: merchResult, // [Merchandise_ID, Item_Name, Item_Type]
+                };
+    
+                sendResponse(res, 200, combinedResults);
+            } catch (err) {
+                console.error("Database query error:", err);
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+    },
+
     getReport: async (req, res) => {
         try {
             const {

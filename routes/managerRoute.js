@@ -1,5 +1,6 @@
 import attractionController from "../controllers/attraction.js";
 import vendorReportController from "../controllers/vendorReportController.js"
+import ticketReportController from "../controllers/ticketReportController.js"
 
 /*
 Endpoints:
@@ -36,6 +37,20 @@ const managerRoutes = {
     "/api/getVendMerchReport": (req,res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorReportController.getReport);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+    "/api/getTicketReportFormInfo": (req,res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, ticketReportController.getTicketReportFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+    "/api/getTicketReport": (req,res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, ticketReportController.getReport);
         } else {
             sendMethodNotAllowed(res);
         }
