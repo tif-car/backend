@@ -43,5 +43,3 @@ function sendMethodNotAllowed(res) {
 }
 
 export default adminRoutes;
-
-

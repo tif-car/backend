@@ -10,7 +10,7 @@ const ticketReportController = {
 
         try {
             const [deptResult] = await pool.promise().query(deptSql);
-            const [vendResult] = await pool.promise().query(vendSql);
+            const [vendResult] = await pool.promise().query(vendSql); 
             const [itemTResult] = await pool.promise().query(itemTSql);
             const [merchResult] = await pool.promise().query(merchSql);
 
@@ -81,7 +81,7 @@ const ticketReportController = {
 
             let reportData = {
                 GeneralSales: [],
-                DeptSales: [ ],
+                DeptSales: [],
                 AttSales: [],
                 PTypeSales: [],
                 MemTypeSales: []
@@ -188,4 +188,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default vendorReportController;
+export default ticketReportController;

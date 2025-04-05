@@ -71,7 +71,7 @@ const animalFeedingController = {
 
     createFeedingLog: async (req, res) => {
         const { animal_ID, employee_ID, date, time, foodtID, quantity, unittID } = req.body;
-
+ 
         if (!employee_ID || !animal_ID || !date || !time || !foodtID || !quantity || !unittID) {
             return sendResponse(res, 400, { error: "All fields are required" });
         }
