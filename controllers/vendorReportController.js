@@ -52,9 +52,11 @@ const vendorReportController = {
             }
 
             if (Vendor_ID) {
-                conditions.push("o.vendor_ID = ?");
+                conditions.push("v.Vendor_ID = ?");
                 params.push(Vendor_ID);
             }
+            
+            
 
             if (Item_type_ID) {
                 conditions.push("m.Item_Type = ?");
@@ -62,9 +64,10 @@ const vendorReportController = {
             }
 
             if (Merchandise_ID) {
-                conditions.push("o.Merch_ItemID = ?");
+                conditions.push("m.Merchandise_ID = ?");
                 params.push(Merchandise_ID);
             }
+            
 
             const whereClause = conditions.length ? "AND " + conditions.join(" AND ") : "";
 
@@ -86,19 +89,20 @@ const vendorReportController = {
 
            
             const vendorQuery = `
-               SELECT
-                    DATE(o.Order_Date) AS sale_date,
-                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-                    o.vendor_ID
-                FROM orders o
-                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
-                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
-                JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                WHERE DATE(o.Order_Date) BETWEEN ? AND ?
-                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+             SELECT
+            DATE(o.Order_Date) AS sale_date,
+            CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+            v.Vendor_ID
+            FROM orders o
+            JOIN single_item si ON o.Order_ID = si.order_ID
+            JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
+            JOIN vendor v ON m.V_ID = v.Vendor_ID
+            WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+            ${whereClause}
+            GROUP BY sale_date, v.Vendor_ID
+            ORDER BY v.Vendor_ID, sale_date;
 
-                GROUP BY sale_date, o.vendor_ID
-                ORDER BY o.vendor_ID, sale_date;
+
             
             `;
             const [vendorResults] = await pool.promise().query(vendorQuery, params);
@@ -106,39 +110,42 @@ const vendorReportController = {
 
             
             const itemQuery = `
-                 SELECT
-                    DATE(o.Order_Date) AS sale_date,
-                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-                    m.Merchandise_ID
-                FROM orders o
-                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
-                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
-                JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-               WHERE DATE(o.Order_Date) BETWEEN ? AND ?
-                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+              SELECT
+         DATE(o.Order_Date) AS sale_date,
+         CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+        m.Merchandise_ID
+        FROM orders o
+        JOIN single_item si ON o.Order_ID = si.order_ID
+        JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
+        JOIN vendor v ON m.V_ID = v.Vendor_ID
+        WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+        ${whereClause}
+        GROUP BY sale_date, m.Merchandise_ID
+        ORDER BY m.Merchandise_ID, sale_date;
 
-                GROUP BY sale_date, m.Merchandise_ID
-                ORDER BY m.Merchandise_ID, sale_date;
-            `;
+                    `;
+
+
             const [itemResults] = await pool.promise().query(itemQuery, params);
             reportData.itemSales = itemResults;
 
            
             const deptQuery = `
                 
-                   SELECT
-                    DATE(o.Order_Date) AS sale_date,
-                    CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-                    v.Dept_ID
-                FROM orders o
-                JOIN bought_item bi ON o.Order_ID = bi.Order_ID
-                JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
-                JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                WHERE DATE(o.Order_Date) BETWEEN ? AND ?
-                ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+                  SELECT
+         DATE(o.Order_Date) AS sale_date,
+         CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+         v.Dept_ID
+        FROM orders o
+        JOIN single_item si ON o.Order_ID = si.order_ID
+        JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
+        JOIN vendor v ON m.V_ID = v.Vendor_ID
+        WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+        ${whereClause}
+        GROUP BY sale_date, v.Dept_ID
+        ORDER BY v.Dept_ID, sale_date;
 
-                GROUP BY sale_date, v.Dept_ID
-                ORDER BY v.Dept_ID, sale_date;
+
             `;
             const [deptResults] = await pool.promise().query(deptQuery, params);
             reportData.deptSales = deptResults;
@@ -146,19 +153,20 @@ const vendorReportController = {
            
             if (!Merchandise_ID) {
                 const itemTypeQuery = `
-                   SELECT
-                        DATE(o.Order_Date) AS sale_date,
-                        CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-                        m.Item_Type
-                    FROM orders o
-                    JOIN bought_item bi ON o.Order_ID = bi.Order_ID
-                    JOIN merchandise m ON bi.Item_ID = m.Merchandise_ID
-                    JOIN vendor v ON o.vendor_ID = v.Vendor_ID
-                    WHERE DATE(o.Order_Date) BETWEEN ? AND ?
-                    ${conditions.length ? ' AND ' + conditions.join(' AND ') : ''}
+                  SELECT
+                DATE(o.Order_Date) AS sale_date,
+                CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
+                 si.Item_ID
+                FROM orders o
+                JOIN single_item si ON o.Order_ID = si.order_ID
+                JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
+                JOIN vendor v ON m.V_ID = v.Vendor_ID
+                WHERE DATE(o.Order_Date) BETWEEN ? AND ?
+                ${whereClause}
+                GROUP BY sale_date, si.Item_ID
+                ORDER BY si.Item_ID, sale_date;
 
-                    GROUP BY sale_date, m.Item_Type
-                    ORDER BY m.Item_Type, sale_date;
+
                 `;
                 const [itemTypeResults] = await pool.promise().query(itemTypeQuery, params);
                 reportData.itemTypeSales = itemTypeResults;
