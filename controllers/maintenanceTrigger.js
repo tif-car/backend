@@ -31,8 +31,10 @@ const getMaintenanceNotifications = (req, res) => {
             m.maintenance_messageID, 
             m.maintenance_employeeID, 
             m.message, 
-            m.maintenance_locationID
+            ml.Location_type,
+            ml.Location_ID
         FROM maintenance_notifications m
+        JOIN maintenance_location ml ON m.maintenance_locationID = ml.Maintenance_Location
         WHERE m.message_sent = FALSE
         ORDER BY m.maintenance_messageID DESC
     `;
@@ -44,12 +46,12 @@ const getMaintenanceNotifications = (req, res) => {
         }
 
         if (result.length === 0) {
-            return sendResponse(res, 404, { error: "No new maintenance notifications" });
+            return sendResponse(res, 200, { error: "No new maintenance notifications" });
         }
 
         // For each notification, get the corresponding location name
         const notificationsWithLocation = result.map(notification => {
-            return getLocationName(notification.maintenance_locationID)
+            return getLocationName(notification.Location_ID, notification.Location_type)
                 .then(locationName => {
                     return { ...notification, Location_Name: locationName };
                 });
@@ -63,7 +65,7 @@ const getMaintenanceNotifications = (req, res) => {
                 
                 // Mark notifications as "sent"
                 //this is so the same message isn't sent twice
-                const updateSql = `UPDATE maintenance_notifications SET sent = TRUE 
+                const updateSql = `UPDATE maintenance_notifications SET message_sent = TRUE 
                                    WHERE maintenance_messageID IN (?)`;
 
                 const notificationIds = result.map(row => row.maintenance_messageID);
@@ -86,39 +88,41 @@ const getMaintenanceNotifications = (req, res) => {
 };
 
 // Function to get the location name based on the location ID
-const getLocationName = (locationID) => {
+const getLocationName = (locationID, Location_type) => {
     return new Promise((resolve, reject) => {
         // Check if it's a vendor, habitat, or attraction by querying the tables
         const vendorSql = `SELECT name FROM vendor WHERE Vendor_ID = ?`;
         const habitatSql = `SELECT Habitat_Name FROM habitat WHERE Habitat_ID = ?`;
         const attractionSql = `SELECT Attraction_Name FROM attraction WHERE Attraction_ID = ?`;
 
-        dbConnection.query(vendorSql, [locationID], (err, vendorResult) => {
-            if (err) return reject(err);
+        if(Location_type === "attraction"){
+            dbConnection.query(attractionSql, [locationID], (err, attractionResult) => {
+                if (err) return reject(err);
 
-            if (vendorResult.length > 0) {
-                return resolve(vendorResult[0].name); // Vendor name
-            }
-
+                if (attractionResult.length > 0) {
+                    return resolve(attractionResult[0].Attraction_Name); // Attraction name
+                }
+            });
+        } else if (Location_type === "habitat"){
             dbConnection.query(habitatSql, [locationID], (err, habitatResult) => {
                 if (err) return reject(err);
 
                 if (habitatResult.length > 0) {
                     return resolve(habitatResult[0].Habitat_Name); // Habitat name
                 }
-
-                dbConnection.query(attractionSql, [locationID], (err, attractionResult) => {
-                    if (err) return reject(err);
-
-                    if (attractionResult.length > 0) {
-                        return resolve(attractionResult[0].Attraction_Name); // Attraction name
-                    }
-
-                    // If not found in any table
-                    resolve('Unknown Location');
-                });
             });
-        });
+        } else if(Location_type === "vendor"){
+            dbConnection.query(vendorSql, [locationID], (err, vendorResult) => {
+                if (err) return reject(err);
+    
+                if (vendorResult.length > 0) {
+                    return resolve(vendorResult[0].name); // Vendor name
+                }
+            });
+        } else {
+            // If not found in any table
+            resolve('Unknown Location');
+        }   
     });
 };
 

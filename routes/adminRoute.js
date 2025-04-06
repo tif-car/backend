@@ -1,5 +1,4 @@
 import HRController from "../controllers/HR.js";
-import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 import vendorTrigger from "../controllers/vendorTrigger.js";
 import purchaseController from "../controllers/purchases.js";
 
@@ -27,15 +26,6 @@ const adminRoutes = {
     "/api/createEmployee": (req, res) => {
         if (req.method === "POST") {
             HRController.createEmployee(req, res);
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
-
-     //maintenance trigger
-    "/api/getMaintenanceNotifications": (req, res) => {
-        if (req.method === "POST") {
-            maintenanceTrigger(req, res);
         } else {
             sendMethodNotAllowed(res);
         }
