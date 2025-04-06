@@ -4,7 +4,7 @@ const vendorReportController = {
     getVendorReportFormInfo: async (req, res) => {
     
             const deptSql = `select d.Department_ID, d.name AS Department_name from department d;`;
-            const vendSql = `select a.Attraction_Name, a.Attraction_ID, a.Dept_ID  from attraction a;`; 
+            const vendSql = `select v.Vendor_ID, v.name, v.Dept_ID from vendor v;`; 
             const itemTSql = `select i.item_typeID, i.item_types from item_types i;`; 
             const merchSql = `select m.Merchandise_ID, m.Item_Name, m.Item_Type from merchandise m;`;
     
@@ -37,7 +37,7 @@ const vendorReportController = {
                 Merchandise_ID,
                 start_date,
                 end_date
-            } = req.body;
+            } = req.body || {};
 
             if (!start_date || !end_date) {
                 return sendResponse(res, 400, { error: "Start date and end date are required" });
@@ -56,7 +56,6 @@ const vendorReportController = {
                 params.push(Vendor_ID);
             }
             
-            
 
             if (Item_type_ID) {
                 conditions.push("m.Item_Type = ?");
@@ -72,15 +71,6 @@ const vendorReportController = {
             const whereClause = conditions.length ? "AND " + conditions.join(" AND ") : "";
 
             let reportData = {
-                title: "Vendor and Merchandise Sales Report",
-                parameters: {
-                    start_date,
-                    end_date,
-                    Dept_ID,
-                    Vendor_ID,
-                    Item_type_ID,
-                    Merchandise_ID
-                },
                 vendorSales: [],
                 itemSales: [],
                 deptSales: [],
@@ -91,8 +81,8 @@ const vendorReportController = {
             const vendorQuery = `
              SELECT
             DATE(o.Order_Date) AS sale_date,
-            CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-            v.Vendor_ID
+            FORMAT(SUM(m.Item_Price), 2) AS total_sales,
+            v.name as vendor_name
             FROM orders o
             JOIN single_item si ON o.Order_ID = si.order_ID
             JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
@@ -112,8 +102,8 @@ const vendorReportController = {
             const itemQuery = `
               SELECT
          DATE(o.Order_Date) AS sale_date,
-         CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-        m.Merchandise_ID
+        FORMAT(SUM(m.Item_Price), 2) AS total_sales,
+        m.Item_Name
         FROM orders o
         JOIN single_item si ON o.Order_ID = si.order_ID
         JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
@@ -129,17 +119,18 @@ const vendorReportController = {
             const [itemResults] = await pool.promise().query(itemQuery, params);
             reportData.itemSales = itemResults;
 
-           
+           if (!Vendor_ID){
             const deptQuery = `
                 
                   SELECT
          DATE(o.Order_Date) AS sale_date,
-         CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-         v.Dept_ID
+          FORMAT(SUM(m.Item_Price), 2) AS total_sales,
+         d.name as department_name
         FROM orders o
         JOIN single_item si ON o.Order_ID = si.order_ID
         JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
         JOIN vendor v ON m.V_ID = v.Vendor_ID
+        JOIN department d ON v.Dept_ID = d.Department_ID
         WHERE DATE(o.Order_Date) BETWEEN ? AND ?
         ${whereClause}
         GROUP BY sale_date, v.Dept_ID
@@ -149,21 +140,22 @@ const vendorReportController = {
             `;
             const [deptResults] = await pool.promise().query(deptQuery, params);
             reportData.deptSales = deptResults;
-
+            }
            
-            if (!Merchandise_ID) {
+            if (!Merchandise_ID){
                 const itemTypeQuery = `
                   SELECT
                 DATE(o.Order_Date) AS sale_date,
-                CONCAT('$', FORMAT(SUM(m.Item_Price), 2)) AS total_sales,
-                 si.Item_ID
+                FORMAT(SUM(m.Item_Price), 2) AS total_sales,
+                it.item_types
                 FROM orders o
                 JOIN single_item si ON o.Order_ID = si.order_ID
                 JOIN merchandise m ON si.merch_ID = m.Merchandise_ID
                 JOIN vendor v ON m.V_ID = v.Vendor_ID
+                JOIN item_types it ON m.Item_Type = it.item_typeID
                 WHERE DATE(o.Order_Date) BETWEEN ? AND ?
                 ${whereClause}
-                GROUP BY sale_date, si.Item_ID
+                GROUP BY sale_date, it.item_types
                 ORDER BY si.Item_ID, sale_date;
 
 

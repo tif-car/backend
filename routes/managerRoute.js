@@ -29,7 +29,7 @@ const managerRoutes = {
 
     "/api/getVendMerchReportFormInfo": (req,res) => {
         if (req.method === "POST") {
-            handleRequestBody(req, res, vendorReportController.getVendorQueryFormInfo);
+            handleRequestBody(req, res, vendorReportController.getVendorReportFormInfo);
         } else {
             sendMethodNotAllowed(res);
         }
