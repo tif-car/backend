@@ -10,7 +10,8 @@ import memberRoutes from "./routes/memberRoutes.js";
 import adminRoutes from "./routes/adminRoute.js";
 import managerRoutes from "./routes/managerRoute.js"; 
 import authRoutes from "./routes/authRoute.js";
-import logRoutes from "./routes/logRoute.js"
+import logRoutes from "./routes/logRoute.js";
+import maintenanceRoutes from "./routes/maintenanceRoute.js";
 
 
 
@@ -24,6 +25,7 @@ const routes = {
     ...authRoutes,
     ...logRoutes,
     ...memberRoutes,
+    ...maintenanceRoutes, 
 
 };
 
