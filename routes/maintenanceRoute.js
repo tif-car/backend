@@ -6,9 +6,10 @@ import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
     Endpoints Available:
     - `POST /api/maintenance/form-info`: Fetches information for the maintenance form.
     - `POST /api/maintenance/report`: Fetches a maintenance report.
-    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
+    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications. Trigger
     - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
     - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
+    - `POST /api/updateMaintenance` : Updates a maintenance record based on Maintenance_ID.
 */
 
 const maintenanceRoutes = {
@@ -19,6 +20,8 @@ const maintenanceRoutes = {
       sendMethodNotAllowed(res);
     }
   },
+
+
   "/api/maintenance/report": async (req, res) => {
     if(req.method === "POST"){
     handleRequestBody(req, res, maintenanceController.getMaintenanceReport);
@@ -36,14 +39,14 @@ const maintenanceRoutes = {
     }
     },
 
-      //acknowledge maintenance notification
-      "/api/seenMaintenanceNotification": (req, res) => {  
-       if (req.method === "POST") {
-            maintenanceController.seenMaintenanceNotification(req, res);  
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
+  // Acknowledge maintenance notification
+  "/api/seenMaintenanceNotification": (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, maintenanceController.seenMaintenanceNotification);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
   
      // Delete a maintenance record
      "/api/deleteMaintenance": async (req, res) => {
@@ -52,8 +55,17 @@ const maintenanceRoutes = {
      } else {
       sendMethodNotAllowed(res);
     }
-  }
-};
+  },
+
+    // Update a maintenance record
+    "/api/updateMaintenance": async (req, res) => {
+      if (req.method === "POST") {
+        handleRequestBody(req, res, maintenanceController.editMaintenanceRow);
+      } else {
+        sendMethodNotAllowed(res);
+      }
+    }
+  };
 
 // Helper function to parse request body and call the appropriate controller
 function handleRequestBody(req, res, callback) {
