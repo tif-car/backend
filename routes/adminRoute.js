@@ -13,52 +13,68 @@ import purchaseController from "../controllers/purchases.js";
 
 const adminRoutes = {
 
-    //update employee info
+    // Route to update employee info
     "/api/editEmployee": (req, res) => {
         if (req.method === "POST") {
-            HRController.editEmployee(req, res);  // Partial updates
+            handleRequestBody(req, res, HRController.editEmployee);  // Partial updates
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-     //add new employee to table
+    // Route to add a new employee to the table
     "/api/createEmployee": (req, res) => {
         if (req.method === "POST") {
-            HRController.createEmployee(req, res);
+            handleRequestBody(req, res, HRController.createEmployee);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-    //vendor trigger
+    // Route to get vendor notifications
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
-            vendorTrigger(req, res);
+            handleRequestBody(req, res, vendorTrigger);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-    //insert into bulk_purchase
+    // Route to update bulk purchase info
     "/api/updateBulkPurchase": (req, res) => {
-             if (req.method === "POST") {
-                purchaseController.updateBulkPurchase(req, res);
-            } else {
-                sendMethodNotAllowed(res);
-            }
-         },
+        if (req.method === "POST") {
+            handleRequestBody(req, res, purchaseController.updateBulkPurchase);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
 
-
-    //mark vendor notifications as seen
+    // Route to mark vendor notifications as seen
     "/api/vendorNotificationSeen": (req, res) => {
-         if (req.method === "POST") {
-            vendorTriggerController.vendorNotificationSeen(req, res);  // Handle acknowledgment
+        if (req.method === "POST") {
+            handleRequestBody(req, res, vendorTriggerController.vendorNotificationSeen);  // Handle acknowledgment
         } else {
             sendMethodNotAllowed(res);
         }
     }
 };
+
+// Helper function to parse request body and call the appropriate controller
+function handleRequestBody(req, res, callback) {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
+
+    req.on("end", () => {
+        try {
+            req.body = JSON.parse(body);  // Parse the JSON body
+        } catch (error) {
+            req.body = {};  // Handle invalid JSON
+        }
+        callback(req, res);  // Call the controller function
+    });
+}
 
 // Helper function to handle method restrictions
 function sendMethodNotAllowed(res) {

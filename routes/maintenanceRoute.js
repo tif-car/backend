@@ -4,8 +4,11 @@ import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 
 /*
     Endpoints Available:
+    - `POST /api/maintenance/form-info`: Fetches information for the maintenance form.
+    - `POST /api/maintenance/report`: Fetches a maintenance report.
     - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
     - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
+    - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
 */
 
 const maintenanceRoutes = {
@@ -40,7 +43,16 @@ const maintenanceRoutes = {
         } else {
             sendMethodNotAllowed(res);
         }
+    },
+  
+     // Delete a maintenance record
+     "/api/deleteMaintenance": async (req, res) => {
+      if (req.method === "POST") {
+       handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
+     } else {
+      sendMethodNotAllowed(res);
     }
+  }
 };
 
 // Helper function to parse request body and call the appropriate controller
