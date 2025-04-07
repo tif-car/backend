@@ -1,6 +1,6 @@
 import HRController from "../controllers/HR.js";
 import vendorTrigger from "../controllers/vendorTrigger.js";
-import purchaseController from "../controllers/purchases.js";
+import BulkPurchaseController from "../controllers/purchases.js";
 
 /*
     Endpoints Available:
@@ -34,22 +34,48 @@ const adminRoutes = {
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
-            vendorTrigger(req, res);
+            handleRequestBody(req, res, vendorTrigger);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-            //insert into bulk_purchase
-            "/api/updateBulkPurchase": (req, res) => {
-                if (req.method === "POST") {
-                    purchaseController.updateBulkPurchase(req, res);
-                } else {
-                    sendMethodNotAllowed(res);
-                }
-            }
+    //insert into bulk_purchase
+    "/api/addBulkPurchase": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, BulkPurchaseController.addBulkPurchase);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //insert into bulk_purchase
+    "/api/getBulkPurchaseFormInfo": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, BulkPurchaseController.getBulkPurchaseFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    }
 
 };
+
+// Helper function to parse request body and call the appropriate controller
+function handleRequestBody(req, res, callback) {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
+
+    req.on("end", () => {
+        try {
+            req.body = JSON.parse(body);
+        } catch (error) {
+            req.body = {};
+        }
+        callback(req, res);
+    });
+}
 
 // Helper function to handle method restrictions
 function sendMethodNotAllowed(res) {
