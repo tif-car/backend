@@ -1,31 +1,31 @@
 import HRController from "../controllers/HR.js";
 import vendorTrigger from "../controllers/vendorTrigger.js";
-import purchaseController from "../controllers/purchases.js";
+import BulkPurchaseController from "../controllers/purchases.js";
 
 /*
     Endpoints Available:
     - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
     - `POST /api/createEmployee` : Creates a new employee in the employee table.
-    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
-    - `POST /api/getVendorNotifications` : Fetches new vendor notifications.
+    - `POST /api/getVendorNotifications` : Fetches new vendor notifications. Trigger
     - `POST /api/updateBulkPurchase` : Updates amount_of_items in bulk_purchase.
+    - `POST /api/vendorNotificationSeen` : Marks vendor notifications as sent. 
 */
 
 const adminRoutes = {
 
-    //update employee info
+    // Route to update employee info (requires Employee_ID)
     "/api/editEmployee": (req, res) => {
         if (req.method === "POST") {
-            HRController.editEmployee(req, res);  // Partial updates
+            handleRequestBody(req, res, HRController.editEmployee);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-     //add new employee to table
+    // Route to add a new employee
     "/api/createEmployee": (req, res) => {
         if (req.method === "POST") {
-            HRController.createEmployee(req, res);
+            handleRequestBody(req, res, HRController.createEmployee);
         } else {
             sendMethodNotAllowed(res);
         }
@@ -34,7 +34,16 @@ const adminRoutes = {
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
-            vendorTrigger(req, res);
+            handleRequestBody(req, res, vendorTrigger);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //insert into bulk_purchase
+    "/api/addBulkPurchase": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, BulkPurchaseController.addBulkPurchase);
         } else {
             sendMethodNotAllowed(res);
         }
@@ -47,7 +56,16 @@ const adminRoutes = {
                 } else {
                     sendMethodNotAllowed(res);
                 }
-            }
+            },
+            
+            // Route to mark vendor notification as seen
+    "/api/vendorNotificationSeen": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, vendorTrigger.vendorNotificationSeen);  // Handle acknowledgment
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    }
 
 };
 
@@ -56,5 +74,8 @@ function sendMethodNotAllowed(res) {
     res.writeHead(405, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Method Not Allowed. Use POST instead." }));
 }
+
+
+
 
 export default adminRoutes;

@@ -149,4 +149,4 @@ const feedingLogRoutes = {
     }
 };
 
-export default feedingLogRoutes; 
+export default feedingLogRoutes;

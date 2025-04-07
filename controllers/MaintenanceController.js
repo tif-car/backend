@@ -1,11 +1,6 @@
 
 import pool from "../db.js";
 
-function sendResponse(res, statusCode, data) {
-  res.writeHead(statusCode, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(data));
-}
-
 const maintenanceController = {
   getMaintenanceFormInfo: async (req, res) => {
     try {
@@ -121,7 +116,159 @@ console.log(durationRaw);
       res.end(JSON.stringify({ error: "Failed to generate report" }));
     }
   }
+
+  };
+
+
+// Delete a maintenance record based on Maintenance_ID
+const deleteMaintenanceRow = async (req, res) => {
+  /*
+    Function: deleteMaintenanceRow
+    Ex: Frontend provides:
+    {
+        "Maintenance_ID": 42
+    };
+    Output:
+    {
+        "message": "Maintenance record deleted successfully"
+    }
+  */
+
+  const { Maintenance_ID } = req.body || {};
+
+  // Ensure Maintenance_ID is provided
+  if (!Maintenance_ID) {
+    return sendResponse(res, 400, { error: "Maintenance_ID is required" });
+  }
+
+  const sql = `
+    DELETE FROM maintenance
+    WHERE Maintenance_ID = ?
+  `;
+
+  try {
+    const [result] = await pool.promise().query(sql, [Maintenance_ID]);
+
+    if (result.affectedRows === 0) {
+      return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
+    }
+
+    sendResponse(res, 200, { message: "Maintenance record deleted successfully" });
+  } catch (err) {
+    console.error("Database delete error:", err);
+    sendResponse(res, 500, { error: "Database error while deleting maintenance record" });
+  }
 };
 
-export default maintenanceController;
+// Edit a maintenance record based on Maintenance_ID
+const editMaintenanceRow = async (req, res) => {
+  /*
+    Function: editMaintenanceRow
+    Ex: Frontend provides:
+    {
+        "Maintenance_ID": 42,
+        "Cost": 1500.00,
+        "Status": 2
+    };
+    Output:
+    {
+        "message": "Maintenance record updated successfully"
+    }
+  */
+
+  const {
+    Maintenance_ID,
+    Maintenance_EmployeeID,
+    Start_Date,
+    End_Date,
+    Description,
+    Status,
+    Cost,
+    RecentCheck,
+    maintenance_locationID,
+  } = req.body;
+
+  // Ensure Maintenance_ID is provided
+  if (!Maintenance_ID) {
+    return sendResponse(res, 400, { error: "Maintenance_ID is required" });
+  }
+
+  // Dynamically build the SET clause
+  const updates = [];
+  const values = [];
+
+  if (Maintenance_EmployeeID) {
+    updates.push("Maintenance_EmployeeID = ?");
+    values.push(Maintenance_EmployeeID);
+  }
+  if (Start_Date) {
+    updates.push("Start_Date = ?");
+    values.push(Start_Date);
+  }
+  if (End_Date) {
+    updates.push("End_Date = ?");
+    values.push(End_Date);
+  }
+  if (Description) {
+    updates.push("Description = ?");
+    values.push(Description);
+  }
+  if (Status) {
+    updates.push("Status = ?");
+    values.push(Status);
+  }
+  if (Cost) {
+    updates.push("Cost = ?");
+    values.push(Cost);
+  }
+  if (RecentCheck) {
+    updates.push("RecentCheck = ?");
+    values.push(RecentCheck);
+  }
+  if (maintenance_locationID) {
+    updates.push("maintenance_locationID = ?");
+    values.push(maintenance_locationID);
+  }
+
+  // If no fields provided to update
+  if (updates.length === 0) {
+    return sendResponse(res, 400, { error: "At least one field must be provided for update" });
+  }
+
+  values.push(Maintenance_ID);
+
+  const sql = `
+    UPDATE maintenance
+    SET ${updates.join(", ")}
+    WHERE Maintenance_ID = ?
+  `;
+
+  try {
+    const [result] = await pool.promise().query(sql, values);
+
+    if (result.affectedRows === 0) {
+      return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
+    }
+
+    sendResponse(res, 200, { message: "Maintenance record updated successfully" });
+  } catch (err) {
+    console.error("Error while updating maintenance record:", err);
+    sendResponse(res, 500, { error: "Internal server error" });
+  }
+};
+
+
+// **Helper function to send JSON responses**
+function sendResponse(res, statusCode, data) {
+  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+
+export default {
+  maintenanceController, 
+  deleteMaintenanceRow,
+  editMaintenanceRow
+};
+
 

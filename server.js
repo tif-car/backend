@@ -66,4 +66,4 @@ server.listen(PORT, "0.0.0.0", () => {
         console.log(`Local:  ${localURL}${route}`);
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
-});
+})

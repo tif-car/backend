@@ -19,8 +19,8 @@ const purchaseRoutes = {
         }
       });
     } else {
-      res.writeHead(405);
-      res.end("Method Not Allowed");
+      res.writeHead(405, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Method Not Allowed" }));
     }
   },
 
@@ -41,8 +41,8 @@ const purchaseRoutes = {
         }
       });
     } else {
-      res.writeHead(405);
-      res.end("Method Not Allowed");
+      res.writeHead(405, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Method Not Allowed" }));
     }
   },
 };
