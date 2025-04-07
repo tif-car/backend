@@ -1,5 +1,4 @@
 import HRController from "../controllers/HR.js";
-import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 import vendorTrigger from "../controllers/vendorTrigger.js";
 import purchaseController from "../controllers/purchases.js";
 
@@ -32,15 +31,6 @@ const adminRoutes = {
         }
     },
 
-     //maintenance trigger
-    "/api/getMaintenanceNotifications": (req, res) => {
-        if (req.method === "POST") {
-            maintenanceTrigger(req, res);
-        } else {
-            sendMethodNotAllowed(res);
-        }
-    },
-
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
@@ -68,5 +58,3 @@ function sendMethodNotAllowed(res) {
 }
 
 export default adminRoutes;
-
-

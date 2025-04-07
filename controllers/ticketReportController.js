@@ -3,22 +3,22 @@ import pool from "../db.js";
 const ticketReportController = {
     getTicketReportFormInfo: async (req, res) => {
 
-        const deptSql = `select d.Department_ID, d.name from department d;`;
-        const vendSql = `select v.Vendor_ID, v.name, v.Dept_ID from vendor v;`; 
-        const itemTSql = `select i.item_typeID, i.item_types from item_types i;`; 
-        const merchSql = `select m.Merchandise_ID, m.Item_Name, m.Item_Type from merchandise m;`;
+        const deptSql = `select d.Department_ID, d.name AS department_name from department d where d.name <> 'General';`;
+        const attSql = `select a.Attraction_Name, a.Attraction_ID, a.Dept_ID  from attraction a where Dept_ID <> '6';`; 
+        const pTypeSql = `select tp.PersonType_ID, tp.ticket_person from ticket_person tp;`; 
+        const memTypeSql = `select membership_TypeID, membership_Type from membership_type;`;
 
         try {
             const [deptResult] = await pool.promise().query(deptSql);
-            const [vendResult] = await pool.promise().query(vendSql);
-            const [itemTResult] = await pool.promise().query(itemTSql);
-            const [merchResult] = await pool.promise().query(merchSql);
+            const [attResult] = await pool.promise().query(attSql);
+            const [pTypeResult] = await pool.promise().query(pTypeSql);
+            const [memTypeResult] = await pool.promise().query(memTypeSql);
 
             const combinedResults = {
-                Departments: deptResult, // [Department_ID, name]
-                Vendors: vendResult, // [Vendor_ID, name, Dept_ID]
-                Item_types: itemTResult, // [item_typeID, item_types]
-                Merchandise: merchResult, // [Merchandise_ID, Item_Name, Item_Type]
+                departments: deptResult, 
+                attractions: attResult, 
+                personTypes: pTypeResult, 
+                membershipStatuses: memTypeResult, 
             };
 
             sendResponse(res, 200, combinedResults);
@@ -33,13 +33,13 @@ const ticketReportController = {
             const {
                 IsMoney,
                 IsGeneral,
-                Dept,
+                Department,
                 Attraction,
                 Person_Type,
                 Membership_type,
                 start_date,
                 end_date
-            } = req.body;
+            } = req.body || {};
 
             if (!start_date || !end_date) {
                 return sendResponse(res, 400, { error: "Start date and end date are required" });
@@ -52,9 +52,9 @@ const ticketReportController = {
             params.push(start_date, end_date);
 
             if (!IsGeneral){
-                if (Dept) {
+                if (Department) {
                     conditions.push("department_name = ?");
-                    params.push(Dept);
+                    params.push(Department);
                 }
     
                 if (Attraction) {
@@ -62,7 +62,7 @@ const ticketReportController = {
                     params.push(Attraction);
                 }
             } else {
-                conditions.push("department_name = \"General\" ");
+                conditions.push("department_name = \'General\' ");
             }
 
             if (Person_Type) {
@@ -81,7 +81,7 @@ const ticketReportController = {
 
             let reportData = {
                 GeneralSales: [],
-                DeptSales: [ ],
+                DeptSales: [],
                 AttSales: [],
                 PTypeSales: [],
                 MemTypeSales: []
@@ -90,13 +90,13 @@ const ticketReportController = {
             if (!IsGeneral) {
                 let deptQuery = `SELECT
                                     sale_date,
-                                    COUNT(*) AS tickets_sold
+                                    COUNT(*) AS tickets_sold,
                                     department_name
                                 FROM
                                     ticket_report
                                 ${whereClause}
                                 GROUP BY
-                                    sale_date
+                                    sale_date,
                                     department_name
                                 ORDER BY
                                     sale_date;`;
@@ -106,13 +106,13 @@ const ticketReportController = {
 
                 let attQuery = `SELECT
                                     sale_date,
-                                    COUNT(*) AS tickets_sold
+                                    COUNT(*) AS tickets_sold,
                                     Attraction_Name
                                 FROM
                                     ticket_report
                                 ${whereClause}
                                 GROUP BY
-                                    sale_date
+                                    sale_date,
                                     Attraction_Name
                                 ORDER BY
                                     sale_date;`;
@@ -123,13 +123,13 @@ const ticketReportController = {
             } else {
                 let genQuery = `SELECT
                                     sale_date,
-                                    COUNT(*) AS tickets_sold
+                                    COUNT(*) AS tickets_sold,
                                     Attraction_Name
                                 FROM
                                     ticket_report
                                 ${whereClause}
                                 GROUP BY
-                                    sale_date
+                                    sale_date,
                                     Attraction_Name
                                 ORDER BY
                                     sale_date;`;
@@ -142,13 +142,13 @@ const ticketReportController = {
 
             let pTypeQuery =  `SELECT
                                     sale_date,
-                                    COUNT(*) AS tickets_sold
+                                    COUNT(*) AS tickets_sold,
                                     ticket_Person
                                 FROM
                                     ticket_report
                                 ${whereClause}
                                 GROUP BY
-                                    sale_date
+                                    sale_date,
                                     ticket_Person
                                 ORDER BY
                                     sale_date;`;
@@ -158,14 +158,14 @@ const ticketReportController = {
             
             let memTypeQuery = `SELECT
                                     sale_date,
-                                    COUNT(*) AS tickets_sold
-                                    ticket_Person
+                                    COUNT(*) AS tickets_sold,
+                                    membership_type
                                 FROM
                                     ticket_report
                                 ${whereClause}
                                 GROUP BY
-                                    sale_date
-                                    ticket_Person
+                                    sale_date,
+                                    membership_type
                                 ORDER BY
                                     sale_date;`;
             
@@ -188,4 +188,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default vendorReportController;
+export default ticketReportController;
