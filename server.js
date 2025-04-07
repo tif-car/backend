@@ -12,6 +12,8 @@ import managerRoutes from "./routes/managerRoute.js";
 import authRoutes from "./routes/authRoute.js";
 import logRoutes from "./routes/logRoute.js";
 import maintenanceRoutes from "./routes/maintenanceRoute.js";
+import purchaseroutes from "./routes/purchaseroutes.js";
+
 
 
 
@@ -26,6 +28,7 @@ const routes = {
     ...logRoutes,
     ...memberRoutes,
     ...maintenanceRoutes, 
+    ...purchaseroutes,
 
 };
 
@@ -65,4 +68,4 @@ server.listen(PORT, "0.0.0.0", () => {
         console.log(`Local:  ${localURL}${route}`);
         console.log(`Azure:  ${azureURL}${route}\n`);
     });
-});
+})
