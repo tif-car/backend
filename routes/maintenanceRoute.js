@@ -49,7 +49,7 @@ const maintenanceRoutes = {
   },
   
      // Delete a maintenance record
-     "/api/deleteMaintenance": async (req, res) => {
+     "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
        handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
      } else {
@@ -58,7 +58,7 @@ const maintenanceRoutes = {
   },
 
     // Update a maintenance record
-    "/api/updateMaintenance": async (req, res) => {
+    "/api/editMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
         handleRequestBody(req, res, maintenanceController.editMaintenanceRow);
       } else {
