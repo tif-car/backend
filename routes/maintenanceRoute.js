@@ -2,6 +2,12 @@
 import maintenanceController from "../controllers/MaintenanceController.js";
 import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 
+/*
+    Endpoints Available:
+    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
+    - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
+*/
+
 const maintenanceRoutes = {
   "/api/maintenance/form-info": async (req, res) => {
     if (req.method === "POST") {
@@ -26,6 +32,15 @@ const maintenanceRoutes = {
         sendMethodNotAllowed(res);
     }
     },
+
+      //acknowledge maintenance notification
+      "/api/seenMaintenanceNotification": (req, res) => {  
+       if (req.method === "POST") {
+            maintenanceController.seenMaintenanceNotification(req, res);  
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    }
 };
 
 // Helper function to parse request body and call the appropriate controller

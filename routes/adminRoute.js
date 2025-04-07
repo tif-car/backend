@@ -6,9 +6,9 @@ import purchaseController from "../controllers/purchases.js";
     Endpoints Available:
     - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
     - `POST /api/createEmployee` : Creates a new employee in the employee table.
-    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications
     - `POST /api/getVendorNotifications` : Fetches new vendor notifications.
     - `POST /api/updateBulkPurchase` : Updates amount_of_items in bulk_purchase.
+    - `POST /api/vendorNotificationSeen` : Marks vendor notifications as sent. 
 */
 
 const adminRoutes = {
@@ -40,15 +40,24 @@ const adminRoutes = {
         }
     },
 
-            //insert into bulk_purchase
-            "/api/updateBulkPurchase": (req, res) => {
-                if (req.method === "POST") {
-                    purchaseController.updateBulkPurchase(req, res);
-                } else {
-                    sendMethodNotAllowed(res);
-                }
+    //insert into bulk_purchase
+    "/api/updateBulkPurchase": (req, res) => {
+             if (req.method === "POST") {
+                purchaseController.updateBulkPurchase(req, res);
+            } else {
+                sendMethodNotAllowed(res);
             }
+         },
 
+
+    //mark vendor notifications as seen
+    "/api/vendorNotificationSeen": (req, res) => {
+         if (req.method === "POST") {
+            vendorTriggerController.vendorNotificationSeen(req, res);  // Handle acknowledgment
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    }
 };
 
 // Helper function to handle method restrictions

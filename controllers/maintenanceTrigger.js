@@ -1,6 +1,5 @@
 import dbConnection from "../db.js";
 
-
 /*
 Example response to frontend:
 {
@@ -21,9 +20,9 @@ Example response to frontend:
         }
     ]
 }
-
 */
 
+// Function to get maintenance notifications from the database
 const getMaintenanceNotifications = (req, res) => {
     // SQL query to get information from the maintenance_notifications table
     const sql = `
@@ -62,23 +61,6 @@ const getMaintenanceNotifications = (req, res) => {
             .then(notifications => {
                 // Send notifications with location names to frontend
                 sendResponse(res, 200, { notifications });
-                
-                // Mark notifications as "sent"
-                //this is so the same message isn't sent twice
-                const updateSql = `UPDATE maintenance_notifications SET message_sent = TRUE 
-                                   WHERE maintenance_messageID IN (?)`;
-
-                const notificationIds = result.map(row => row.maintenance_messageID);
-
-                if (notificationIds.length > 0) {
-                    dbConnection.query(updateSql, [notificationIds], (updateErr) => {
-                        if (updateErr) {
-                            console.error("Error updating notifications:", updateErr);
-                        } else {
-                            console.log("Notifications marked as sent.");
-                        }
-                    });
-                }
             })
             .catch(err => {
                 console.error("Error fetching location names:", err);
@@ -126,10 +108,50 @@ const getLocationName = (locationID, Location_type) => {
     });
 };
 
+//function to handle acknowledgment of maintenance notifications by the frontend
+//expecting the maintenance id and a T for true from the frontend.
+const seenMaintenanceNotification = (req, res) => {
+    /*
+    Ex: Frontend provides:
+    {
+    "maintenance_messageID": 1,
+    "seen": "T"
+     }
+     */
+
+    const { maintenance_messageID, seen } = req.body;
+
+    // Validate if the seen field is 'T'
+    if (seen !== 'T') {
+        return sendResponse(res, 400, { error: "Invalid 'seen' value. Use 'T' to mark as seen." });
+    }
+
+    // SQL query to mark the notification as 'sent' after acknowledgment
+    const sql = `UPDATE maintenance_notifications 
+                 SET message_sent = TRUE 
+                 WHERE maintenance_messageID = ?`;
+
+    dbConnection.query(sql, [maintenance_messageID], (err, result) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        if (result.affectedRows === 0) {
+            return sendResponse(res, 404, { error: "Notification not found" });
+        }
+
+        sendResponse(res, 200, { message: "Notification marked as sent" });
+    });
+};
+
 // **Helper function to send JSON responses**
 function sendResponse(res, statusCode, data) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(data));
 }
 
-export default getMaintenanceNotifications;
+export default {
+    getMaintenanceNotifications,
+    seenMaintenanceNotification
+};
