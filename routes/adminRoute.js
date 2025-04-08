@@ -49,6 +49,15 @@ const adminRoutes = {
         }
     },
 
+     //insert into bulk_purchase
+     "/api/getBulkPurchaseFormInfo": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, BulkPurchaseController.getBulkPurchaseFormInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     //insert into bulk_purchase
      "/api/updateBulkPurchase": (req, res) => {
         if (req.method === "POST") {
@@ -69,23 +78,6 @@ const adminRoutes = {
 
 };
 
-
-// Helper function to parse request body and call the appropriate controller
-function handleRequestBody(req, res, callback) {
-    let body = "";
-    req.on("data", (chunk) => {
-        body += chunk.toString();
-    });
-
-    req.on("end", () => {
-        try {
-            req.body = JSON.parse(body);
-        } catch (error) {
-            req.body = {};
-        }
-        callback(req, res);
-    });
-}
 
 // Helper function to handle method restrictions
 function sendMethodNotAllowed(res) {

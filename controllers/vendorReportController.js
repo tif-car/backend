@@ -90,7 +90,7 @@ const vendorReportController = {
             WHERE DATE(o.Order_Date) BETWEEN ? AND ?
             ${whereClause}
             GROUP BY sale_date, v.Vendor_ID
-            ORDER BY v.Vendor_ID, sale_date;
+            ORDER BY sale_date;
 
 
             
@@ -111,7 +111,7 @@ const vendorReportController = {
         WHERE DATE(o.Order_Date) BETWEEN ? AND ?
         ${whereClause}
         GROUP BY sale_date, m.Merchandise_ID
-        ORDER BY m.Merchandise_ID, sale_date;
+        ORDER BY sale_date;
 
                     `;
 
@@ -134,7 +134,7 @@ const vendorReportController = {
         WHERE DATE(o.Order_Date) BETWEEN ? AND ?
         ${whereClause}
         GROUP BY sale_date, v.Dept_ID
-        ORDER BY v.Dept_ID, sale_date;
+        ORDER BY sale_date;
 
 
             `;
@@ -156,7 +156,7 @@ const vendorReportController = {
                 WHERE DATE(o.Order_Date) BETWEEN ? AND ?
                 ${whereClause}
                 GROUP BY sale_date, it.item_types
-                ORDER BY si.Item_ID, sale_date;
+                ORDER BY sale_date;
 
 
                 `;
