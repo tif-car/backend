@@ -1,4 +1,4 @@
-import authController from "../controllers/authController.js";
+import authControl from "../controllers/authController.js";
 
 /**
     Endpoints Available:
@@ -9,7 +9,7 @@ import authController from "../controllers/authController.js";
 const authRoutes = {
     "/api/loginUser": (req, res) => {
         if (req.method === "POST") {
-            authController.loginUser(req, res);
+            authControl.loginUser(req, res);
         } else {
             sendMethodNotAllowed(res);
         }
@@ -17,12 +17,13 @@ const authRoutes = {
 
     "/api/getUserRole": (req, res) => {
         if (req.method === "POST") {
-            authController.getUserRole(req, res);
+            authControl.getUserRole(req, res);
         } else {
             sendMethodNotAllowed(res);
         }
     }
 };
+
 
 // Helper function to handle method restrictions
 function sendMethodNotAllowed(res) {
