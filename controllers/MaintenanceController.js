@@ -2,6 +2,51 @@
 import pool from "../db.js";
 
 const maintenanceController = {
+  getMaintenanceRequestFormInfo: async (req, res) => {
+    try {
+      const [vendors] = await pool.promise().query(`
+        select v.name as vendor_name, ml.Maintenance_Location
+        from vendor v
+        join maintenance_location ml on ml.Location_ID = v.Vendor_ID;
+      `);
+      const [attractions] = await pool.promise().query(`
+        select a.Attraction_Name, ml.Maintenance_Location
+        from attraction a
+        join maintenance_location ml on ml.Location_ID = a.Attraction_ID;
+      `);
+      const [habitats] = await pool.promise().query(`
+        select h.Habitat_Name, ml.Maintenance_Location
+        from habitat h
+        join maintenance_location ml on ml.Location_ID = h.Habitat_ID;
+      `);
+
+      sendResponse(res, 200, {
+        vendors,
+        attractions,
+        habitats,
+      });
+    } catch (error) {
+      console.error("❌ Error fetching maintenance form info:", error);
+      sendResponse(res, 500, { error: "Failed to fetch form data" });
+    }
+  },
+
+  addMaintenanceRequest: async (req, res) => {
+    try {
+      const {startDate ,Location_ID, request_desc} = req.body;
+
+      const sql = `
+        INSERT INTO zoo.maintenance  (Start_Date, maintenance_locationID, request_desc) 
+        VALUES (?, ?, ?)`;
+
+      const result = await pool.promise().query(sql,[startDate, Location_ID, request_desc])
+
+    } catch (error) {
+      console.error("❌ Error fetching maintenance form info:", error);
+      sendResponse(res, 500, { error: "Failed to fetch form data" });
+    }
+  },
+
   getMaintenanceFormInfo: async (req, res) => {
     try {
       const [departments] = await pool.promise().query("SELECT Department_ID, name FROM department");

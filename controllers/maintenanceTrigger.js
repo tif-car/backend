@@ -114,17 +114,11 @@ const seenMaintenanceNotification = (req, res) => {
     /*
     Ex: Frontend provides:
     {
-    "maintenance_messageID": 1,
-    "seen": "T"
+    "maintenance_messageID": 1
      }
      */
 
-    const { maintenance_messageID, seen } = req.body;
-
-    // Validate if the seen field is 'T'
-    if (seen !== 'T') {
-        return sendResponse(res, 400, { error: "Invalid 'seen' value. Use 'T' to mark as seen." });
-    }
+    const { maintenance_messageID } = req.body;
 
     // SQL query to mark the notification as 'sent' after acknowledgment
     const sql = `UPDATE maintenance_notifications 
