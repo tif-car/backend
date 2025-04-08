@@ -33,7 +33,7 @@ const maintenanceRoutes = {
     //maintenance trigger
     "/api/getMaintenanceNotifications": (req, res) => {
     if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceController.getMaintenanceNotifications);
+        handleRequestBody(req, res, maintenanceTrigger.getMaintenanceNotifications);
     } else {
         sendMethodNotAllowed(res);
     }
@@ -42,7 +42,7 @@ const maintenanceRoutes = {
   // Acknowledge maintenance notification
   "/api/seenMaintenanceNotification": (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, maintenanceController.seenMaintenanceNotification);
+      handleRequestBody(req, res, maintenanceTrigger.seenMaintenanceNotification);
     } else {
       sendMethodNotAllowed(res);
     }
