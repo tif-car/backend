@@ -1,4 +1,4 @@
-
+ 
 import pool from "../db.js";
 
 const maintenanceController = {
@@ -33,14 +33,14 @@ const maintenanceController = {
 
   addMaintenanceRequest: async (req, res) => {
     try {
-      const {startDate ,Location_ID, request_desc} = req.body;
+      const {start_date ,Location_ID, request_desc} = req.body;
 
       const sql = `
-        INSERT INTO zoo.maintenance  (Start_Date, maintenance_locationID, request_desc) 
-        VALUES (?, ?, ?)`;
+        INSERT INTO zoo.maintenance  (Maintenance_EmployeeID, Start_Date, maintenance_locationID, request_desc) 
+        VALUES (2, ?, ?, ?)`;
 
-      const result = await pool.promise().query(sql,[startDate, Location_ID, request_desc])
-
+      const result = await pool.promise().query(sql,[start_date, Location_ID, request_desc])
+      sendResponse(res, 200, { result });
     } catch (error) {
       console.error("❌ Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });

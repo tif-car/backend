@@ -140,7 +140,7 @@ const employeeRoutes = {
      // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
      "/api/getMaintenanceRequestFormInfo": (req, res) => {
         if (req.method === "POST") {
-            handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
+            handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
@@ -149,7 +149,7 @@ const employeeRoutes = {
      // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
      "/api/addMaintenanceRequest": (req, res) => {
         if (req.method === "POST") {
-            handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
+            handleRequestBody(req, res, MaintenanceController.addMaintenanceRequest);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
