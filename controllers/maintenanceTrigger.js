@@ -28,7 +28,7 @@ const MaintenanceTriggerController = {
         // SQL query to get information from the maintenance_notifications table
         const sql = `
             SELECT 
-                m.maintenance_messageID, 
+                m.mnt_ID, 
                 m.maintenance_employeeID, 
                 m.message, 
                 ml.Location_type,

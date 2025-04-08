@@ -1,6 +1,7 @@
 // routes/maintenanceRoute.js
 import maintenanceController from "../controllers/MaintenanceController.js";
 import MaintenanceTriggerController from "../controllers/maintenanceTrigger.js";
+import MaintenanceController from "../controllers/MaintenanceController.js";
 
 /*
     Endpoints Available:
@@ -64,7 +65,43 @@ const maintenanceRoutes = {
       } else {
         sendMethodNotAllowed(res);
       }
-    }
+    },
+
+    "/api/getMaintenanceRequestFormInfo": (req, res) => {
+      if (req.method === "POST") {
+          handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo);
+      } else {
+          res.writeHead(405, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+      }
+  },
+
+  "/api/getMaintenanceEditFormInfo": (req, res) => {
+      if (req.method === "POST") {
+          handleRequestBody(req, res, MaintenanceController.getMaintenanceEditFormInfo);
+      } else {
+          res.writeHead(405, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+      }
+  },
+
+  "/api/getMaintenanceInfo": (req, res) => {
+      if (req.method === "POST") {
+          handleRequestBody(req, res, MaintenanceController.getMaintenanceInfo);
+      } else {
+          res.writeHead(405, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+      }
+  },
+
+   "/api/addMaintenanceRequest": (req, res) => {
+      if (req.method === "POST") {
+          handleRequestBody(req, res, MaintenanceController.addMaintenanceRequest);
+      } else {
+          res.writeHead(405, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+      }
+  }
   };
 
 // Helper function to parse request body and call the appropriate controller
