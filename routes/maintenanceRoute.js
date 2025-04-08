@@ -33,7 +33,7 @@ const maintenanceRoutes = {
     //maintenance trigger
     "/api/getMaintenanceNotifications": (req, res) => {
     if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceController.maintenanceTrigger);
+        handleRequestBody(req, res, maintenanceController.getMaintenanceNotifications);
     } else {
         sendMethodNotAllowed(res);
     }
@@ -80,7 +80,7 @@ function handleRequestBody(req, res, callback) {
       } catch (error) {
           req.body = {};
       }
-      callback(req, res);
+      callback(req, res);  //debug 
   });
 }
 
