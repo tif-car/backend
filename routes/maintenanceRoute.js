@@ -4,93 +4,90 @@ import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
 
 /*
     Endpoints Available:
-    - `POST /api/maintenance/form-info`: Fetches information for the maintenance form.
-    - `POST /api/maintenance/report`: Fetches a maintenance report.
-    - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications. Trigger
-    - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
-    - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
-    - `POST /api/updateMaintenance` : Updates a maintenance record based on Maintenance_ID.
+    - POST /api/maintenance/form-info
+    - POST /api/maintenance/report
+    - POST /api/getMaintenanceNotifications
+    - POST /api/seenMaintenanceNotification
+    - POST /api/deleteMaintenanceRow
+    - POST /api/editMaintenanceRow
 */
 
 const maintenanceRoutes = {
-  "/api/maintenance/form-info": async (req, res) => {
+  "/api/maintenance/form-info": (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, maintenanceController.getMaintenanceFormInfo);
+      parseBodyAndExecute(req, res, maintenanceController.getMaintenanceFormInfo);
     } else {
       sendMethodNotAllowed(res);
     }
   },
 
-
-  "/api/maintenance/report": async (req, res) => {
-    if(req.method === "POST"){
-    handleRequestBody(req, res, maintenanceController.getMaintenanceReport);
+  "/api/maintenance/report": (req, res) => {
+    if (req.method === "POST") {
+      parseBodyAndExecute(req, res, maintenanceController.getMaintenanceReport);
     } else {
       sendMethodNotAllowed(res);
     }
   },
 
-    //maintenance trigger
-    "/api/getMaintenanceNotifications": (req, res) => {
+  "/api/getMaintenanceNotifications": (req, res) => {
     if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceTrigger.getMaintenanceNotifications);
+      parseBodyAndExecute(req, res, maintenanceTrigger.getMaintenanceNotifications);
     } else {
-        sendMethodNotAllowed(res);
+      sendMethodNotAllowed(res);
     }
-    },
+  },
 
-  // Acknowledge maintenance notification
   "/api/seenMaintenanceNotification": (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, maintenanceTrigger.seenMaintenanceNotification);
+      parseBodyAndExecute(req, res, maintenanceTrigger.seenMaintenanceNotification);
     } else {
       sendMethodNotAllowed(res);
     }
   },
-  
-     // Delete a maintenance record
-     "/api/deleteMaintenanceRow": async (req, res) => {
-      if (req.method === "POST") {
-       handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
-     } else {
+
+  "/api/deleteMaintenanceRow": (req, res) => {
+    if (req.method === "POST") {
+      parseBodyAndExecute(req, res, maintenanceController.deleteMaintenanceRow);
+    } else {
       sendMethodNotAllowed(res);
     }
   },
 
-    // Update a maintenance record
-    "/api/editMaintenanceRow": async (req, res) => {
-      if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceController.editMaintenanceRow);
-      } else {
-        sendMethodNotAllowed(res);
-      }
+  "/api/editMaintenanceRow": (req, res) => {
+    if (req.method === "POST") {
+      parseBodyAndExecute(req, res, maintenanceController.editMaintenanceRow);
+    } else {
+      sendMethodNotAllowed(res);
     }
-  };
+  },
+};
 
-// Helper function to parse request body and call the appropriate controller
-//function handleRequestBody(req, res, callback = (result) => res.send(result)) {
-function handleRequestBody(req, res, callback) {
+// ✅ Helper: Parse JSON body and call the given controller
+function parseBodyAndExecute(req, res, controllerFn) {
   let body = "";
+
   req.on("data", (chunk) => {
-      body += chunk.toString();
+    body += chunk.toString();
   });
 
   req.on("end", () => {
-      try {
-          req.body = JSON.parse(body);
-      } catch (error) {
-          req.body = {};
-      }
-      //callback(req, res);  //debug 
-      callback(req, res);
+    try {
+      req.body = JSON.parse(body);
+    } catch (err) {
+      console.error("❌ Failed to parse JSON body:", err);
+      req.body = {};
+    }
+
+    controllerFn(req, res);
   });
 }
 
-// Helper function to handle method restrictions
+// ✅ Helper: Reject non-POST methods
 function sendMethodNotAllowed(res) {
   res.writeHead(405, { "Content-Type": "application/json" });
   res.end(JSON.stringify({ error: "Method Not Allowed. Use POST instead." }));
 }
 
 export default maintenanceRoutes;
+
 
