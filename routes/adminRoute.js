@@ -93,7 +93,22 @@ function sendMethodNotAllowed(res) {
     res.end(JSON.stringify({ error: "Method Not Allowed. Use POST instead." }));
 }
 
+// Helper function to parse request body and call the appropriate controller
+function handleRequestBody(req, res, callback) {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
 
+    req.on("end", () => {
+        try {
+            req.body = JSON.parse(body);
+        } catch (error) {
+            req.body = {};
+        }
+        callback(req, res);
+    });
+}
 
 
 export default adminRoutes;
