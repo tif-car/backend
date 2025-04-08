@@ -10,41 +10,73 @@ const shopOrderController = {
     try {
       const { Visitor_ID, items } = req.body;
 
-      if (!Visitor_ID || !Array.isArray(items)) {
-        console.log("❌ Invalid payload structure.");
+      if (!Visitor_ID || !Array.isArray(items) || items.length === 0) {
+        console.log(" Invalid payload structure.");
         return sendJSON(res, 400, { error: "Invalid input data" });
       }
 
       console.log("🛒 Visitor_ID:", Visitor_ID);
       console.log("🧾 Items:", items);
 
-      const [orderResult] = await pool
-        .promise()
-        .query("INSERT INTO orders (Visitor_ID, Order_Date) VALUES (?, CURDATE())", [Visitor_ID]);
+      const conn = await pool.promise().getConnection();
+      await conn.beginTransaction();
 
+      // Validate inventory
+      for (const item of items) {
+        const { Merchandise_ID, quantity } = item;
+
+        if (!Merchandise_ID || !quantity || quantity < 1) {
+          await conn.rollback();
+          conn.release();
+          return sendJSON(res, 400, { error: `Invalid item or quantity: ${JSON.stringify(item)}` });
+        }
+
+        const [stockRows] = await conn.query(
+          `SELECT COUNT(*) AS available FROM single_item WHERE merch_ID = ? AND order_ID IS NULL`,
+          [Merchandise_ID]
+        );
+
+        if (stockRows[0].available < quantity) {
+          await conn.rollback();
+          conn.release();
+          return sendJSON(res, 400, {
+            error: `Not enough stock for merchandise ID ${Merchandise_ID}. Available: ${stockRows[0].available}, Requested: ${quantity}`,
+          });
+        }
+      }
+
+      // Create the order
+      const [orderResult] = await conn.query(
+        "INSERT INTO orders (Visitor_ID, Order_Date) VALUES (?, CURDATE())",
+        [Visitor_ID]
+      );
       const orderId = orderResult.insertId;
       console.log("🆕 Created Order ID:", orderId);
 
-      const insertPromises = items.map((item) =>
-        pool
-          .promise()
-          .query(
-            "INSERT INTO single_item (merch_ID, order_ID) VALUES (?, ?)",
-            [item.Merchandise_ID, orderId]
-          )
-      );
+      // Assign items to order
+      for (const item of items) {
+        const { Merchandise_ID, quantity } = item;
 
-      await Promise.all(insertPromises);
-      console.log("✅ All items added to single_item");
+        await conn.query(
+          `UPDATE single_item
+           SET order_ID = ?
+           WHERE merch_ID = ? AND order_ID IS NULL
+           LIMIT ?`,
+          [orderId, Merchandise_ID, quantity]
+        );
+        console.log(`✅ Assigned ${quantity} of merch_ID ${Merchandise_ID} to order ${orderId}`);
+      }
+
+      await conn.commit();
+      conn.release();
 
       return sendJSON(res, 200, { message: "Shop order successfully saved!" });
 
     } catch (error) {
-      console.error("🔥 Error in createOrder:", error);
-      sendJSON(res, 500, { error: "Internal server error" });
+      console.error(" Error in createOrder:", error);
+      return sendJSON(res, 500, { error: "Internal server error" });
     }
   },
 };
 
 export default shopOrderController;
-
