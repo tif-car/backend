@@ -2,6 +2,7 @@ import animalCareController from "../controllers/animalCare.js";
 import animalHealthController from "../controllers/animalHealth.js";
 import animalFeedingController from "../controllers/animalFeeding.js";  // Added animalFeedingController
 import animalController from "../controllers/animalController.js";
+import MaintenanceController from "../controllers/MaintenanceController.js";
 
 /*
 Info:
@@ -131,6 +132,24 @@ const employeeRoutes = {
                 }
                 animalController.updateAnimal(req, res, animalId); // Pass ID to controller
             });
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+        }
+    },
+     // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
+     "/api/getMaintenanceRequestFormInfo": (req, res) => {
+        if (req.method === "GET") {
+            handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+        }
+    },
+     // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
+     "/api/addMaintenanceRequest": (req, res) => {
+        if (req.method === "GET") {
+            handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));

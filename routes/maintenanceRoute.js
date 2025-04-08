@@ -1,6 +1,6 @@
 // routes/maintenanceRoute.js
 import maintenanceController from "../controllers/MaintenanceController.js";
-import maintenanceTrigger from "../controllers/maintenanceTrigger.js";
+import MaintenanceTriggerController from "../controllers/maintenanceTrigger.js";
 
 /*
     Endpoints Available:
@@ -33,7 +33,7 @@ const maintenanceRoutes = {
     //maintenance trigger
     "/api/getMaintenanceNotifications": (req, res) => {
     if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceTrigger);
+        handleRequestBody(req, res, MaintenanceTriggerController.getMaintenanceNotifications);
     } else {
         sendMethodNotAllowed(res);
     }
@@ -42,7 +42,7 @@ const maintenanceRoutes = {
   // Acknowledge maintenance notification
   "/api/seenMaintenanceNotification": (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, maintenanceController.seenMaintenanceNotification);
+      handleRequestBody(req, res, MaintenanceTriggerController.seenMaintenanceNotification);
     } else {
       sendMethodNotAllowed(res);
     }
@@ -51,7 +51,7 @@ const maintenanceRoutes = {
      // Delete a maintenance record
      "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-       handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
+      //handleRequestBody(req, res, maintenanceController);
      } else {
       sendMethodNotAllowed(res);
     }

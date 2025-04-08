@@ -310,10 +310,6 @@ function sendResponse(res, statusCode, data) {
 }
 
 
-export default {
-  maintenanceController, 
-  deleteMaintenanceRow,
-  editMaintenanceRow
-};
+export default maintenanceController;
 
 

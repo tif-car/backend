@@ -12,10 +12,8 @@ import managerRoutes from "./routes/managerRoute.js";
 import authRoutes from "./routes/authRoute.js";
 import logRoutes from "./routes/logRoute.js";
 import maintenanceRoutes from "./routes/maintenanceRoute.js";
-import purchaseroutes from "./routes/purchaseroutes.js";
-
-
-
+import purchaseRoutes from "./routes/purchaseroutes.js";
+import merchandiseRoutes from "./routes/merchandiseRoutes.js";
 
 dotenv.config();
 
@@ -28,8 +26,8 @@ const routes = {
     ...logRoutes,
     ...memberRoutes,
     ...maintenanceRoutes, 
-    ...purchaseroutes,
-
+    ...purchaseRoutes,
+    ...merchandiseRoutes,
 };
 
 const corsMiddleware = cors({
