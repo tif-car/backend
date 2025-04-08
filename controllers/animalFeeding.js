@@ -133,7 +133,16 @@ const animalFeedingController = {
     },
 
     QueryFeedingLogs: async (req, res) => {
-        const { animal_ID, employee_ID, date, time, foodtID, species_ID, Habitat_ID } = req.body || {} ;
+        const {
+            animal_ID,
+            employee_ID,
+            date,
+            time,
+            foodtID,
+            speciesID,  // ✅ match frontend casing
+            Habitat_ID,
+          } = req.body || {};
+          
 
         let query = `select
                         A.Animal_Name,
@@ -180,9 +189,9 @@ const animalFeedingController = {
             parameters.push(foodtID);
         }
         
-        if (species_ID) {
+        if (speciesID) {
             conditions.push("A.Species_ID = ?");
-            parameters.push(species_ID);
+            parameters.push(speciesID);
         }
         
         if (Habitat_ID) {
