@@ -139,7 +139,7 @@ const employeeRoutes = {
     },
      // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
      "/api/getMaintenanceRequestFormInfo": (req, res) => {
-        if (req.method === "GET") {
+        if (req.method === "POST") {
             handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
@@ -148,7 +148,7 @@ const employeeRoutes = {
     },
      // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
      "/api/addMaintenanceRequest": (req, res) => {
-        if (req.method === "GET") {
+        if (req.method === "POST") {
             handleRequestBody(req, res, MaintenanceController.getMaintenanceRequestFormInfo)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });

@@ -70,45 +70,6 @@ const MaintenanceTriggerController = {
         });
     },
 
-    // Function to get the location name based on the location ID
-    getLocationName: (locationID, Location_type) => {
-        return new Promise((resolve, reject) => {
-            // Check if it's a vendor, habitat, or attraction by querying the tables
-            const vendorSql = `SELECT name FROM vendor WHERE Vendor_ID = ?`;
-            const habitatSql = `SELECT Habitat_Name FROM habitat WHERE Habitat_ID = ?`;
-            const attractionSql = `SELECT Attraction_Name FROM attraction WHERE Attraction_ID = ?`;
-
-            if(Location_type === "attraction"){
-                dbConnection.query(attractionSql, [locationID], (err, attractionResult) => {
-                    if (err) return reject(err);
-
-                    if (attractionResult.length > 0) {
-                        return resolve(attractionResult[0].Attraction_Name); // Attraction name
-                    }
-                });
-            } else if (Location_type === "habitat"){
-                dbConnection.query(habitatSql, [locationID], (err, habitatResult) => {
-                    if (err) return reject(err);
-
-                    if (habitatResult.length > 0) {
-                        return resolve(habitatResult[0].Habitat_Name); // Habitat name
-                    }
-                });
-            } else if(Location_type === "vendor"){
-                dbConnection.query(vendorSql, [locationID], (err, vendorResult) => {
-                    if (err) return reject(err);
-        
-                    if (vendorResult.length > 0) {
-                        return resolve(vendorResult[0].name); // Vendor name
-                    }
-                });
-            } else {
-                // If not found in any table
-                resolve('Unknown Location');
-            }   
-        });
-    },
-
     //function to handle acknowledgment of maintenance notifications by the frontend
     //expecting the maintenance id and a T for true from the frontend.
     seenMaintenanceNotification: (req, res) => {
@@ -140,6 +101,45 @@ const MaintenanceTriggerController = {
         });
     }
 }
+
+// Function to get the location name based on the location ID
+const getLocationName = (locationID, Location_type) => {
+    return new Promise((resolve, reject) => {
+        // Check if it's a vendor, habitat, or attraction by querying the tables
+        const vendorSql = `SELECT name FROM vendor WHERE Vendor_ID = ?`;
+        const habitatSql = `SELECT Habitat_Name FROM habitat WHERE Habitat_ID = ?`;
+        const attractionSql = `SELECT Attraction_Name FROM attraction WHERE Attraction_ID = ?`;
+
+        if(Location_type === "attraction"){
+            dbConnection.query(attractionSql, [locationID], (err, attractionResult) => {
+                if (err) return reject(err);
+
+                if (attractionResult.length > 0) {
+                    return resolve(attractionResult[0].Attraction_Name); // Attraction name
+                }
+            });
+        } else if (Location_type === "habitat"){
+            dbConnection.query(habitatSql, [locationID], (err, habitatResult) => {
+                if (err) return reject(err);
+
+                if (habitatResult.length > 0) {
+                    return resolve(habitatResult[0].Habitat_Name); // Habitat name
+                }
+            });
+        } else if(Location_type === "vendor"){
+            dbConnection.query(vendorSql, [locationID], (err, vendorResult) => {
+                if (err) return reject(err);
+    
+                if (vendorResult.length > 0) {
+                    return resolve(vendorResult[0].name); // Vendor name
+                }
+            });
+        } else {
+            // If not found in any table
+            resolve('Unknown Location');
+        }   
+    });
+};
 
 
 // **Helper function to send JSON responses**
