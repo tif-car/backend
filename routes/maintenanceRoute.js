@@ -82,7 +82,7 @@ function handleRequestBody(req, res, callback = (result) => res.send(result)) {
           req.body = {};
       }
       //callback(req, res);  //debug 
-      callback(result);
+      callback(req, res);
   });
 }
 
