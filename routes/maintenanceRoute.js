@@ -68,8 +68,8 @@ const maintenanceRoutes = {
   };
 
 // Helper function to parse request body and call the appropriate controller
-function handleRequestBody(req, res, callback = (result) => res.send(result)) {
-//function handleRequestBody(req, res, callback) {
+//function handleRequestBody(req, res, callback = (result) => res.send(result)) {
+function handleRequestBody(req, res, callback) {
   let body = "";
   req.on("data", (chunk) => {
       body += chunk.toString();
