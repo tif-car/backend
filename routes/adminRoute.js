@@ -34,7 +34,7 @@ const adminRoutes = {
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
-            handleRequestBody(req, res, vendorTrigger);
+            handleRequestBody(req, res, getVendorNotifications);
         } else {
             sendMethodNotAllowed(res);
         }
