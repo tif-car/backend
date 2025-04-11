@@ -8,8 +8,9 @@ import MaintenanceController from "../controllers/MaintenanceController.js";
     - `POST /api/maintenance/report`: Fetches a maintenance report.
     - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications. Trigger
     - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
-    - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
-    - `POST /api/updateMaintenance` : Updates a maintenance record based on Maintenance_ID.
+    - `POST /api/maintenance/deleteMaintenanceRow` : Deletes a maintenance record based on Maintenance_ID.
+    - `POST /api/maintenance/editMaintenanceRow` : Updates a maintenance record based on Maintenance_ID.
+    - `POST /api/maintenance/maintenanceView`: Fetches all maintenance requests.
 */
 
 const maintenanceRoutes = {
@@ -47,9 +48,18 @@ const maintenanceRoutes = {
       sendMethodNotAllowed(res);
     }
   },
+
+  //shows maintenance view of all maintenance requests
+  "/api/maintenanceView": async (req, res) => {
+    if(req.method === "POST"){
+    handleRequestBody(req, res, MaintenanceController.maintenanceView);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
   
      // Delete a maintenance record
-     "/api/deleteMaintenanceRow": async (req, res) => {
+     "api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
       handleRequestBody(req, res, MaintenanceController.deleteMaintenanceRow);
      } else {

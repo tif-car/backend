@@ -216,6 +216,27 @@ console.log(durationRaw);
     }
   },
 
+//maintenance view of all requests
+//frontend recieves ID#, location, location_type, Dept, status.
+  maintenanceView: async (req, res) => {
+    const sql = `SELECT * FROM MAINTENANCE_REQUESTS`;
+
+    try {
+        const [result] = await pool.promise().query(sql);
+
+        if (result.length === 0) {
+            console.log("No maintenance requests found.");
+            return sendResponse(res, 404, { error: "No maintenance requests found." });
+        }
+
+        sendResponse(res, 200, { maintenance_requests: result });
+    } catch (err) {
+        console.error("Error fetching maintenance view:", err);
+        sendResponse(res, 500, { error: "Database error" });
+    }
+
+  },
+
   // Delete a maintenance record based on Maintenance_ID
   deleteMaintenanceRow: async (req, res) => {
     /*

@@ -139,7 +139,7 @@ const animalFeedingController = {
             date,
             time,
             foodtID,
-            speciesID,  // ✅ match frontend casing
+            speciesID,  
             Habitat_ID,
           } = req.body || {};
           
