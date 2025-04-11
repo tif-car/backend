@@ -1,7 +1,7 @@
  
 import pool from "../db.js";
 
-const maintenanceController = {
+const MaintenanceController = {
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
       const [vendors] = await pool.promise().query(`
@@ -272,13 +272,15 @@ console.log(durationRaw);
       }
     */
 
+    console.log(req.body);
+
     const {
       Maintenance_ID,
       Maintenance_EmployeeID,
       End_Date,
       Description,
       Status,
-      Cost,
+      cost,
       RecentCheck,
     } = req.body;
 
@@ -307,9 +309,9 @@ console.log(durationRaw);
       updates.push("Status = ?");
       values.push(Status);
     }
-    if (Cost) {
+    if (cost) {
       updates.push("Cost = ?");
-      values.push(Cost);
+      values.push(cost);
     }
     if (RecentCheck) {
       updates.push("RecentCheck = ?");
@@ -384,6 +386,6 @@ function sendResponse(res, statusCode, data) {
 }
 
 
-export default maintenanceController;
+export default MaintenanceController;
 
 

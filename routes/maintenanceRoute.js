@@ -1,5 +1,4 @@
 // routes/maintenanceRoute.js
-import maintenanceController from "../controllers/MaintenanceController.js";
 import MaintenanceTriggerController from "../controllers/maintenanceTrigger.js";
 import MaintenanceController from "../controllers/MaintenanceController.js";
 
@@ -16,7 +15,7 @@ import MaintenanceController from "../controllers/MaintenanceController.js";
 const maintenanceRoutes = {
   "/api/maintenance/form-info": async (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, maintenanceController.getMaintenanceFormInfo);
+      handleRequestBody(req, res, MaintenanceController.getMaintenanceFormInfo);
     } else {
       sendMethodNotAllowed(res);
     }
@@ -25,7 +24,7 @@ const maintenanceRoutes = {
 
   "/api/maintenance/report": async (req, res) => {
     if(req.method === "POST"){
-    handleRequestBody(req, res, maintenanceController.getMaintenanceReport);
+    handleRequestBody(req, res, MaintenanceController.getMaintenanceReport);
     } else {
       sendMethodNotAllowed(res);
     }
@@ -52,7 +51,7 @@ const maintenanceRoutes = {
      // Delete a maintenance record
      "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-      //handleRequestBody(req, res, maintenanceController);
+      handleRequestBody(req, res, MaintenanceController.deleteMaintenanceRow);
      } else {
       sendMethodNotAllowed(res);
     }
@@ -61,7 +60,7 @@ const maintenanceRoutes = {
     // Update a maintenance record
     "/api/editMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-        handleRequestBody(req, res, maintenanceController.editMaintenanceRow);
+        handleRequestBody(req, res, MaintenanceController.editMaintenanceRow);
       } else {
         sendMethodNotAllowed(res);
       }
