@@ -160,13 +160,31 @@ console.log(durationRaw);
       res.writeHead(500, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Failed to generate report" }));
     }
-  }
+  },
 
-  };
+//maintenance view of all requests
+//frontend recieves ID#, location, location_type, Dept, status.
+  maintenanceView: async (req, res) => {
+    const sql = `SELECT * FROM MAINTENANCE_REQUESTS`;
 
+    try {
+        const [result] = await pool.promise().query(sql);
+
+        if (result.length === 0) {
+            console.log("No maintenance requests found.");
+            return sendResponse(res, 404, { error: "No maintenance requests found." });
+        }
+
+        sendResponse(res, 200, { maintenance_requests: result });
+    } catch (err) {
+        console.error("Error fetching maintenance view:", err);
+        sendResponse(res, 500, { error: "Database error" });
+    }
+
+  },
 
 // Delete a maintenance record based on Maintenance_ID
-const deleteMaintenanceRow = async (req, res) => {
+    deleteMaintenanceRow: async (req, res) => {
   /*
     Function: deleteMaintenanceRow
     Ex: Frontend provides:
@@ -203,10 +221,10 @@ const deleteMaintenanceRow = async (req, res) => {
     console.error("Database delete error:", err);
     sendResponse(res, 500, { error: "Database error while deleting maintenance record" });
   }
-};
+},
 
 // Edit a maintenance record based on Maintenance_ID
-const editMaintenanceRow = async (req, res) => {
+    editMaintenanceRow: async (req, res) => {
   /*
     Function: editMaintenanceRow
     Ex: Frontend provides:
@@ -300,7 +318,10 @@ const editMaintenanceRow = async (req, res) => {
     console.error("Error while updating maintenance record:", err);
     sendResponse(res, 500, { error: "Internal server error" });
   }
-};
+}
+
+}
+
 
 
 // **Helper function to send JSON responses**
