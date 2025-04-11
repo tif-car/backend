@@ -1,5 +1,10 @@
 import animalFeedingController from '../controllers/animalFeeding.js';
 
+/*
+Endpoints Available:
+- `POST /api/feeding/employeeFeedingLogView`: Fetches all feeding logs from the FEEDINGLOG_View, frontend sends Employee_ID to backend.
+*/
+
 const feedingLogRoutes = {
     "/api/feeding/details": (req, res) => {
         if (req.method === "POST") {
@@ -146,7 +151,28 @@ const feedingLogRoutes = {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
         }
-    }
+    },
+
+    "/api/feeding/employeeFeedingLogView": (req, res) => {
+        if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch (error) {
+                    req.body = {};
+                }
+                animalFeedingController.employeeFeedingLogView(req, res);
+            });
+        } else {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
+        }
+    },
 };
 
 export default feedingLogRoutes;
