@@ -52,7 +52,7 @@ const maintenanceRoutes = {
   //shows maintenance view of all maintenance requests
   "/api/maintenance/maintenanceView": async (req, res) => {
     if(req.method === "POST"){
-    handleRequestBody(req, res, maintenanceController.maintenanceView);
+    handleRequestBody(req, res, MaintenanceController.maintenanceView);
     } else {
       sendMethodNotAllowed(res);
     }
