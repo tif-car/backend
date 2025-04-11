@@ -1,7 +1,7 @@
  
 import pool from "../db.js";
 
-const maintenanceController = {
+const MaintenanceController = {
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
       const [vendors] = await pool.promise().query(`
@@ -31,13 +31,67 @@ const maintenanceController = {
     }
   },
 
+  getMaintenanceEditFormInfo: async (req, res) => {
+    try {
+      const [employees] = await pool.promise().query(`
+        select e.Employee_ID, e.first_Name, e.last_Name
+        from employee e
+        where Role = '2';
+      `);
+      const [statuses] = await pool.promise().query(`select * from mntstatus_type;`);
+
+      sendResponse(res, 200, {
+        employees,
+        statuses,
+      });
+    } catch (error) {
+      console.error("❌ Error fetching maintenance form info:", error);
+      sendResponse(res, 500, { error: "Failed to fetch form data" });
+    }
+  },
+
+  getMaintenanceInfo: async (req, res) => {
+    try {
+      const {requestId} = req.body;
+      if(!requestId){
+        return sendResponse(res, 400, { error: "Maintenance_ID is required" });
+      }
+      const [requests] = await pool.promise().query(`
+        select Maintenance_ID, Maintenance_EmployeeID, Start_Date, End_Date, Description, Status, cost, RecentCheck, request_desc ,Location_ID, Location_type
+        from maintenance
+        join maintenance_location on maintenance_locationID = Maintenance_Location
+        where Maintenance_ID = ?;
+        `, [requestId]);
+
+        if (requests.length === 0) {
+          return sendResponse(res, 404, { error: "Maintenance request not found" });
+        }
+  
+        const request = requests[0];
+        
+        // Get location name
+        const locationName = await getLocationName(request.Location_ID, request.Location_type);
+        
+        // Add location name to the request object
+        const responseData = {
+          ...request,
+          Location_Name: locationName
+        };
+  
+        sendResponse(res, 200, {request: responseData});
+    } catch (error) {
+      console.error("❌ Error fetching maintenance form info:", error);
+      sendResponse(res, 500, { error: "Failed to fetch form data" });
+    }
+  },
+
   addMaintenanceRequest: async (req, res) => {
     try {
       const {start_date ,Location_ID, request_desc} = req.body;
 
       const sql = `
-        INSERT INTO zoo.maintenance  (Maintenance_EmployeeID, Start_Date, maintenance_locationID, request_desc) 
-        VALUES (2, ?, ?, ?)`;
+        INSERT INTO zoo.maintenance  (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
+        VALUES (2, 0, 6, ?, ?, ?)`;
 
       const result = await pool.promise().query(sql,[start_date, Location_ID, request_desc])
       sendResponse(res, 200, { result });
@@ -183,146 +237,168 @@ console.log(durationRaw);
 
   },
 
-// Delete a maintenance record based on Maintenance_ID
-    deleteMaintenanceRow: async (req, res) => {
-  /*
-    Function: deleteMaintenanceRow
-    Ex: Frontend provides:
-    {
-        "Maintenance_ID": 42
-    };
-    Output:
-    {
-        "message": "Maintenance record deleted successfully"
+  // Delete a maintenance record based on Maintenance_ID
+  deleteMaintenanceRow: async (req, res) => {
+    /*
+      Function: deleteMaintenanceRow
+      Ex: Frontend provides:
+      {
+          "Maintenance_ID": 42
+      };
+      Output:
+      {
+          "message": "Maintenance record deleted successfully"
+      }
+    */
+
+    const { Maintenance_ID } = req.body || {};
+
+    // Ensure Maintenance_ID is provided
+    if (!Maintenance_ID) {
+      return sendResponse(res, 400, { error: "Maintenance_ID is required" });
     }
-  */
 
-  const { Maintenance_ID } = req.body || {};
+    const sql = `
+      DELETE FROM maintenance
+      WHERE Maintenance_ID = ?
+    `;
 
-  // Ensure Maintenance_ID is provided
-  if (!Maintenance_ID) {
-    return sendResponse(res, 400, { error: "Maintenance_ID is required" });
-  }
+    try {
+      const [result] = await pool.promise().query(sql, [Maintenance_ID]);
 
-  const sql = `
-    DELETE FROM maintenance
-    WHERE Maintenance_ID = ?
-  `;
+      if (result.affectedRows === 0) {
+        return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
+      }
 
+      sendResponse(res, 200, { message: "Maintenance record deleted successfully" });
+    } catch (err) {
+      console.error("Database delete error:", err);
+      sendResponse(res, 500, { error: "Database error while deleting maintenance record" });
+    }
+  },
+
+  // Edit a maintenance record based on Maintenance_ID
+  editMaintenanceRow: async (req, res) => {
+    /*
+      Function: editMaintenanceRow
+      Ex: Frontend provides:
+      {
+          "Maintenance_ID": 42,
+          "Cost": 1500.00,
+          "Status": 2
+      };
+      Output:
+      {
+          "message": "Maintenance record updated successfully"
+      }
+    */
+
+    console.log(req.body);
+
+    const {
+      Maintenance_ID,
+      Maintenance_EmployeeID,
+      End_Date,
+      Description,
+      Status,
+      cost,
+      RecentCheck,
+    } = req.body;
+
+    // Ensure Maintenance_ID is provided
+    if (!Maintenance_ID) {
+      return sendResponse(res, 400, { error: "Maintenance_ID is required" });
+    }
+
+    // Dynamically build the SET clause
+    const updates = [];
+    const values = [];
+
+    if (Maintenance_EmployeeID) {
+      updates.push("Maintenance_EmployeeID = ?");
+      values.push(Maintenance_EmployeeID);
+    }
+    if (End_Date) {
+      updates.push("End_Date = ?");
+      values.push(End_Date);
+    }
+    if (Description) {
+      updates.push("Description = ?");
+      values.push(Description);
+    }
+    if (Status) {
+      updates.push("Status = ?");
+      values.push(Status);
+    }
+    if (cost) {
+      updates.push("Cost = ?");
+      values.push(cost);
+    }
+    if (RecentCheck) {
+      updates.push("RecentCheck = ?");
+      values.push(RecentCheck);
+    }
+
+    // If no fields provided to update
+    if (updates.length === 0) {
+      return sendResponse(res, 400, { error: "At least one field must be provided for update" });
+    }
+
+    values.push(Maintenance_ID);
+
+    const sql = `
+      UPDATE maintenance
+      SET ${updates.join(", ")}
+      WHERE Maintenance_ID = ?
+    `;
+
+    try {
+      const [result] = await pool.promise().query(sql, values);
+
+      if (result.affectedRows === 0) {
+        return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
+      }
+
+      sendResponse(res, 200, { message: "Maintenance record updated successfully" });
+    } catch (err) {
+      console.error("Error while updating maintenance record:", err);
+      sendResponse(res, 500, { error: "Internal server error" });
+    }
+  },
+};
+
+// Function to get the location name based on the location ID
+const getLocationName = async (locationID, Location_type) => {
   try {
-    const [result] = await pool.promise().query(sql, [Maintenance_ID]);
+    // Check if it's a vendor, habitat, or attraction by querying the tables
+    const vendorSql = `SELECT name FROM vendor WHERE Vendor_ID = ?`;
+    const habitatSql = `SELECT Habitat_Name FROM habitat WHERE Habitat_ID = ?`;
+    const attractionSql = `SELECT Attraction_Name FROM attraction WHERE Attraction_ID = ?`;
 
-    if (result.affectedRows === 0) {
-      return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
+    if (Location_type === "attraction") {
+        const [attractionResult] = await pool.promise().query(attractionSql, [locationID]);
+        if (attractionResult.length > 0) {
+            return attractionResult[0].Attraction_Name;
+        }
+    } else if (Location_type === "habitat") {
+        const [habitatResult] = await pool.promise().query(habitatSql, [locationID]);
+        if (habitatResult.length > 0) {
+            return habitatResult[0].Habitat_Name;
+        }
+    } else if (Location_type === "vendor") {
+        const [vendorResult] = await pool.promise().query(vendorSql, [locationID]);
+        if (vendorResult.length > 0) {
+            return vendorResult[0].name;
+        }
     }
-
-    sendResponse(res, 200, { message: "Maintenance record deleted successfully" });
+    
+    // If not found in any table or type doesn't match
+    return 'Unknown Location';
   } catch (err) {
-    console.error("Database delete error:", err);
-    sendResponse(res, 500, { error: "Database error while deleting maintenance record" });
+      console.error("Error fetching location name:", err);
+      return 'Unknown Location';
   }
-},
-
-// Edit a maintenance record based on Maintenance_ID
-    editMaintenanceRow: async (req, res) => {
-  /*
-    Function: editMaintenanceRow
-    Ex: Frontend provides:
-    {
-        "Maintenance_ID": 42,
-        "Cost": 1500.00,
-        "Status": 2
-    };
-    Output:
-    {
-        "message": "Maintenance record updated successfully"
-    }
-  */
-
-  const {
-    Maintenance_ID,
-    Maintenance_EmployeeID,
-    Start_Date,
-    End_Date,
-    Description,
-    Status,
-    Cost,
-    RecentCheck,
-    maintenance_locationID,
-  } = req.body;
-
-  // Ensure Maintenance_ID is provided
-  if (!Maintenance_ID) {
-    return sendResponse(res, 400, { error: "Maintenance_ID is required" });
-  }
-
-  // Dynamically build the SET clause
-  const updates = [];
-  const values = [];
-
-  if (Maintenance_EmployeeID) {
-    updates.push("Maintenance_EmployeeID = ?");
-    values.push(Maintenance_EmployeeID);
-  }
-  if (Start_Date) {
-    updates.push("Start_Date = ?");
-    values.push(Start_Date);
-  }
-  if (End_Date) {
-    updates.push("End_Date = ?");
-    values.push(End_Date);
-  }
-  if (Description) {
-    updates.push("Description = ?");
-    values.push(Description);
-  }
-  if (Status) {
-    updates.push("Status = ?");
-    values.push(Status);
-  }
-  if (Cost) {
-    updates.push("Cost = ?");
-    values.push(Cost);
-  }
-  if (RecentCheck) {
-    updates.push("RecentCheck = ?");
-    values.push(RecentCheck);
-  }
-  if (maintenance_locationID) {
-    updates.push("maintenance_locationID = ?");
-    values.push(maintenance_locationID);
-  }
-
-  // If no fields provided to update
-  if (updates.length === 0) {
-    return sendResponse(res, 400, { error: "At least one field must be provided for update" });
-  }
-
-  values.push(Maintenance_ID);
-
-  const sql = `
-    UPDATE maintenance
-    SET ${updates.join(", ")}
-    WHERE Maintenance_ID = ?
-  `;
-
-  try {
-    const [result] = await pool.promise().query(sql, values);
-
-    if (result.affectedRows === 0) {
-      return sendResponse(res, 404, { error: "No record found with the given Maintenance_ID" });
-    }
-
-    sendResponse(res, 200, { message: "Maintenance record updated successfully" });
-  } catch (err) {
-    console.error("Error while updating maintenance record:", err);
-    sendResponse(res, 500, { error: "Internal server error" });
-  }
-}
-
-}
-
-
+};
 
 // **Helper function to send JSON responses**
 function sendResponse(res, statusCode, data) {
@@ -331,4 +407,6 @@ function sendResponse(res, statusCode, data) {
 }
 
 
-export default maintenanceController;
+export default MaintenanceController;
+
+
