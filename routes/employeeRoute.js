@@ -3,12 +3,22 @@ import animalHealthController from "../controllers/animalHealth.js";
 import animalFeedingController from "../controllers/animalFeeding.js";  // Added animalFeedingController
 import animalController from "../controllers/animalController.js";
 
-
 /*
-Info:
-- Frontend will send a POST request to the appropriate endpoint.
-- The route extracts the request body, parses it as JSON, and calls the 
-  respective function from the corresponding controller.
+    Endpoints Available:
+    - `POST /api/animalCare/getAnimalCareTasks`: Fetches animal care tasks for the employee. Requires `Employee_ID` from frontend
+    - `POST /api/animalHealth/updateAnimalWellness`: Updates the wellness status of an animal. Requires `animal_ID` and `wellness_status` from frontend.
+    - `POST /api/animalHealth/createMedicalRecord`: Creates a new medical record for an animal. Requires `Animal_ID`, `Employee_ID`, `Checkup_Date`, `Diagnosis`, and `Treatment` from frontend.
+    - `POST /api/animalHealth/editMedicalRecord`: Edits an existing medical record. Requires `Record_ID` and updated fields from frontend.
+    - `POST /api/animalHealth/editAllMedicalRow`: Edits all fields of a medical record. Requires `Record_ID` and all updated fields.
+    - `POST /api/getFeedingDetails`: Fetches feeding details for an animal. Requires `employee_ID` and `animal_ID` from frontend.
+    - `POST /api/getFeedingQueryDetails`: Fetches feeding query form details.
+    - `POST /api/QueryFeedingLogs`: Queries feeding logs for an animal.
+    - `GET /api/animals`: Fetches all animals.
+    - `POST /api/animals`: Creates a new animal entry. Requires details in the request body.
+    - `GET /api/animals/:id`: Fetches details of an animal by ID.
+    - `PUT /api/animals/:id`: Updates an animal by ID.
+    - `POST /api/animalCare/getAnimalById`: Fetches details of a specific animal by ID. Requires `animal_ID` from frontend.
+    - `POST /api/animalCare/getCaretakerView`: Fetches the caretaker's view for animal care tasks. Requires `employee_ID` from frontend.
 */
 
 const employeeRoutes = {
@@ -119,7 +129,16 @@ const employeeRoutes = {
         } else {
             sendMethodNotAllowed(res);
         }
-    }
+    },
+
+       //Get animals and habitat information from the CARETAKER_VIEW
+        "/api/animalCare/getCaretakerView": (req, res) => {
+            if (req.method === "POST") {
+                handleRequestBody(req, res, animalCareController.getCaretakerView);
+            } else {
+                sendMethodNotAllowed(res);
+            }
+        }
 };
 
 

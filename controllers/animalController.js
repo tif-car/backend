@@ -125,6 +125,35 @@ const animalCareController = {
 
         sendResponse(res, 200, { message: "Animal updated successfully" });
     });
+},
+
+
+//Get animals and habitat information from the CARETAKER_VIEW
+//frontend will provide the Employee_ID
+   getCaretakerView: async (req, res) => {
+    const { Employee_ID } = req.body || {};
+
+    if (!Employee_ID) {
+        return sendResponse(res, 400, { error: "Employee ID is required" });
+    }
+
+    const sql = `SELECT *
+                 FROM CARETAKER_VIEW
+                 WHERE Employee_ID = ?
+                 ORDER BY Habitat_Name, Species_Type`;
+
+    pool.query(sql, [Employee_ID], (err, result) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        if (result.length === 0) {
+            return sendResponse(res, 404, { error: "No records found for this employee" });
+        }
+
+        sendResponse(res, 200, { caretakerData: result });
+    });
 }
 
 };
