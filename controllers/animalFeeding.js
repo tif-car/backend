@@ -215,35 +215,6 @@ const animalFeedingController = {
 
     },
 
-    //feedingLog View based on employee_ID
-     employeeFeedingLogView: async (req, res) => {
-        const { employee_ID } = req.body;
-    
-        if (!employee_ID) {
-            return sendResponse(res, 400, { error: "employee_ID is required" });
-        }
-    
-        const sql = `
-            SELECT *
-            FROM FEEDINGLOG_View
-            WHERE Employee_ID = ?
-            ORDER BY Feeding_Date DESC, Feeding_Time DESC;
-        `;
-    
-        try {
-            const [result] = await pool.promise().query(sql, [employee_ID]);
-    
-            if (result.length === 0) {
-                return sendResponse(res, 404, { error: "No feeding logs found for this employee." });
-            }
-    
-            sendResponse(res, 200, result);
-        } catch (err) {
-            console.error("Error fetching feeding logs from view:", err);
-            return sendResponse(res, 500, { error: "Internal server error" });
-        }
-    }
-    
 };
 
 function sendResponse(res, statusCode, data) {
