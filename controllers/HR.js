@@ -1,6 +1,8 @@
 import pool from "../db.js"; // Use pool instead of dbConnection
 
-const editEmployee = async (req, res) => {
+
+const HRController = {
+    editEmployee: async (req, res) => {
     const { Employee_ID, Salary, Name, Role, Work_Location_ID, Phone_number, Email, Password } = req.body;
 
     // Ensure Employee_ID is provided
@@ -66,10 +68,10 @@ const editEmployee = async (req, res) => {
         console.error("Database update error:", err);
         sendResponse(res, 500, { error: "Database error while updating employee." });
     }
-};
+},
 
 // Create a new employee
-const createEmployee = async (req, res) => {
+     createEmployee: async (req, res) => {
     const { Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = req.body;
 
     // Ensure all required fields are provided
@@ -89,6 +91,8 @@ const createEmployee = async (req, res) => {
         console.error("Database insertion error:", err);
         sendResponse(res, 500, { error: "Database error while adding employee." });
     }
+},
+
 };
 
 // Helper function for sending responses
@@ -97,4 +101,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { createEmployee, editEmployee };
+export default {HRController};

@@ -14,7 +14,7 @@ import BulkPurchaseController from "../controllers/purchases.js";
 const adminRoutes = {
 
     // Route to update employee info (requires Employee_ID)
-    "/api/editEmployee": (req, res) => {
+    "/api/HR/editEmployee": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, HRController.editEmployee);
         } else {
@@ -23,7 +23,7 @@ const adminRoutes = {
     },
 
     // Route to add a new employee
-    "/api/createEmployee": (req, res) => {
+    "/api/HR/createEmployee": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, HRController.createEmployee);
         } else {
