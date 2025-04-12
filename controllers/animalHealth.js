@@ -1,9 +1,11 @@
 import pool from "../db.js";  // Assuming pool is the connection pool object.
 
 
+const animalHealthController = {
+
 // Function to update the wellness status of an animal.
 // Frontend would need to include the animal_ID and wellness_status. Maybe from a dropdown box?
-const updateAnimalWellness = (req, res) => {
+    updateAnimalWellness: async (req, res) => {
 
 /*
  Function: updateAnimalWellness
@@ -35,11 +37,11 @@ Output:
 
         sendResponse(res, 200, { message: "Wellness status updated successfully" });
     });
-};
+},
 
 // Function to create a new medical record for an animal.
 // Frontend must provide: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment.
-const createMedicalRecord = (req, res) => {
+     createMedicalRecord: async (req, res) => {
     /*
         Function: createMedicalRecord
         Ex: Frontend provides:
@@ -71,12 +73,12 @@ const createMedicalRecord = (req, res) => {
 
         sendResponse(res, 201, { message: "Medical record created successfully.", Record_ID: result.insertId });
     });
-};
+},
 
 
 //Functoin to edit medical record row
 //Only updates the fields provided by the frontend
-const editMedicalRecord = (req, res) => {
+    editMedicalRecord: async (req, res) => {
     /*
         Function: editMedicalRecord
         Ex: Frontend provides:
@@ -132,7 +134,7 @@ const editMedicalRecord = (req, res) => {
             sendResponse(res, 500, { error: "Database error while updating medical record." });
         }
     });
-};
+},
 
 /*
 Function: EditMedicalRecords
@@ -155,7 +157,7 @@ output:
 
 // Function to update an existing medical record.
 // Frontend must provide a valid Record_ID along with updated fields: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment.
-const editAllMedicalRow = (req, res) => {
+    editAllMedicalRow: async (req, res) => {
     const { Record_ID, Animal_ID, Employee_ID, Checkup_Date, Diagnosis, Treatment } = req.body || {};
 
     if (!Record_ID || !Animal_ID || !Employee_ID || !Checkup_Date || !Diagnosis || !Treatment) {
@@ -179,7 +181,7 @@ const editAllMedicalRow = (req, res) => {
 
         sendResponse(res, 200, { message: "Medical record updated successfully." });
     });
-};
+}
 
 /*
 Function: editAllMedicalRow
@@ -208,6 +210,7 @@ Expected output:
     12
 ]
  */
+};
 
 // Helper function to send JSON responses
 function sendResponse(res, statusCode, data) {
@@ -215,4 +218,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { updateAnimalWellness, createMedicalRecord, editMedicalRecord, editAllMedicalRow };
+export default { animalHealthController };

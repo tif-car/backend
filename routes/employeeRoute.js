@@ -13,7 +13,7 @@ Info:
 
 const employeeRoutes = {
     // Route to get animal care tasks (requires Employee_ID from frontend)
-    "/api/getAnimalCareTasks": (req, res) => {
+    "/api/animalCare/getAnimalCareTasks": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalCareController.getAnimalCareTasks);
         } else {
@@ -22,7 +22,7 @@ const employeeRoutes = {
     },
 
     // Route to update animal wellness status (requires animal_ID and wellness_status from frontend)
-    "/api/updateAnimalWellness": (req, res) => {
+    "/api/animalHealth/updateAnimalWellness": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.updateAnimalWellness);
         } else {
@@ -31,7 +31,7 @@ const employeeRoutes = {
     },
 
     // Route to create a new medical record (requires Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment)
-    "/api/createMedicalRecord": (req, res) => {
+    "/api/animalHealth/createMedicalRecord": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.createMedicalRecord);
         } else {
@@ -40,7 +40,7 @@ const employeeRoutes = {
     },
 
     // Route to edit an existing medical record (requires Record_ID and updated fields)
-    "/api/editMedicalRecord": (req, res) => {
+    "/api/animalHealth/editMedicalRecord": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.editMedicalRecord);
         } else {
@@ -49,7 +49,7 @@ const employeeRoutes = {
     },
 
     // New route to edit all fields of a medical record (requires Record_ID and all updated fields)
-    "/api/editAllMedicalRow": (req, res) => {
+    "/api/animalHealth/editAllMedicalRow": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.editAllMedicalRow);
         } else {
@@ -113,31 +113,15 @@ const employeeRoutes = {
     },
 
     // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
-    "/api/animals/:id": (req, res) => {
-        const animalId = req.url.split("/")[3]; // Extract ID from URL
-        
-        if (req.method === "GET") {
-            animalController.getAnimalById(req, res, animalId); // Pass ID to controller
-        } else if (req.method === "PUT") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalController.updateAnimal(req, res, animalId); // Pass ID to controller
-            });
+    "/api/animalCare/getAnimalById": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalCareController.getAnimalById);
         } else {
-            res.writeHead(405, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
+            sendMethodNotAllowed(res);
         }
-    },
+    }
 };
+
 
 // Helper function to parse request body and call the appropriate controller
 function handleRequestBody(req, res, callback) {
