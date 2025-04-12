@@ -1,7 +1,7 @@
  
 import pool from "../db.js";
 
-const MaintenanceController = {
+const maintenanceController = {
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
       const [vendors] = await pool.promise().query(`
@@ -56,29 +56,8 @@ const MaintenanceController = {
       if(!requestId){
         return sendResponse(res, 400, { error: "Maintenance_ID is required" });
       }
-      const [requests] = await pool.promise().query(`
-        select Maintenance_ID, Maintenance_EmployeeID, Start_Date, End_Date, Description, Status, cost, RecentCheck, request_desc ,Location_ID, Location_type
-        from maintenance
-        join maintenance_location on maintenance_locationID = Maintenance_Location
-        where Maintenance_ID = ?;
-        `, [requestId]);
-
-        if (requests.length === 0) {
-          return sendResponse(res, 404, { error: "Maintenance request not found" });
-        }
-  
-        const request = requests[0];
-        
-        // Get location name
-        const locationName = await getLocationName(request.Location_ID, request.Location_type);
-        
-        // Add location name to the request object
-        const responseData = {
-          ...request,
-          Location_Name: locationName
-        };
-  
-        sendResponse(res, 200, {request: responseData});
+      const [request] = await pool.promise().query(`select * from maintenance where Maintenance_ID = ?;`, [requestId]);
+      sendResponse(res, 200, {request});
     } catch (error) {
       console.error("❌ Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
@@ -216,27 +195,6 @@ console.log(durationRaw);
     }
   },
 
-//maintenance view of all requests
-//frontend recieves ID#, location, location_type, Dept, status.
-  maintenanceView: async (req, res) => {
-    const sql = `SELECT * FROM MAINTENANCE_REQUESTS`;
-
-    try {
-        const [result] = await pool.promise().query(sql);
-
-        if (result.length === 0) {
-            console.log("No maintenance requests found.");
-            return sendResponse(res, 404, { error: "No maintenance requests found." });
-        }
-
-        sendResponse(res, 200, { maintenance_requests: result });
-    } catch (err) {
-        console.error("Error fetching maintenance view:", err);
-        sendResponse(res, 500, { error: "Database error" });
-    }
-
-  },
-
   // Delete a maintenance record based on Maintenance_ID
   deleteMaintenanceRow: async (req, res) => {
     /*
@@ -293,15 +251,13 @@ console.log(durationRaw);
       }
     */
 
-    console.log(req.body);
-
     const {
       Maintenance_ID,
       Maintenance_EmployeeID,
       End_Date,
       Description,
       Status,
-      cost,
+      Cost,
       RecentCheck,
     } = req.body;
 
@@ -330,9 +286,9 @@ console.log(durationRaw);
       updates.push("Status = ?");
       values.push(Status);
     }
-    if (cost) {
+    if (Cost) {
       updates.push("Cost = ?");
-      values.push(cost);
+      values.push(Cost);
     }
     if (RecentCheck) {
       updates.push("RecentCheck = ?");
@@ -367,39 +323,6 @@ console.log(durationRaw);
   },
 };
 
-// Function to get the location name based on the location ID
-const getLocationName = async (locationID, Location_type) => {
-  try {
-    // Check if it's a vendor, habitat, or attraction by querying the tables
-    const vendorSql = `SELECT name FROM vendor WHERE Vendor_ID = ?`;
-    const habitatSql = `SELECT Habitat_Name FROM habitat WHERE Habitat_ID = ?`;
-    const attractionSql = `SELECT Attraction_Name FROM attraction WHERE Attraction_ID = ?`;
-
-    if (Location_type === "attraction") {
-        const [attractionResult] = await pool.promise().query(attractionSql, [locationID]);
-        if (attractionResult.length > 0) {
-            return attractionResult[0].Attraction_Name;
-        }
-    } else if (Location_type === "habitat") {
-        const [habitatResult] = await pool.promise().query(habitatSql, [locationID]);
-        if (habitatResult.length > 0) {
-            return habitatResult[0].Habitat_Name;
-        }
-    } else if (Location_type === "vendor") {
-        const [vendorResult] = await pool.promise().query(vendorSql, [locationID]);
-        if (vendorResult.length > 0) {
-            return vendorResult[0].name;
-        }
-    }
-    
-    // If not found in any table or type doesn't match
-    return 'Unknown Location';
-  } catch (err) {
-      console.error("Error fetching location name:", err);
-      return 'Unknown Location';
-  }
-};
-
 // **Helper function to send JSON responses**
 function sendResponse(res, statusCode, data) {
   res.writeHead(statusCode, { 'Content-Type': 'application/json' });
@@ -407,6 +330,6 @@ function sendResponse(res, statusCode, data) {
 }
 
 
-export default MaintenanceController;
+export default maintenanceController;
 
 
