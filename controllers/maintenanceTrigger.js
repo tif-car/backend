@@ -28,7 +28,6 @@ const MaintenanceTriggerController = {
         // SQL query to get information from the maintenance_notifications table
         const sql = `
             SELECT 
-                m.maintenance_messageID,
                 m.mnt_ID, 
                 m.maintenance_employeeID, 
                 m.message, 
@@ -37,7 +36,7 @@ const MaintenanceTriggerController = {
             FROM maintenance_notifications m
             JOIN maintenance_location ml ON m.maintenance_locationID = ml.Maintenance_Location
             WHERE m.message_sent = FALSE
-            ORDER BY m.maintenance_messageID DESC;
+            ORDER BY m.maintenance_messageID DESC
         `;
 
         dbConnection.query(sql, (err, result) => {
@@ -98,7 +97,7 @@ const MaintenanceTriggerController = {
                 return sendResponse(res, 404, { error: "Notification not found" });
             }
 
-            sendResponse(res, 200, { success: 1 });
+            sendResponse(res, 200, { message: "Notification marked as sent" });
         });
     }
 }

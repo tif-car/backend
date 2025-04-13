@@ -4,7 +4,6 @@ const paymentController = {
   processPayment: async (req, res) => {
     const { Visitor_ID, tickets = [], merchandise = [] } = req.body;
 
-    
     if (!Visitor_ID || (tickets.length === 0 && merchandise.length === 0)) {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Visitor_ID, tickets, or merchandise missing" }));
@@ -16,14 +15,14 @@ const paymentController = {
     try {
       await conn.beginTransaction();
 
-      //Create order
+      // Create a new order
       const [orderResult] = await conn.query(
         "INSERT INTO orders (Visitor_ID, Order_Date, Discount_Applied) VALUES (?, CURDATE(), 0.00)",
         [Visitor_ID]
       );
       const orderID = orderResult.insertId;
 
-      //Handle tickets
+      // Handle ticket insertion 
       if (Array.isArray(tickets) && tickets.length > 0) {
         const ticketMap = new Map();
         for (const [personTypeID, attractionID] of tickets) {
@@ -45,15 +44,15 @@ const paymentController = {
           const priceID = priceRow[0].Price_ID;
           for (let i = 0; i < quantity; i++) {
             await conn.query(
-              `INSERT INTO ticket (Visitor_ID, Bought_Date, Expire_Date, Ticket_Price_ID)
-               VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), ?)`,
-              [Visitor_ID, priceID]
+              `INSERT INTO ticket (Visitor_ID, Order_ID, Bought_Date, Expire_Date, Ticket_Price_ID)
+               VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), ?)`,
+              [Visitor_ID, orderID, priceID]
             );
           }
         }
       }
 
-      // Handle merchandise 
+      // Handle merchandise
       if (Array.isArray(merchandise) && merchandise.length > 0) {
         for (const item of merchandise) {
           const { Merchandise_ID, quantity } = item;

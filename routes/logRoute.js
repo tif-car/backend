@@ -1,10 +1,5 @@
 import animalFeedingController from '../controllers/animalFeeding.js';
 
-/*
-Endpoints Available:
-- `POST /api/feeding/employeeFeedingLogView`: Fetches all feeding logs from the FEEDINGLOG_View, frontend sends Employee_ID to backend.
-*/
-
 const feedingLogRoutes = {
     "/api/feeding/details": (req, res) => {
         if (req.method === "POST") {

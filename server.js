@@ -14,6 +14,8 @@ import feedingLogRoutes from "./routes/logRoute.js";
 import maintenanceRoutes from "./routes/maintenanceRoute.js";
 import purchaseRoutes from "./routes/purchaseroutes.js";
 import merchandiseRoutes from "./routes/merchandiseRoutes.js";
+import orderHistoryRoute from "./routes/orderHistoryRoute.js";
+import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";
 
 dotenv.config();
 
@@ -28,6 +30,8 @@ const routes = {
     ...maintenanceRoutes, 
     ...purchaseRoutes,
     ...merchandiseRoutes,
+    ...orderHistoryRoute,
+    ...merchandiseStockRoutes,
 };
 
 const corsMiddleware = cors({

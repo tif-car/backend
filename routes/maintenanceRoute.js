@@ -1,4 +1,5 @@
 // routes/maintenanceRoute.js
+import maintenanceController from "../controllers/MaintenanceController.js";
 import MaintenanceTriggerController from "../controllers/maintenanceTrigger.js";
 import MaintenanceController from "../controllers/MaintenanceController.js";
 
@@ -8,15 +9,14 @@ import MaintenanceController from "../controllers/MaintenanceController.js";
     - `POST /api/maintenance/report`: Fetches a maintenance report.
     - `POST /api/getMaintenanceNotifications` : Fetches new maintenance notifications. Trigger
     - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
-    - `POST /api/maintenance/deleteMaintenanceRow` : Deletes a maintenance record based on Maintenance_ID.
-    - `POST /api/maintenance/editMaintenanceRow` : Updates a maintenance record based on Maintenance_ID.
-    - `POST /api/maintenance/maintenanceView`: Fetches all maintenance requests.
+    - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
+    - `POST /api/updateMaintenance` : Updates a maintenance record based on Maintenance_ID.
 */
 
 const maintenanceRoutes = {
   "/api/maintenance/form-info": async (req, res) => {
     if (req.method === "POST") {
-      handleRequestBody(req, res, MaintenanceController.getMaintenanceFormInfo);
+      handleRequestBody(req, res, maintenanceController.getMaintenanceFormInfo);
     } else {
       sendMethodNotAllowed(res);
     }
@@ -25,7 +25,7 @@ const maintenanceRoutes = {
 
   "/api/maintenance/report": async (req, res) => {
     if(req.method === "POST"){
-    handleRequestBody(req, res, MaintenanceController.getMaintenanceReport);
+    handleRequestBody(req, res, maintenanceController.getMaintenanceReport);
     } else {
       sendMethodNotAllowed(res);
     }
@@ -59,9 +59,9 @@ const maintenanceRoutes = {
   },
   
      // Delete a maintenance record
-     "api/deleteMaintenanceRow": async (req, res) => {
+     "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-      handleRequestBody(req, res, MaintenanceController.deleteMaintenanceRow);
+      //handleRequestBody(req, res, maintenanceController);
      } else {
       sendMethodNotAllowed(res);
     }
@@ -70,7 +70,7 @@ const maintenanceRoutes = {
     // Update a maintenance record
     "/api/editMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-        handleRequestBody(req, res, MaintenanceController.editMaintenanceRow);
+        handleRequestBody(req, res, maintenanceController.editMaintenanceRow);
       } else {
         sendMethodNotAllowed(res);
       }

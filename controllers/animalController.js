@@ -1,7 +1,9 @@
 import pool from "../db.js"; // Using the connection pool for query handling
 
+const animalCareController = {
+
 // Get all animals
-const getAllAnimals = (req, res) => {
+    getAllAnimals: async (req, res) => {
     const sql = `SELECT * FROM animal`;
 
     pool.query(sql, (err, result) => {
@@ -12,10 +14,10 @@ const getAllAnimals = (req, res) => {
 
         sendResponse(res, 200, { animals: result });
     });
-};
+},
 
 // Get a single animal by ID
-const getAnimalById = (req, res) => {
+    getAnimalById: async (req, res) => {
     const { Animal_ID } = req.body || {};
 
     if (!Animal_ID) {
@@ -36,10 +38,10 @@ const getAnimalById = (req, res) => {
 
         sendResponse(res, 200, { animal: result[0] });
     });
-};
+},
 
 // Create a new animal
-const createAnimal = (req, res) => {
+    createAnimal: async (req, res) => {
     const { Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status } = req.body || {};
 
     if (!Animal_Name || !Species_ID || !Habitat_ID) {
@@ -60,10 +62,10 @@ const createAnimal = (req, res) => {
             Animal_ID: result.insertId
         });
     });
-};
+},
 
 // Update an animal's information
-const updateAnimal = (req, res) => {
+    updateAnimal: async (req, res) => {
     const { 
         Animal_ID, 
         Animal_Name, 
@@ -123,6 +125,37 @@ const updateAnimal = (req, res) => {
 
         sendResponse(res, 200, { message: "Animal updated successfully" });
     });
+},
+
+
+//Get animals and habitat information from the CARETAKER_VIEW
+//frontend will provide the Employee_ID
+   getCaretakerView: async (req, res) => {
+    const { Employee_ID } = req.body || {};
+
+    if (!Employee_ID) {
+        return sendResponse(res, 400, { error: "Employee ID is required" });
+    }
+
+    const sql = `SELECT *
+                 FROM CARETAKER_VIEW
+                 WHERE Employee_ID = ?
+                 ORDER BY Habitat_Name, Species_Type`;
+
+    pool.query(sql, [Employee_ID], (err, result) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        if (result.length === 0) {
+            return sendResponse(res, 404, { error: "No records found for this employee" });
+        }
+
+        sendResponse(res, 200, { caretakerData: result });
+    });
+}
+
 };
 
 // Helper function to send JSON responses
@@ -131,9 +164,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { 
-    getAllAnimals, 
-    getAnimalById, 
-    createAnimal, 
-    updateAnimal 
-};
+export default {animalCareController};

@@ -1,11 +1,18 @@
 import attractionController from "../controllers/attraction.js";
 import vendorReportController from "../controllers/vendorReportController.js"
 import ticketReportController from "../controllers/ticketReportController.js"
+import managerController from "../controllers/managerController.js";
+
 
 /*
 Endpoints:
 - `POST /api/getAttractionStatus`: Retrieves the status type of an attraction based on its name.
 - `POST /api/updateAttractionStatus`: Updates the status type of an attraction.
+- `POST /api/getVendMerchReportFormInfo`: Retrieves dropdown options for vendor/merchandise report form.
+- `POST /api/getVendMerchReport`: Retrieves filtered vendor/merchandise report data.
+- `POST /api/getTicketReportFormInfo`: Retrieves dropdown options for ticket report form.
+- `POST /api/getTicketReport`: Retrieves filtered ticket report data.
+- `POST /api/manager/getManagerView`: Retrieves department and employee info under a specific manager.
 */
 
 const managerRoutes = {
@@ -55,6 +62,16 @@ const managerRoutes = {
             sendMethodNotAllowed(res);
         }
     },
+
+    //function to get managerView
+    "/api/manager/getManagerView": (req, res) => {
+    if (req.method === "POST") {
+        handleRequestBody(req, res, managerController.getManagerView);
+    } else {
+        sendMethodNotAllowed(res);
+    }
+},
+
 };
 
 // Helper function to parse request body and call the appropriate controller
