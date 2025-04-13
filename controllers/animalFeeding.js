@@ -3,25 +3,33 @@ import pool from "../db.js";
 const animalFeedingController = {
    
     getFeedingDetails: async (req, res) => {
-        const { employee_ID, animal_ID } = req.body;
+        const { feedingId } = req.body;
 
-        if (!employee_ID || !animal_ID) {
-            return sendResponse(res, 400, { error: "Both employee_ID and animal_ID are required" });
+        if (!feedingId ) {
+            return sendResponse(res, 400, { error: "feeding log ID is required" });
         }
 
         const sql = `
-            SELECT f.Feeding_Time, f.Quantity, ft.food_Types
-            FROM feeding_log f
-            JOIN food_type ft ON f.Food_Time = ft.foodtype_ID
-            WHERE f.Employee_ID = ? AND f.Animal_ID = ?;
+            select Animal_ID, 
+                Food_Type, 
+                Feeding_Date, 
+                Feeding_Time, 
+                Quantity, 
+                Q_Unit,
+                e.Employee_ID, 
+                e.first_Name, 
+                e.last_Name
+            from feeding_log
+            join employee e on feeding_log.Employee_ID = e.Employee_ID
+            where Feeding_ID = ?;
         `;
 
         try {
-            const [result] = await pool.promise().query(sql, [employee_ID, animal_ID]);
+            const [result] = await pool.promise().query(sql, [feedingId]);
             if (result.length === 0) {
-                return sendResponse(res, 404, { error: "No feeding details found for the given IDs" });
+                return sendResponse(res, 404, { error: "No feeding details found for the given ID" });
             }
-            sendResponse(res, 200, result);
+            sendResponse(res, 200, {request: result[0]});
         } catch (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });
@@ -215,6 +223,125 @@ const animalFeedingController = {
 
     },
 
+    //feedingLog View based on employee_ID
+     employeeFeedingLogView: async (req, res) => {
+        const { employee_ID } = req.body;
+    
+        if (!employee_ID) {
+            return sendResponse(res, 400, { error: "employee_ID is required" });
+        }
+    
+        const sql = `
+            SELECT *
+            FROM FEEDINGLOG_View
+            WHERE Employee_ID = ?
+            ORDER BY Feeding_Date DESC, Feeding_Time DESC;
+        `;
+    
+        try {
+            const [result] = await pool.promise().query(sql, [employee_ID]);
+    
+            if (result.length === 0) {
+                return sendResponse(res, 404, { error: "No feeding logs found for this employee." });
+            }
+    
+            sendResponse(res, 200, {feeding_logs: result});
+        } catch (err) {
+            console.error("Error fetching feeding logs from view:", err);
+            return sendResponse(res, 500, { error: "Internal server error" });
+        }
+    },
+
+    editFeedingLog: async (req,res) => {
+        const {
+            Feeding_ID,
+            Food_Type,
+            date,
+            time,
+            Quantity,
+            Q_Unit,
+        } = req.body;
+
+        if (!Feeding_ID) {
+            return sendResponse(res, 400, { error: "Feeding_ID is required" });
+        }
+
+        const updates = [];
+        const values = [];
+
+        if(Food_Type){
+            updates.push("Food_Type = ?");
+            values.push(Food_Type);
+        }
+        if(Quantity){
+            updates.push("Quantity = ?");
+            values.push(Quantity);
+        }
+        if(Q_Unit){
+            updates.push("Q_Unit = ?");
+            values.push(Q_Unit);
+        }
+        if(date){
+            updates.push("Feeding_Date = ?");
+            values.push(date);
+        }
+        if(time){
+            updates.push("Feeding_Time = ?");
+            values.push(time);
+        }
+
+        // If no fields provided to update
+        if (updates.length === 0) {
+            return sendResponse(res, 400, { error: "At least one field must be provided for update" });
+        }
+
+        values.push(Feeding_ID);
+
+        const sql =`
+            UPDATE feeding_log
+            SET ${updates.join(", ")}
+            WHERE Feeding_ID = ?;`;
+
+        try {
+            const [result] = await pool.promise().query(sql, values);
+        
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "No record found with the given Feeding_ID" });
+            }
+        
+            sendResponse(res, 200, { message: "Feeding Log updated successfully" });
+            } catch (err) {
+            console.error("Error while updating maintenance record:", err);
+            sendResponse(res, 500, { error: "Internal server error" });
+        }
+    },
+
+    deleteFeedingLog: async (req, res) => {
+        const {Feeding_ID} = req.body;
+
+        if (!Feeding_ID) {
+            return sendResponse(res, 400, { error: "Feeding_ID is required" });
+        }
+
+        const sql = `
+            DELETE FROM feeding_log
+            WHERE Feeding_ID = ?`;
+
+        try {
+            const [result] = await pool.promise().query(sql, Feeding_ID);
+        
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "No record found with the given Feeding_ID" });
+            }
+        
+            sendResponse(res, 200, { message: "Feeding Log Deleted successfully" });
+            } catch (err) {
+            console.error("Error while updating feeding log:", err);
+            sendResponse(res, 500, { error: "Internal server error" });
+        }
+
+    }
+    
 };
 
 function sendResponse(res, statusCode, data) {

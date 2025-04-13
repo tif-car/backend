@@ -1,21 +1,14 @@
 import animalFeedingController from '../controllers/animalFeeding.js';
 
+/*
+Endpoints Available:
+- `POST /api/feeding/employeeFeedingLogView`: Fetches all feeding logs from the FEEDINGLOG_View, frontend sends Employee_ID to backend.
+*/
+
 const feedingLogRoutes = {
     "/api/feeding/details": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingDetails(req, res);
-            });
+            handleRequestBody(req,res, animalFeedingController.getFeedingDetails);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
@@ -24,19 +17,7 @@ const feedingLogRoutes = {
 
     "/api/feeding/form-info": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingFormInfo(req, res);
-            });
+            handleRequestBody(req,res, animalFeedingController.getFeedingFormInfo);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
@@ -45,109 +26,56 @@ const feedingLogRoutes = {
 
     "/api/feeding/create": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.createFeedingLog(req, res);
-            });
+            handleRequestBody(req,res, animalFeedingController.createFeedingLog);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
         }
     },
 
-    "/api/feeding-logs/employee": (req, res) => {
+    "/api/employeeFeedingLogView": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingLogsByEmployee(req, res);
-            });
+            handleRequestBody(req, res, animalFeedingController.employeeFeedingLogView)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
         }
     },
 
-    "/api/feeding-logs/animal": (req, res) => {
+    "/api/editFeedingLog": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingLogsByAnimal(req, res);
-            });
+            handleRequestBody(req, res, animalFeedingController.editFeedingLog)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
         }
     },
-
-    "/api/feeding-logs/date": (req, res) => {
+    "/api/deleteFeedingLog": (req, res) => {
         if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingLogsByDate(req, res);
-            });
+            handleRequestBody(req, res, animalFeedingController.deleteFeedingLog)
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
         }
     },
-
-    "/api/feeding-logs/food-type": (req, res) => {
-        if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalFeedingController.getFeedingLogsByFoodType(req, res);
-            });
-        } else {
-            res.writeHead(405, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Method Not Allowed. Use POST." }));
-        }
-    }
 };
+
+// Helper function to parse request body and call the appropriate controller
+function handleRequestBody(req, res, callback) {
+    let body = "";
+    req.on("data", (chunk) => {
+        body += chunk.toString();
+    });
+
+    req.on("end", () => {
+        try {
+            req.body = JSON.parse(body);
+        } catch (error) {
+            req.body = {};
+        }
+        callback(req, res);
+    });
+}
 
 export default feedingLogRoutes;
  
