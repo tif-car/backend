@@ -2,6 +2,7 @@
 import pool from "../db.js";
 
 const maintenanceController = {
+  //work in progress?
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
       const [vendors] = await pool.promise().query(`
@@ -64,6 +65,7 @@ const maintenanceController = {
     }
   },
 
+  //why are values being hardcoded?
   addMaintenanceRequest: async (req, res) => {
     try {
       const {start_date ,Location_ID, request_desc} = req.body;
