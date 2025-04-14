@@ -3,7 +3,9 @@ import pool from "../db.js"; // Use pool instead of dbConnection
 
 const HRController = {
     editEmployee: async (req, res) => {
-    const { Employee_ID, Salary, Name, Role, Work_Location_ID, Phone_number, Email, Password } = req.body;
+
+
+    const {Employee_ID, first_Name, last_Name, Role, Salary, Phone_number, Email, Password } = req.body;
 
     // Ensure Employee_ID is provided
     if (!Employee_ID) {
@@ -15,21 +17,21 @@ const HRController = {
     let values = [];
 
     // Add fields to setClause if they are provided
-    if (Salary) {
-        setClause.push("Salary = ?");
-        values.push(Salary);
+    if (Name) {
+        setClause.push("first_Name = ?");
+        values.push(Name);
     }
     if (Name) {
-        setClause.push("Name = ?");
+        setClause.push("last_Name = ?");
         values.push(Name);
     }
     if (Role) {
         setClause.push("Role = ?");
         values.push(Role);
     }
-    if (Work_Location_ID) {
-        setClause.push("Work_Location_ID = ?");
-        values.push(Work_Location_ID);
+    if (Salary) {
+        setClause.push("Salary = ?");
+        values.push(Salary);
     }
     if (Phone_number) {
         setClause.push("Phone_number = ?");
@@ -72,19 +74,19 @@ const HRController = {
 
 // Create a new employee
      createEmployee: async (req, res) => {
-    const { Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password } = req.body;
+    const {first_Name, last_Name, Role, Salary, Phone_number, Email, Password} = req.body;
 
     // Ensure all required fields are provided
-    if (!Name || !Role || !Salary || !Work_Location_ID || !Phone_number || !Email || !Password) {
+    if (!first_Name || !last_Name || !Role || !Salary || !Phone_number || !Email || !Password) {
         return sendResponse(res, 400, { error: "All fields are required to create a new employee." });
     }
 
     // Add new information into the employee table
-    const sql = `INSERT INTO employee (Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password) 
+    const sql = `INSERT INTO employee (first_Name, last_Name, Role, Salary, Phone_number, Email, Password) 
                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
     try {
-        const [result] = await pool.promise().query(sql, [Name, Role, Salary, Work_Location_ID, Phone_number, Email, Password]);
+        const [result] = await pool.promise().query(sql, [first_Name, last_Name, Role, Salary, Phone_number, Email, Password]);
 
         sendResponse(res, 201, { message: "Employee created successfully.", Employee_ID: result.insertId });
     } catch (err) {
