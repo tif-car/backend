@@ -1,6 +1,6 @@
 import pool from "../db.js"; // Using the connection pool for query handling
 
-const animalCareController = {
+const animalController = {
 
 // Get all animals
     getAllAnimals: async (req, res) => {
@@ -42,27 +42,27 @@ const animalCareController = {
 
 // Create a new animal
     createAnimal: async (req, res) => {
-    const { Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status } = req.body || {};
+        const { name, Species_ID, Habitat_ID, Birth_Date, wellness_typeID } = req.body.newAnimal || {};
 
-    if (!Animal_Name || !Species_ID || !Habitat_ID) {
-        return sendResponse(res, 400, { error: "Animal name, species ID, and habitat ID are required" });
-    }
-
-    const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status) 
-                 VALUES (?, ?, ?, ?, ?)`;
-
-    pool.query(sql, [Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status], (err, result) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
+        if (!name || !Species_ID || !Habitat_ID) {
+            return sendResponse(res, 400, { error: "Animal name, species ID, and habitat ID are required" });
         }
 
-        sendResponse(res, 201, { 
-            message: "Animal created successfully",
-            Animal_ID: result.insertId
+        const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status) 
+                    VALUES (?, ?, ?, ?, ?)`;
+
+        pool.query(sql, [name, Species_ID, Habitat_ID, Birth_Date, wellness_typeID], (err, result) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+
+            sendResponse(res, 201, { 
+                message: "Animal created successfully",
+                Animal_ID: result.insertId
+            });
         });
-    });
-},
+    },
 
 // Update an animal's information
     updateAnimal: async (req, res) => {
@@ -131,30 +131,63 @@ const animalCareController = {
 //Get animals and habitat information from the CARETAKER_VIEW
 //frontend will provide the Employee_ID
    getCaretakerView: async (req, res) => {
-    const { Employee_ID } = req.body || {};
+        const { Employee_ID } = req.body || {};
 
-    if (!Employee_ID) {
-        return sendResponse(res, 400, { error: "Employee ID is required" });
+        if (!Employee_ID) {
+            return sendResponse(res, 400, { error: "Employee ID is required" });
+        }
+
+        const sql = `SELECT distinct *
+                    FROM CARETAKER_VIEW
+                    WHERE Employee_ID = ?
+                    ORDER BY Habitat_Name, Species_Type`;
+
+        pool.query(sql, [Employee_ID], (err, result) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+
+            if (result.length === 0) {
+                return sendResponse(res, 404, { error: "No records found for this employee" });
+            }
+
+            sendResponse(res, 200, { caretakerData: result });
+        });
+
+    },
+
+    getSpecies: async (req, res) => {
+
+        const sql =`
+        select Name, Species_ID 
+        from species;`;
+
+        pool.query(sql, (err, result) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+    
+            sendResponse(res, 200, { speciesData: result });
+        });
+    },
+
+    getWellness: async (req, res) => {
+
+        const sql =`
+        select * 
+        from wellness_type;`;
+
+        pool.query(sql, (err, result) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return sendResponse(res, 500, { error: "Database error" });
+            }
+    
+            sendResponse(res, 200, { wellnessData: result });
+        });
     }
-
-    const sql = `SELECT *
-                 FROM CARETAKER_VIEW
-                 WHERE Employee_ID = ?
-                 ORDER BY Habitat_Name, Species_Type`;
-
-    pool.query(sql, [Employee_ID], (err, result) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return sendResponse(res, 500, { error: "Database error" });
-        }
-
-        if (result.length === 0) {
-            return sendResponse(res, 404, { error: "No records found for this employee" });
-        }
-
-        sendResponse(res, 200, { caretakerData: result });
-    });
-}
 
 };
 
@@ -164,4 +197,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default {animalCareController};
+export default animalController;

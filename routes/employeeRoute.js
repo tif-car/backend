@@ -103,19 +103,7 @@ const employeeRoutes = {
         if (req.method === "GET") {
             animalController.getAllAnimals(req, res);
         } else if (req.method === "POST") {
-            let body = "";
-            req.on("data", (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on("end", () => {
-                try {
-                    req.body = JSON.parse(body);
-                } catch (error) {
-                    req.body = {};
-                }
-                animalController.createAnimal(req, res);
-            });
+           handleRequestBody(req, res, animalController.getAllAnimals);
         } else {
             res.writeHead(405, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or POST." }));
@@ -125,20 +113,56 @@ const employeeRoutes = {
     // Route for /api/animals/:id (GET to fetch by ID, PUT to update by ID)
     "/api/animalCare/getAnimalById": (req, res) => {
         if (req.method === "POST") {
-            handleRequestBody(req, res, animalCareController.getAnimalById);
+            handleRequestBody(req, res, animalController.getAnimalById);
         } else {
             sendMethodNotAllowed(res);
         }
     },
 
-       //Get animals and habitat information from the CARETAKER_VIEW
-        "/api/animalCare/getCaretakerView": (req, res) => {
-            if (req.method === "POST") {
-                handleRequestBody(req, res, animalCareController.getCaretakerView);
-            } else {
-                sendMethodNotAllowed(res);
-            }
+    //Get animals and habitat information from the CARETAKER_VIEW
+    "/api/animalCare/getCaretakerView": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.getCaretakerView);
+        } else {
+            sendMethodNotAllowed(res);
         }
+    },
+
+    //Update animal
+    "/api/animalCare/updateAnimal": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.updateAnimal);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //Create Animal
+    "/api/animalCare/createAnimal": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.createAnimal);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //Lists out the names and IDs of all species on record
+    "/api/getSpecies": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.getSpecies);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //Lists out the names and IDs of all wellness types on record
+    "/api/getWellness": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.getWellness);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
 };
 
 
