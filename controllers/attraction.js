@@ -1,5 +1,7 @@
 import pool from "../db.js";
 
+//work in progress, still needs work
+
 
 
 const attractionController = {
