@@ -1,6 +1,6 @@
 import pool from "../db.js";
 
-//work in progress, still needs work
+//work in progress, still needs work, may just delete later since notifications table handles this
 
 
 
