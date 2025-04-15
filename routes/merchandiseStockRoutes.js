@@ -1,4 +1,4 @@
-import merchandiseStockController from "../controllers/merchandiseStockController.js";
+/*import merchandiseStockController from "../controllers/merchandiseStockController.js";
 
 const merchandiseStockRoutes = {
   "/api/merchandise": (req, res) => {
@@ -11,5 +11,5 @@ const merchandiseStockRoutes = {
   },
 };
 
-export default merchandiseStockRoutes;
+export default merchandiseStockRoutes;*/
 
