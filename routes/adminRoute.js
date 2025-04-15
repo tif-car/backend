@@ -4,11 +4,11 @@ import BulkPurchaseController from "../controllers/purchases.js";
 
 /*
     Endpoints Available:
-    - `POST /api/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
-    - `POST /api/createEmployee` : Creates a new employee in the employee table.
-    - `POST /api/getVendorNotifications` : Fetches new vendor notifications. Trigger
+    - `POST /api/HR/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
+    - `POST /api/HR/createEmployee` : Creates a new employee in the employee table.
+    - `POST /api/vendorTrigger/getVendorNotifications` : Fetches new vendor notifications. Trigger
     - `POST /api/updateBulkPurchase` : Updates amount_of_items in bulk_purchase.
-    - `POST /api/vendorNotificationSeen` : Marks vendor notifications as sent. 
+    - `POST /api/vendorTrigger/vendorNotificationSeen` : Marks vendor notifications as sent. 
 */
 
 const adminRoutes = {
@@ -50,7 +50,7 @@ const adminRoutes = {
     },
 
     //vendor trigger
-    "/api/getVendorNotifications": (req, res) => {
+    "/api/vendorTrigger/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorTrigger.getVendorNotifications);
         } else {
@@ -85,8 +85,8 @@ const adminRoutes = {
          }
     },
             
-            // Route to mark vendor notification as seen
-    "/api/vendorNotificationSeen": (req, res) => {
+    // Route to mark vendor notification as seen
+    "/api/vendorTrigger/vendorNotificationSeen": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorTrigger.vendorNotificationSeen);  // Handle acknowledgment
         } else {
