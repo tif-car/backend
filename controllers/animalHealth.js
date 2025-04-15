@@ -218,4 +218,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { animalHealthController };
+export default animalHealthController;

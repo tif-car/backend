@@ -31,6 +31,24 @@ const adminRoutes = {
         }
     },
 
+    //Route to update where an employee works
+    "/api/HR/updateWorksAt": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, HRController.updateWorksAt);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //Route to add a work location to a new employee
+    "/api/HR/createWorksAt": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, HRController.createWorksAt);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
