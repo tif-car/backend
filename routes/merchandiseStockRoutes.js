@@ -1,7 +1,7 @@
 import merchandiseStockController from "../controllers/merchandiseStockController.js";
 
 const merchandiseStockRoutes = {
-  "/api/merchandise": (req, res) => {
+  "/api/getMerchandiseStock": (req, res) => {
     if (req.method === "GET") {
       merchandiseStockController.getCurrentStock(req, res);
     } else {

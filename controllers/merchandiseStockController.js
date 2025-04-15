@@ -4,20 +4,18 @@ const merchandiseStockController = {
   getCurrentStock: async (req, res) => {
     try {
       const [rows] = await pool.promise().query(`
-        SELECT 
-          m.Merch_ID AS merch_ID,
-          m.Name AS name,
-          m.Price AS price,
-          m.Cost AS cost,
+        SELECT
+          m.Merchandise_ID AS merch_ID,
+          m.Item_Name AS name,
+          m.Item_Price AS price,
+          m.m_cost AS cost,
           COUNT(s.Item_ID) AS current_stock
         FROM merchandise m
-        LEFT JOIN single_item s ON m.Merch_ID = s.merch_ID AND s.order_ID IS NULL
-        GROUP BY m.Merch_ID, m.Name, m.Price, m.Cost
-        ORDER BY m.Merch_ID
+        LEFT JOIN single_item s ON m.Merchandise_ID = s.merch_ID AND s.order_ID IS NULL
+        GROUP BY Merchandise_ID;
       `);
 
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(rows));
+      sendResponse(res, 200, {rows});
     } catch (error) {
       console.error(" Error fetching stock info:", error.message);
       res.writeHead(500, { "Content-Type": "application/json" });
@@ -25,5 +23,11 @@ const merchandiseStockController = {
     }
   },
 };
+
+// Helper function for sending responses
+function sendResponse(res, statusCode, data) {
+  res.writeHead(statusCode, { "Content-Type": "application/json" });
+  res.end(JSON.stringify(data));
+}
 
 export default merchandiseStockController;

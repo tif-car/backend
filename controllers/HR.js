@@ -17,11 +17,11 @@ const HRController = {
     let values = [];
 
     // Add fields to setClause if they are provided
-    if (Name) {
+    if (first_Name) {
         setClause.push("first_Name = ?");
         values.push(Name);
     }
-    if (Name) {
+    if (last_Name) {
         setClause.push("last_Name = ?");
         values.push(Name);
     }
