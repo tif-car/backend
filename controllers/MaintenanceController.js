@@ -5,32 +5,54 @@ const maintenanceController = {
   //work in progress?
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
+      
       const [vendors] = await pool.promise().query(`
-        select v.name as vendor_name, ml.Maintenance_Location
-        from vendor v
-        join maintenance_location ml on ml.Location_ID = v.Vendor_ID;
+       SELECT
+       v.name AS vendor_name,
+       ml.Location_ID AS Maintenance_Location
+       FROM vendor v
+       JOIN maintenance_location ml
+       ON ml.Location_ID = v.Status
+      WHERE ml.Location_type = 'vendor';
       `);
-      const [attractions] = await pool.promise().query(`
-        select a.Attraction_Name, ml.Maintenance_Location
-        from attraction a
-        join maintenance_location ml on ml.Location_ID = a.Attraction_ID;
-      `);
-      const [habitats] = await pool.promise().query(`
-        select h.Habitat_Name, ml.Maintenance_Location
-        from habitat h
-        join maintenance_location ml on ml.Location_ID = h.Habitat_ID;
-      `);
+     
 
+
+
+      
+      const [attractions] = await pool.promise().query(`
+       
+        SELECT
+          a.Attraction_Name,
+          ml.Location_ID AS Maintenance_Location
+        FROM attraction a
+        JOIN maintenance_location ml
+          ON ml.Location_ID = a.Status
+        WHERE ml.Location_type = 'attraction';
+      `);
+  
+      
+      const [habitats] = await pool.promise().query(`
+                SELECT
+            h.Habitat_Name,
+            ml.Location_ID AS Maintenance_Location
+          FROM habitat h
+          JOIN maintenance_location ml
+            ON ml.Location_ID = h.Status
+          WHERE ml.Location_type = 'habitat';
+                `);
+  
       sendResponse(res, 200, {
         vendors,
         attractions,
         habitats,
       });
     } catch (error) {
-      console.error("❌ Error fetching maintenance form info:", error);
+      console.error(" Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
     }
   },
+  
 
 
   getMaintenanceEditFormInfo: async (req, res) => {
