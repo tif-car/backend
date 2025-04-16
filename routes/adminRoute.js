@@ -50,7 +50,7 @@ const adminRoutes = {
     },
 
     //vendor trigger
-    "/api/vendorTrigger/getVendorNotifications": (req, res) => {
+    "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorTrigger.getVendorNotifications);
         } else {
@@ -79,7 +79,16 @@ const adminRoutes = {
     //insert into bulk_purchase
      "/api/updateBulkPurchase": (req, res) => {
         if (req.method === "POST") {
-             handleRequestBody(req, res, purchaseController.updateBulkPurchase);
+             handleRequestBody(req, res, BulkPurchaseController.updateBulkPurchase);
+         } else {
+            sendMethodNotAllowed(res);
+         }
+    },
+
+    //insert into bulk_purchase
+    "/api/getEmployeeInfo": (req, res) => {
+        if (req.method === "POST") {
+             handleRequestBody(req, res, HRController.getEmployeeInfo);
          } else {
             sendMethodNotAllowed(res);
          }
