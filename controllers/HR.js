@@ -95,6 +95,20 @@ const HRController = {
     }
 },
 
+    getRoles: async (req, res) => {
+        const sql = "select * from role_type;";
+
+        try {
+            const [roles] = await pool.promise().query(sql);
+
+            sendResponse(res, 200, {roles});
+
+        } catch {
+            console.error("Database retreval error:", err);
+            sendResponse(res, 500, { error: "Database error while retreving roles." });
+        }
+    },
+
 };
 
 // Helper function for sending responses
@@ -103,4 +117,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default {HRController};
+export default HRController;

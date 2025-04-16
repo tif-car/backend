@@ -61,7 +61,7 @@ const adminRoutes = {
     //insert into bulk_purchase
      "/api/updateBulkPurchase": (req, res) => {
         if (req.method === "POST") {
-             purchaseController.updateBulkPurchase(req, res);
+             handleRequestBody(req, res, purchaseController.updateBulkPurchase);
          } else {
             sendMethodNotAllowed(res);
          }
@@ -71,6 +71,14 @@ const adminRoutes = {
     "/api/vendorNotificationSeen": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorTrigger.vendorNotificationSeen);  // Handle acknowledgment
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    "/api/getRoles": (req, res) => {
+        if (req.method === "GET") {
+            handleRequestBody(req, res, HRController.getRoles); 
         } else {
             sendMethodNotAllowed(res);
         }

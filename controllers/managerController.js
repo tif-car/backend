@@ -9,11 +9,8 @@ const managerController = {
                 return sendResponse(res, 400, { error: "Manager ID is required" });
             }
         
-
-
             const sql = `SELECT * FROM MANAGER_VIEW 
-                         WHERE Manager_ID = ? 
-                         ORDER BY Department_Name, Location_Type, Employees_Name`;
+                         WHERE Manager_ID = ? `;
         
             pool.query(sql, [Manager_ID], (err, result) => {
                 if (err) {
@@ -37,4 +34,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default {managerController};
+export default managerController;
