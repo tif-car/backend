@@ -94,6 +94,23 @@ const BulkPurchaseController ={
             return sendResponse(res, 500, { error: "Database error" });
         }
     },
+
+    //Function to see the bulk_purchase_view 
+    //Returns the purchases from newest to oldest
+    BulkPurchaseView: async (req, res) => {
+    
+        const sql = `SELECT * FROM BULK_PURCHASE_VIEW 
+                     ORDER BY date_purchased DESC`;
+    
+        try {
+            const [results] = await pool.promise().query(sql);
+            sendResponse(res, 200, { data: results });
+        } catch (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+    },
+    
 };
 
 
