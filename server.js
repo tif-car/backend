@@ -20,6 +20,8 @@ import ticketFormRoutes from "./routes/ticketFormRoutes.js";
 
 
 /*import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";*/
+import orderSummaryRoutes from "./routes/orderSummaryRoutes.js";
+
 
 dotenv.config();
 
@@ -36,6 +38,7 @@ const routes = {
     ...merchandiseRoutes,
     ...orderHistoryRoute,
     ...ticketFormRoutes,
+    ...orderSummaryRoutes,
    /* ...merchandiseStockRoutes,*/
 };
 
