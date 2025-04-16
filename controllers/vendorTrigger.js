@@ -1,8 +1,9 @@
 import dbConnection from "../db.js";
 
+const vendorTrigger = {
+
 /* 
 Front end would receive this response in Format (JSON):
-{
   "notifications": [
      {
        "vendor_messageID": 1,
@@ -10,18 +11,11 @@ Front end would receive this response in Format (JSON):
        "message": "Low supply alert: Only 5 items left for merch_ID 101",
        "Item_Name": "Safari Hat"
     },
-     {
-       "vendor_messageID": 2,
-       "vendor_merchID": 102,
-       "message": "Warning: out of stock",
-       "Item_Name": "Plush Tiger Toy"
-     }
    ]
-}
 */
 
 // Function to get vendor notifications from the database
-const getVendorNotifications = (req, res) => {
+     getVendorNotifications: async (req, res) => {
     const sql = `
         SELECT V.vendor_messageID, V.vendor_merchID, V.message, M.Item_Name  
         FROM vendor_notifications V
@@ -43,11 +37,11 @@ const getVendorNotifications = (req, res) => {
         // Sends notifications to frontend
         sendResponse(res, 200, { notifications: result });
     });
-};
+},
 
 // Function to handle acknowledgment of vendor notifications
 // Expecting the vendor_messageID and 'T' for acknowledgment
-const vendorNotificationSeen = (req, res) => {
+    vendorNotificationSeen: async (req, res) => {
     /*
     Frontend would send this JSON to acknowledge a notification (example):
     {
@@ -80,6 +74,8 @@ const vendorNotificationSeen = (req, res) => {
 
         sendResponse(res, 200, { message: "Notification marked as sent" });
     });
+}
+
 };
 
 // **Helper function to send JSON responses**
@@ -88,7 +84,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default {
-    getVendorNotifications,
-    vendorNotificationSeen
-};
+export default vendorTrigger;

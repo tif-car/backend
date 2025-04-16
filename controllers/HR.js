@@ -19,11 +19,11 @@ const HRController = {
     // Add fields to setClause if they are provided
     if (first_Name) {
         setClause.push("first_Name = ?");
-        values.push(Name);
+        values.push(first_Name);
     }
     if (last_Name) {
         setClause.push("last_Name = ?");
-        values.push(Name);
+        values.push(last_Name);
     }
     if (Role) {
         setClause.push("Role = ?");
@@ -108,6 +108,108 @@ const HRController = {
             sendResponse(res, 500, { error: "Database error while retreving roles." });
         }
     },
+/*
+function to update the works_at table
+Frontend will need to send Employee_ID, Dept_ID, Habitat_ID. Optional: Attraction_ID or Vend_ID, can also choose neither
+Example of what frontend would send:
+{
+  "Employee_ID": 3,
+  "Dept_ID": 1,
+  "Habitat_ID": 201,
+  "Vend_ID": 6
+}  */
+updateWorksAt: async (req, res) => {
+    const { Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID } = req.body || {};
+
+    if (!Employee_ID || !Dept_ID || !Habitat_ID) {
+        return sendResponse(res, 400, { error: "Employee ID, Dept_ID, and Habitat_ID are required" });
+    }
+
+    // Determine which field to nullify based on what's provided
+    let finalAttractionID = null;
+    let finalVendID = null;
+
+    if (Attraction_ID) {
+        finalAttractionID = Attraction_ID;
+        finalVendID = null;
+    } else if (Vend_ID) {
+        finalVendID = Vend_ID;
+        finalAttractionID = null;
+    }
+
+    const sql = `
+        UPDATE works_at 
+        SET Dept_ID = ?, 
+            Habitat_ID = ?, 
+            Attraction_ID = ?, 
+            Vend_ID = ?
+        WHERE Employee_ID = ?`;
+
+    const values = [Dept_ID, Habitat_ID, finalAttractionID, finalVendID, Employee_ID];
+
+    pool.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        if (result.affectedRows === 0) {
+            return sendResponse(res, 404, { error: "Employee work assignment not found" });
+        }
+
+        sendResponse(res, 200, { message: "Work assignment updated successfully" });
+    });
+},
+
+/*
+Function to insert a row into the works_at table for new employees.
+Frontend will need to send Employee_ID, Dept_ID, Habitat_ID. Optional: Attraction_ID or Vend_ID, can also choose neither
+Example of what frontend would send:
+{
+  "Employee_ID": 18,
+  "Dept_ID": 3,
+  "Habitat_ID": 206,
+  "Attraction_ID": 9
+}   */
+
+createWorksAt: async (req, res) => {
+    const { Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID } = req.body || {};
+
+    if (!Employee_ID || !Dept_ID || !Habitat_ID) {
+        return sendResponse(res, 400, { error: "Employee ID, Dept_ID, and Habitat_ID are required" });
+    }
+
+    // Decide which ID to keep based on which is present
+    let finalAttractionID = null;
+    let finalVendID = null;
+
+    if (Attraction_ID) {
+        finalAttractionID = Attraction_ID;
+        finalVendID = null;
+    } else if (Vend_ID) {
+        finalVendID = Vend_ID;
+        finalAttractionID = null;
+    }
+
+    const sql = `
+        INSERT INTO works_at (Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const values = [Employee_ID, Dept_ID, Habitat_ID, finalAttractionID, finalVendID];
+
+    pool.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Database insert error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+        sendResponse(res, 201, { 
+            message: "Work assignment created successfully", 
+            Works_At_ID: result.insertId 
+        });
+    });
+}
 
 };
 

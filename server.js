@@ -15,7 +15,13 @@ import maintenanceRoutes from "./routes/maintenanceRoute.js";
 import purchaseRoutes from "./routes/purchaseroutes.js";
 import merchandiseRoutes from "./routes/merchandiseRoutes.js";
 import orderHistoryRoute from "./routes/orderHistoryRoute.js";
-import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";
+import ticketFormRoutes from "./routes/ticketFormRoutes.js";
+
+
+
+/*import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";*/
+import orderSummaryRoutes from "./routes/orderSummaryRoutes.js";
+
 
 dotenv.config();
 
@@ -31,7 +37,9 @@ const routes = {
     ...purchaseRoutes,
     ...merchandiseRoutes,
     ...orderHistoryRoute,
-    ...merchandiseStockRoutes,
+    ...ticketFormRoutes,
+    ...orderSummaryRoutes,
+   /* ...merchandiseStockRoutes,*/
 };
 
 const corsMiddleware = cors({

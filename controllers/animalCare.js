@@ -64,4 +64,4 @@ function sendResponse(res, statusCode, data) {
     res.end(JSON.stringify(data));
 }
 
-export default { getAnimalCareTasks };
+export default getAnimalCareTasks;
