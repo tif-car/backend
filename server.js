@@ -16,6 +16,8 @@ import purchaseRoutes from "./routes/purchaseroutes.js";
 import merchandiseRoutes from "./routes/merchandiseRoutes.js";
 import orderHistoryRoute from "./routes/orderHistoryRoute.js";
 /*import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";*/
+import orderSummaryRoutes from "./routes/orderSummaryRoutes.js";
+
 
 dotenv.config();
 
@@ -31,6 +33,7 @@ const routes = {
     ...purchaseRoutes,
     ...merchandiseRoutes,
     ...orderHistoryRoute,
+    ...orderSummaryRoutes,
    /* ...merchandiseStockRoutes,*/
 };
 
