@@ -2,6 +2,36 @@ import pool from "../db.js"; // Use pool instead of dbConnection
 
 
 const HRController = {
+    getEmployeeInfo: async (req,res) => {
+        const {employeeId} = req.body || {};
+
+        // Ensure Employee_ID is provided
+        if (!employeeId) {
+            return sendResponse(res, 400, { error: "Employee_ID is required for updating an employee." });
+        }
+
+        const sql = "select * from employee where Employee_ID = ?;";
+
+        try {
+            const [rows] = await pool.promise().query(sql, [employeeId]);
+    
+            if (rows.length === 0) {
+                return sendResponse(res, 404, { message: 'Employee not found' });
+            }
+            
+            // Extract the first row as an object
+            const employeeInfo = rows[0];
+            
+            // Send as plain object
+            sendResponse(res, 200, employeeInfo);
+
+        } catch {
+            console.error("Database retreval error:", err);
+            sendResponse(res, 500, { error: "Database error while retreving roles." });
+        }
+
+    },
+
     editEmployee: async (req, res) => {
 
 

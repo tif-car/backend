@@ -56,7 +56,7 @@ const adminRoutes = {
     },
 
     //vendor trigger
-    "/api/vendorTrigger/getVendorNotifications": (req, res) => {
+    "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorTrigger.getVendorNotifications);
         } else {
