@@ -48,7 +48,6 @@ const BulkPurchaseController ={
             {
                 "amount_of_items": 10,
                 "merch_ID": 101
-                producer: "General production"
                 date purchased: mm-dd-yyyy
                 bulk cost: xx.xx
             }
@@ -56,16 +55,16 @@ const BulkPurchaseController ={
                     A trigger will handle inserting new rows into single_item table.
         */
         console.log("recived", req.body);
-        const { Amount_of_items, Merchandise_ID, Producer, Date_purchased, Bulk_cost } = req.body || {};
+        const { Amount_of_items, Merchandise_ID, Date_purchased, Bulk_cost } = req.body || {};
 
-        if (!Amount_of_items || !Merchandise_ID || !Producer || !Date_purchased || !Bulk_cost) {
+        if (!Amount_of_items || !Merchandise_ID || !Date_purchased || !Bulk_cost) {
             return sendResponse(res, 400, { error: "missing part" });
         }
         //query used
-        const sql = `INSERT INTO zoo.bulk_purchase (merch_id, Bulk_cost, amount_of_items, producer, date_purchased) VALUES (?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO zoo.bulk_purchase (merch_id, Bulk_cost, amount_of_items, date_purchased) VALUES (?, ?, ?, ?, ?)`;
 
         try {
-            const [result] = await pool.promise().query(sql, [Merchandise_ID, Bulk_cost, Amount_of_items, Producer, Date_purchased]);
+            const [result] = await pool.promise().query(sql, [Merchandise_ID, Bulk_cost, Amount_of_items, Date_purchased]);
 
             sendResponse(res, 200, { message: "bulk_purchase added successfully" });
         } catch (err) {
@@ -94,6 +93,23 @@ const BulkPurchaseController ={
             return sendResponse(res, 500, { error: "Database error" });
         }
     },
+
+    //Function to see the bulk_purchase_view 
+    //Returns the purchases from newest to oldest
+    BulkPurchaseView: async (req, res) => {
+    
+        const sql = `SELECT * FROM BULK_PURCHASE_VIEW 
+                     ORDER BY date_purchased DESC`;
+    
+        try {
+            const [results] = await pool.promise().query(sql);
+            sendResponse(res, 200, { data: results });
+        } catch (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+    },
+    
 };
 
 

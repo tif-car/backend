@@ -6,9 +6,15 @@ import BulkPurchaseController from "../controllers/purchases.js";
     Endpoints Available:
     - `POST /api/HR/editEmployee` : Edits specific fields of an employee. Requires Employee_ID.
     - `POST /api/HR/createEmployee` : Creates a new employee in the employee table.
-    - `POST /api/vendorTrigger/getVendorNotifications` : Fetches new vendor notifications. Trigger
-    - `POST /api/updateBulkPurchase` : Updates amount_of_items in bulk_purchase.
-    - `POST /api/vendorTrigger/vendorNotificationSeen` : Marks vendor notifications as sent. 
+    - `POST /api/HR/updateWorksAt` : Updates the work location and department of an existing employee.
+    - `POST /api/HR/createWorksAt` : Assigns a work location and department to a new employee.
+    - `GET  /api/getRoles` : Fetches all roles from the role_type table.
+    - `POST /api/vendorTrigger/getVendorNotifications` : Fetches new vendor notifications. Trigger-based.
+    - `POST /api/vendorTrigger/vendorNotificationSeen` : Marks vendor notifications as sent.
+    - `POST /api/BulkPurchase/addBulkPurchase` : Inserts a new bulk purchase record.
+    - `POST /api/BulkPurchase/getBulkPurchaseFormInfo` : Gets merch and vendor data for form population.
+    - `POST /api/BulkPurchase/BulkPurchaseView` : Returns bulk purchase view, ordered by date purchased.
+    - `POST /api/BulkPurchase/updateBulkPurchase` : Updates amount_of_items in bulk_purchase.
 */
 
 const adminRoutes = {
@@ -59,7 +65,7 @@ const adminRoutes = {
     },
 
     //insert into bulk_purchase
-    "/api/addBulkPurchase": (req, res) => {
+    "/api/BulkPurchase/addBulkPurchase": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, BulkPurchaseController.addBulkPurchase);
         } else {
@@ -68,7 +74,7 @@ const adminRoutes = {
     },
 
      //insert into bulk_purchase
-     "/api/getBulkPurchaseFormInfo": (req, res) => {
+     "/api/BulkPurchase/getBulkPurchaseFormInfo": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, BulkPurchaseController.getBulkPurchaseFormInfo);
         } else {
@@ -76,19 +82,19 @@ const adminRoutes = {
         }
     },
 
-    //insert into bulk_purchase
-     "/api/updateBulkPurchase": (req, res) => {
-        if (req.method === "POST") {
-             handleRequestBody(req, res, BulkPurchaseController.updateBulkPurchase);
-         } else {
-            sendMethodNotAllowed(res);
-         }
-    },
+        //insert into bulk_purchase
+        "/api/BulkPurchase/BulkPurchaseView": (req, res) => {
+            if (req.method === "POST") {
+                handleRequestBody(req, res, BulkPurchaseController.BulkPurchaseView);
+            } else {
+                sendMethodNotAllowed(res);
+            }
+        },
 
     //insert into bulk_purchase
-    "/api/getEmployeeInfo": (req, res) => {
+     "/api/BulkPurchase/updateBulkPurchase": (req, res) => {
         if (req.method === "POST") {
-             handleRequestBody(req, res, HRController.getEmployeeInfo);
+             handleRequestBody(req, res, BulkPurchaseController.updateBulkPurchase);
          } else {
             sendMethodNotAllowed(res);
          }
