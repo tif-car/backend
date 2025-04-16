@@ -2,6 +2,7 @@
 import maintenanceController from "../controllers/MaintenanceController.js";
 import MaintenanceTriggerController from "../controllers/maintenanceTrigger.js";
 import MaintenanceController from "../controllers/MaintenanceController.js";
+import ClosureController from "../controllers/closureController.js";
 
 /*
     Endpoints Available:
@@ -11,6 +12,10 @@ import MaintenanceController from "../controllers/MaintenanceController.js";
     - `POST /api/seenMaintenanceNotification` : Marks maintenance notifications as sent.
     - `POST /api/deleteMaintenance` : Deletes a maintenance record based on Maintenance_ID.
     - `POST /api/updateMaintenance` : Updates a maintenance record based on Maintenance_ID.
+    - 'POST /api/closure/addClosure`: Adds a new closure row.
+    - 'POST /api/closure/editClosure`: Updates a closure row.
+    - 'POST /api/closure/deleteClosure`: Deletes a closure row.
+    - 'POST /api/closure/closureView`: Fetches a view of all closures.
 */
 
 const maintenanceRoutes = {
@@ -110,7 +115,44 @@ const maintenanceRoutes = {
           res.writeHead(405, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "Method Not Allowed. Use GET or PUT." }));
       }
+  },
+
+  //Add a new closure row
+  "/api/closure/addClosure": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.addClosure);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
+
+  //Edit an existing closure row
+  "/api/closure/editClosure": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.editClosure);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
+
+  //Delete a closure row
+  "/api/closure/deleteClosure": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.deleteClosure);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
+
+  //to view the CLOSURE_VIEW
+  "/api/closure/closureView": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.closureView);
+    } else {
+      sendMethodNotAllowed(res);
+    }
   }
+
   };
 
 // Helper function to parse request body and call the appropriate controller
