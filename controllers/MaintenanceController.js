@@ -111,7 +111,7 @@ const maintenanceController = {
       const [vendors] = await pool.promise().query("SELECT Vendor_ID, name FROM vendor");
       const [attractions] = await pool.promise().query("SELECT Attraction_ID, Attraction_Name FROM attraction");
       const [habitats] = await pool.promise().query("SELECT Habitat_ID, Habitat_Name FROM habitat");
-      const [workers] = await pool.promise().query("SELECT Employee_ID, first_name, last_name FROM employee");
+      const [workers] = await pool.promise().query("SELECT Employee_ID, first_name, last_name FROM employee WHERE Role = 3");
 
       sendResponse(res, 200, {
         departments,
