@@ -16,9 +16,6 @@ const maintenanceController = {
       WHERE ml.Location_type = 'vendor';
       `);
      
-
-
-
       
       const [attractions] = await pool.promise().query(`
        
@@ -109,7 +106,7 @@ const maintenanceController = {
     try {
       const { start_date, Location_ID, request_desc } = req.body;
   
-      // Get the employee with Role = 3 that has been assigned the fewest maintenance tasks
+      // Get the employee with Role = 2 that has been assigned the fewest maintenance tasks
       const getWorkerSql = `
         SELECT e.Employee_ID
         FROM employee e
@@ -118,7 +115,7 @@ const maintenanceController = {
           FROM maintenance m
           GROUP BY Maintenance_EmployeeID
         ) m ON e.Employee_ID = m.Maintenance_EmployeeID
-        WHERE e.Role = 3
+        WHERE e.Role = 2
         ORDER BY COALESCE(m.task_count, 0), e.Employee_ID
         LIMIT 1;
       `;
@@ -130,7 +127,7 @@ const maintenanceController = {
   
       const assignedEmployeeId = workerRows[0].Employee_ID;
   
-      // Now insert the maintenance request with that employee
+      //insert the maintenance request with that employee
       const insertSql = `
         INSERT INTO zoo.maintenance 
         (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
