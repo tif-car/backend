@@ -57,7 +57,7 @@ const maintenanceController = {
       const [employees] = await pool.promise().query(`
         select e.Employee_ID, e.first_Name, e.last_Name
         from employee e
-        where Role = '2';
+        where Role = 2;
       `);
       const [statuses] = await pool.promise().query(`select * from mntstatus_type;`);
 
