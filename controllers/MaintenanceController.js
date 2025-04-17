@@ -88,11 +88,11 @@ const maintenanceController = {
     }
   },
 
-  //why are values being hardcoded?
+ /*
   addMaintenanceRequest: async (req, res) => {
     try {
       const {start_date ,Location_ID, request_desc} = req.body;
-
+//randomly assign a worker, pending, 
       const sql = `
         INSERT INTO zoo.maintenance  (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
         VALUES (2, 0, 6, ?, ?, ?)`;
@@ -104,6 +104,52 @@ const maintenanceController = {
       sendResponse(res, 500, { error: "Failed to fetch form data" });
     }
   },
+  */
+  addMaintenanceRequest: async (req, res) => {
+    try {
+      const { start_date, Location_ID, request_desc } = req.body;
+  
+      // Get the employee with Role = 3 that has been assigned the fewest maintenance tasks
+      const getWorkerSql = `
+        SELECT e.Employee_ID
+        FROM employee e
+        LEFT JOIN (
+          SELECT Maintenance_EmployeeID, COUNT(*) AS task_count
+          FROM maintenance m
+          GROUP BY Maintenance_EmployeeID
+        ) m ON e.Employee_ID = m.Maintenance_EmployeeID
+        WHERE e.Role = 3
+        ORDER BY COALESCE(m.task_count, 0), e.Employee_ID
+        LIMIT 1;
+      `;
+  
+      const [workerRows] = await pool.promise().query(getWorkerSql);
+      if (workerRows.length === 0) {
+        return sendResponse(res, 400, { error: "No maintenance workers found." });
+      }
+  
+      const assignedEmployeeId = workerRows[0].Employee_ID;
+  
+      // Now insert the maintenance request with that employee
+      const insertSql = `
+        INSERT INTO zoo.maintenance 
+        (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
+        VALUES (?, 0, 1, ?, ?, ?)`;
+  
+      const [insertResult] = await pool.promise().query(insertSql, [
+        assignedEmployeeId,
+        start_date,
+        Location_ID,
+        request_desc,
+      ]);
+  
+      sendResponse(res, 200, { message: "Maintenance request added.", assignedEmployeeId });
+    } catch (error) {
+      console.error("❌ Error adding maintenance request:", error);
+      sendResponse(res, 500, { error: "Failed to add maintenance request." });
+    }
+  },
+  
 
   getMaintenanceFormInfo: async (req, res) => {
     try {
