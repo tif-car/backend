@@ -93,6 +93,7 @@ const maintenanceController = {
           M.cost,
           M.RecentCheck,
           M.maintenance_locationID,
+          L.Location_type,
   
           -- Determine the location name depending on type
           CASE 
@@ -133,6 +134,7 @@ SELECT
   M.cost,
   M.RecentCheck,
   M.maintenance_locationID,
+  L.Location_type,
 
   -- Determine the location name depending on type
   CASE 
