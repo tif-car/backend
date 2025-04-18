@@ -78,7 +78,10 @@ const maintenanceController = {
         return sendResponse(res, 400, { error: "Maintenance_ID is required" });
       }
       const [request] = await pool.promise().query(`select * from maintenance where Maintenance_ID = ?;`, [requestId]);
-      sendResponse(res, 200, {request});
+
+      const row = request[0];
+
+      sendResponse(res, 200, {row});
     } catch (error) {
       console.error("❌ Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
