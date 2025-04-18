@@ -2,7 +2,7 @@
 import pool from "../db.js";
 
 const maintenanceController = {
-  //work in progress?
+
   getMaintenanceRequestFormInfo: async (req, res) => {
     try {
       
@@ -16,9 +16,6 @@ const maintenanceController = {
       WHERE ml.Location_type = 'vendor';
       `);
      
-
-
-
       
       const [attractions] = await pool.promise().query(`
        
@@ -60,7 +57,7 @@ const maintenanceController = {
       const [employees] = await pool.promise().query(`
         select e.Employee_ID, e.first_Name, e.last_Name
         from employee e
-        where Role = '2';
+        where Role = 2;
       `);
       const [statuses] = await pool.promise().query(`select * from mntstatus_type;`);
 
@@ -81,18 +78,21 @@ const maintenanceController = {
         return sendResponse(res, 400, { error: "Maintenance_ID is required" });
       }
       const [request] = await pool.promise().query(`select * from maintenance where Maintenance_ID = ?;`, [requestId]);
-      sendResponse(res, 200, {request});
+
+      const row = request[0];
+
+      sendResponse(res, 200, {row});
     } catch (error) {
       console.error("❌ Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
     }
   },
 
-  //why are values being hardcoded?
+ /*
   addMaintenanceRequest: async (req, res) => {
     try {
       const {start_date ,Location_ID, request_desc} = req.body;
-
+//randomly assign a worker, pending, 
       const sql = `
         INSERT INTO zoo.maintenance  (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
         VALUES (2, 0, 6, ?, ?, ?)`;
@@ -104,6 +104,52 @@ const maintenanceController = {
       sendResponse(res, 500, { error: "Failed to fetch form data" });
     }
   },
+  */
+  addMaintenanceRequest: async (req, res) => {
+    try {
+      const { start_date, Location_ID, request_desc } = req.body;
+  
+      // Get the employee with Role = 2 that has been assigned the fewest maintenance tasks
+      const getWorkerSql = `
+        SELECT e.Employee_ID
+        FROM employee e
+        LEFT JOIN (
+          SELECT Maintenance_EmployeeID, COUNT(*) AS task_count
+          FROM maintenance m
+          GROUP BY Maintenance_EmployeeID
+        ) m ON e.Employee_ID = m.Maintenance_EmployeeID
+        WHERE e.Role = 2
+        ORDER BY COALESCE(m.task_count, 0), e.Employee_ID
+        LIMIT 1;
+      `;
+  
+      const [workerRows] = await pool.promise().query(getWorkerSql);
+      if (workerRows.length === 0) {
+        return sendResponse(res, 400, { error: "No maintenance workers found." });
+      }
+  
+      const assignedEmployeeId = workerRows[0].Employee_ID;
+  
+      //insert the maintenance request with that employee
+      const insertSql = `
+        INSERT INTO zoo.maintenance 
+        (Maintenance_EmployeeID, cost, Status, Start_Date, maintenance_locationID, request_desc) 
+        VALUES (?, 0, 1, ?, ?, ?)`;
+  
+      const [insertResult] = await pool.promise().query(insertSql, [
+        assignedEmployeeId,
+        start_date,
+        Location_ID,
+        request_desc,
+      ]);
+  
+      sendResponse(res, 200, { message: "Maintenance request added.", assignedEmployeeId });
+    } catch (error) {
+      console.error("❌ Error adding maintenance request:", error);
+      sendResponse(res, 500, { error: "Failed to add maintenance request." });
+    }
+  },
+  
 
   getMaintenanceFormInfo: async (req, res) => {
     try {
@@ -111,7 +157,7 @@ const maintenanceController = {
       const [vendors] = await pool.promise().query("SELECT Vendor_ID, name FROM vendor");
       const [attractions] = await pool.promise().query("SELECT Attraction_ID, Attraction_Name FROM attraction");
       const [habitats] = await pool.promise().query("SELECT Habitat_ID, Habitat_Name FROM habitat");
-      const [workers] = await pool.promise().query("SELECT Employee_ID, first_name, last_name FROM employee");
+      const [workers] = await pool.promise().query("SELECT Employee_ID, first_name, last_name FROM employee WHERE Role = 2");
 
       sendResponse(res, 200, {
         departments,
@@ -346,6 +392,25 @@ console.log(durationRaw);
       sendResponse(res, 500, { error: "Internal server error" });
     }
   },
+
+
+  maintenanceView: async (req, res) => {
+    const sql = `SELECT * FROM MAINTENANCE_REQUESTS`;
+
+    try {
+        const [result] = await pool.promise().query(sql);
+
+        if (result.length === 0) {
+            console.log("No maintenance requests found.");
+            return sendResponse(res, 404, { error: "No maintenance requests found." });
+        }
+
+        sendResponse(res, 200, { maintenance_requests: result });
+    } catch (err) {
+        console.error("Error fetching maintenance view:", err);
+        sendResponse(res, 500, { error: "Database error" });
+    }
+  }
 };
 
 // **Helper function to send JSON responses**

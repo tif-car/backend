@@ -32,6 +32,33 @@ const HRController = {
 
     },
 
+    getSCEmployeeInfo: async (req,res) => {
+
+
+        const sql = `
+            Select Employee_ID, first_Name as first_name, last_Name as last_name, role_types AS Role
+            from employee
+            join zoo.role_type rt on employee.Role = rt.role_typeID
+            where role_typeID in ('4', '5', '7');
+        `;
+
+        try {
+            const [employees] = await pool.promise().query(sql);
+    
+            if (employees.length === 0) {
+                return sendResponse(res, 404, { message: 'Employees not found' });
+            }
+            
+            // Send as plain object
+            sendResponse(res, 200, {employees});
+
+        } catch {
+            console.error("Database retreval error:", err);
+            sendResponse(res, 500, { error: "Database error while retreving roles." });
+        }
+
+    },
+
     editEmployee: async (req, res) => {
 
 
@@ -203,30 +230,30 @@ Example of what frontend would send:
 }   */
 
 createWorksAt: async (req, res) => {
-    const { Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID } = req.body || {};
+    const { Employee_ID, Dept_ID, Location_type, Location_ID } = req.body || {};
 
-    if (!Employee_ID || !Dept_ID || !Habitat_ID) {
-        return sendResponse(res, 400, { error: "Employee ID, Dept_ID, and Habitat_ID are required" });
+    if (!Employee_ID || !Dept_ID || !Location_type || !Location_ID) {
+        return sendResponse(res, 400, { error: "missing parameter" });
     }
 
-    // Decide which ID to keep based on which is present
-    let finalAttractionID = null;
-    let finalVendID = null;
-
-    if (Attraction_ID) {
-        finalAttractionID = Attraction_ID;
-        finalVendID = null;
-    } else if (Vend_ID) {
-        finalVendID = Vend_ID;
-        finalAttractionID = null;
+    if (Location_type.toLowerCase() === "habitat") {
+        const sql = `
+            INSERT INTO works_at (Employee_ID, Dept_ID, Habitat_ID)
+            VALUES (?, ?, ?)
+        `;
+    } else if (Location_type.toLowerCase() === "vendor") {
+        const sql = `
+            INSERT INTO works_at (Employee_ID, Dept_ID, Vend_ID)
+            VALUES (?, ?, ?)
+        `;
+    } else {
+        const sql = `
+            INSERT INTO works_at (Employee_ID, Dept_ID, Attraction_ID)
+            VALUES (?, ?, ?)
+        `;
     }
 
-    const sql = `
-        INSERT INTO works_at (Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-
-    const values = [Employee_ID, Dept_ID, Habitat_ID, finalAttractionID, finalVendID];
+    const values = [Employee_ID, Dept_ID, Location_ID];
 
     pool.query(sql, values, (err, result) => {
         if (err) {

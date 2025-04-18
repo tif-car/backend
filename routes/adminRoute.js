@@ -26,6 +26,14 @@ const adminRoutes = {
         } else {
             sendMethodNotAllowed(res);
         }
+    }, 
+
+    "/api/HR/getSCEmployees": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, HRController.getSCEmployeeInfo);
+        } else {
+            sendMethodNotAllowed(res);
+        }
     },
 
     // Route to add a new employee
