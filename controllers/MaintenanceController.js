@@ -392,6 +392,25 @@ console.log(durationRaw);
       sendResponse(res, 500, { error: "Internal server error" });
     }
   },
+
+
+  maintenanceView: async (req, res) => {
+    const sql = `SELECT * FROM MAINTENANCE_REQUESTS`;
+
+    try {
+        const [result] = await pool.promise().query(sql);
+
+        if (result.length === 0) {
+            console.log("No maintenance requests found.");
+            return sendResponse(res, 404, { error: "No maintenance requests found." });
+        }
+
+        sendResponse(res, 200, { maintenance_requests: result });
+    } catch (err) {
+        console.error("Error fetching maintenance view:", err);
+        sendResponse(res, 500, { error: "Database error" });
+    }
+  }
 };
 
 // **Helper function to send JSON responses**
