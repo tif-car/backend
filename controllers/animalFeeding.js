@@ -26,10 +26,12 @@ const animalFeedingController = {
 
         try {
             const [result] = await pool.promise().query(sql, [feedingId]);
+
+            const row = result[0];
             if (result.length === 0) {
                 return sendResponse(res, 404, { error: "No feeding details found for the given ID" });
             }
-            sendResponse(res, 200, {request: result[0]});
+            sendResponse(res, 200,{row});
         } catch (err) {
             console.error("Database query error:", err);
             return sendResponse(res, 500, { error: "Database error" });

@@ -16,6 +16,7 @@ const maintenanceController = {
       WHERE ml.Location_type = 'vendor';
       `);
      
+    
       
       const [attractions] = await pool.promise().query(`
        
@@ -28,7 +29,7 @@ const maintenanceController = {
         WHERE ml.Location_type = 'attraction';
       `);
   
-      
+  
       const [habitats] = await pool.promise().query(`
                 SELECT
             h.Habitat_Name,
@@ -38,6 +39,8 @@ const maintenanceController = {
             ON ml.Location_ID = h.Status
           WHERE ml.Location_type = 'habitat';
                 `);
+
+  
   
       sendResponse(res, 200, {
         vendors,
