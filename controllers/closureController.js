@@ -11,7 +11,6 @@ const ClosureController = {
      "start_date": "2025-05-01",
      "end_date": "2025-05-03",
      "location_ID": 2,
-     "status": 1,
      "description": "Routine maintenance in penguin attraction",
      "mnt_ID": 12
  }
@@ -20,21 +19,21 @@ const ClosureController = {
      "message": "Closure created successfully.",
      "closure_ID": 5
  } */
-        const { start_date, location_ID, status, description, mnt_ID } = req.body;
+        const { start_date, location_ID, description, mnt_ID } = req.body;
 
         // Now enforcing description as required
-        if (!start_date || !location_ID || !status || !description || !mnt_ID) {
+        if (!start_date || !location_ID || !description || !mnt_ID) {
             return sendResponse(res, 400, {
-                error: "start_date, end_date, location_ID, status, description, and mnt_ID are required.",
+                error: "start_date, location_ID, description, and mnt_ID are required.",
             });
         }
 
         const sql = `
-            INSERT INTO closure (start_date, location_ID, status, description, mnt_ID)
+            INSERT INTO closure (start_date, location_ID, description, mnt_ID)
             VALUES (?, ?, ?, ?, ?)
         `;
 
-        const values = [start_date, location_ID, status, description, mnt_ID];
+        const values = [start_date, location_ID, description, mnt_ID];
 
         try {
             const [result] = await pool.promise().query(sql, values);
@@ -62,7 +61,7 @@ const ClosureController = {
     {
         "message": "Closure updated successfully."
     } */
-        const { closure_ID, start_date, end_date, location_ID, status, description, mnt_ID } = req.body || {};
+        const { closure_ID, start_date, end_date, location_ID, description, mnt_ID } = req.body || {};
 
         if (!closure_ID) {
             return sendResponse(res, 400, { error: "closure_ID is required for updating closure." });
@@ -82,10 +81,6 @@ const ClosureController = {
         if (location_ID) {
             setClause.push("location_ID = ?");
             values.push(location_ID);
-        }
-        if (status) {
-            setClause.push("status = ?");
-            values.push(status);
         }
         if (description) {
             setClause.push("description = ?");
