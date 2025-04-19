@@ -29,26 +29,28 @@ const MaintenanceTriggerController = {
     getMaintenanceNotifications: (req, res) => {
         // SQL query to get information from the maintenance_notifications table
         const sql = `
-     SELECT
-        m.mnt_ID,
-        m.maintenance_employeeID,
-        m.message,
-        L.Location_type,
-        CASE
-        WHEN L.Location_ID = H.Status THEN H.Habitat_Name
-        WHEN L.Location_ID = A.Status THEN A.Attraction_Name
-        WHEN L.Location_ID = V.Status THEN V.name
-        END AS Location_Name,
-        L.Location_ID
-    FROM maintenance_notifications m
-       JOIN maintenance_location L ON m.maintenance_locationID = L.Location_ID
-       LEFT JOIN habitat H ON L.Location_ID = H.Status
-       LEFT JOIN attraction A ON L.Location_ID = A.Status
-       LEFT JOIN vendor V ON L.Location_ID = V.Status
-    WHERE m.message_sent = FALSE
-       ORDER BY m.maintenance_messageID DESC;
-
+SELECT
+    m.mnt_ID,
+    m.maintenance_employeeID,
+    m.message,
+    Z.Location_type,
+    CASE
+        WHEN Z.Location_ID = H.Status THEN H.Habitat_Name
+        WHEN Z.Location_ID = A.Status THEN A.Attraction_Name
+        WHEN Z.Location_ID = V.Status THEN V.name
+        ELSE 'Unknown'
+    END AS Location_Name,
+    Z.Location_ID
+FROM maintenance_notifications m
+JOIN maintenance_location Z ON m.maintenance_locationID = Z.Location_ID
+LEFT JOIN habitat H ON Z.Location_ID = H.Status
+LEFT JOIN attraction A ON Z.Location_ID = A.Status
+LEFT JOIN vendor V ON Z.Location_ID = V.Status
+WHERE m.message_sent = FALSE
+ORDER BY m.maintenance_messageID DESC;
         `;
+
+ 
 
         dbConnection.query(sql, (err, result) => {
             if (err) {
