@@ -146,6 +146,24 @@ const employeeRoutes = {
         }
     },
 
+    //Create Animal
+    "/api/animalCare/deleteAnimal": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.deleteAnimal);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    //Create Animal
+    "/api/animalCare/getAnimalDropdowns": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalController.getAnimalDropdowns);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     //Lists out the names and IDs of all species on record
     "/api/getSpecies": (req, res) => {
         if (req.method === "POST") {
