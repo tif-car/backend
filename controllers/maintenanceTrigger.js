@@ -96,7 +96,7 @@ ORDER BY m.maintenance_messageID DESC;
                 return sendResponse(res, 404, { error: "Notification not found" });
             }
 
-            sendResponse(res, 200, { message: "Notification marked as sent" });
+            sendResponse(res, 200, {success: true });
         });
     }
 };

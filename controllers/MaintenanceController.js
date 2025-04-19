@@ -396,7 +396,7 @@ console.log(durationRaw);
       End_Date,
       Description,
       Status,
-      Cost,
+      cost,
       RecentCheck,
     } = req.body;
 
@@ -425,9 +425,9 @@ console.log(durationRaw);
       updates.push("Status = ?");
       values.push(Status);
     }
-    if (Cost) {
+    if (cost) {
       updates.push("Cost = ?");
-      values.push(Cost);
+      values.push(cost);
     }
     if (RecentCheck) {
       updates.push("RecentCheck = ?");
