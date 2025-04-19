@@ -54,14 +54,14 @@ const BulkPurchaseController ={
             Effect: Updates the bulk_purchase row with merch_ID = 101, setting amount_of_items to 10.
                     A trigger will handle inserting new rows into single_item table.
         */
-        console.log("recived", req.body);
-        const { Amount_of_items, Merchandise_ID, Date_purchased, Bulk_cost } = req.body || {};
+        //console.log("recived", req.body);
+        const { Amount_of_items, Merchandise_ID, Date_purchased, Bulk_cost } = req.body.payload || {};
 
         if (!Amount_of_items || !Merchandise_ID || !Date_purchased || !Bulk_cost) {
             return sendResponse(res, 400, { error: "missing part" });
         }
         //query used
-        const sql = `INSERT INTO zoo.bulk_purchase (merch_id, Bulk_cost, amount_of_items, date_purchased) VALUES (?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO zoo.bulk_purchase (merch_id, Bulk_cost, amount_of_items, date_purchased) VALUES (?, ?, ?, ?)`;
 
         try {
             const [result] = await pool.promise().query(sql, [Merchandise_ID, Bulk_cost, Amount_of_items, Date_purchased]);
