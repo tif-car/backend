@@ -34,6 +34,10 @@ const visitorControllers = {
             setClause.push("Phone_number = ?");
             values.push(Phone_number);
         }
+        /*
+        membership_status info:
+        membership_TypeID[1, 2, 3, 4] = membership_Type[None, Bronze, Silver, Gold]
+        */
         if (membership_status !== undefined) {
             setClause.push("membership_status = ?");
             values.push(membership_status);
