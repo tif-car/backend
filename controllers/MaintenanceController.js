@@ -16,6 +16,7 @@ const maintenanceController = {
       WHERE ml.Location_type = 'vendor';
       `);
      
+    
       
       const [attractions] = await pool.promise().query(`
        
@@ -28,7 +29,7 @@ const maintenanceController = {
         WHERE ml.Location_type = 'attraction';
       `);
   
-      
+  
       const [habitats] = await pool.promise().query(`
                 SELECT
             h.Habitat_Name,
@@ -38,6 +39,8 @@ const maintenanceController = {
             ON ml.Location_ID = h.Status
           WHERE ml.Location_type = 'habitat';
                 `);
+
+  
   
       sendResponse(res, 200, {
         vendors,
@@ -71,22 +74,87 @@ const maintenanceController = {
     }
   },
 
-  getMaintenanceInfo: async (req, res) => {
+  getMaintenanceInfo: async (req, res) => { 
     try {
-      const {requestId} = req.body;
-      if(!requestId){
+      const { requestId } = req.body;
+      if (!requestId) {
         return sendResponse(res, 400, { error: "Maintenance_ID is required" });
       }
-      const [request] = await pool.promise().query(`select * from maintenance where Maintenance_ID = ?;`, [requestId]);
-
-      const row = request[0];
-
-      sendResponse(res, 200, {row});
+  
+      //query to retrieve maintenance information
+      const [request] = await pool.promise().query(`
+        SELECT 
+          M.Maintenance_ID,
+          M.Maintenance_EmployeeID,
+          M.Start_Date,
+          M.End_Date,
+          M.Description,
+          M.Status,
+          M.cost,
+          M.RecentCheck,
+          M.maintenance_locationID,
+          L.Location_type,
+  
+          -- Determine the location name depending on type
+          CASE 
+            WHEN L.Location_ID = A.Status THEN A.Attraction_Name
+            WHEN L.Location_ID = H.Status THEN H.Habitat_Name
+            WHEN L.Location_ID = V.Status THEN V.name
+            ELSE 'Unknown'
+          END AS Location_Name,
+  
+          M.request_desc
+  
+        FROM maintenance M
+        JOIN maintenance_location L ON M.maintenance_locationID = L.Location_ID
+        LEFT JOIN attraction A ON L.Location_ID = A.Status
+        LEFT JOIN habitat H ON L.Location_ID = H.Status
+        LEFT JOIN vendor V ON L.Location_ID = V.Status
+  
+        WHERE M.Maintenance_ID = ?;
+      `, [requestId]);
+  
+      const row = request[0]; // Extracting the first (and expected only) row
+  
+      sendResponse(res, 200, { row });
     } catch (error) {
-      console.error("❌ Error fetching maintenance form info:", error);
+      console.error("Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
     }
   },
+  
+  /*
+SELECT 
+  M.Maintenance_ID,
+  M.Maintenance_EmployeeID,
+  M.Start_Date,
+  M.End_Date,
+  M.Description,
+  M.Status,
+  M.cost,
+  M.RecentCheck,
+  M.maintenance_locationID,
+  L.Location_type,
+
+  -- Determine the location name depending on type
+  CASE 
+    WHEN L.Location_ID = A.Status THEN A.Attraction_Name
+    WHEN L.Location_ID = H.Status THEN H.Habitat_Name
+    WHEN L.Location_ID = V.Status THEN V.name
+    ELSE 'Unknown'
+  END AS Location_Name,
+
+  M.request_desc
+
+FROM maintenance M
+JOIN maintenance_location L ON M.maintenance_locationID = L.Location_ID
+LEFT JOIN attraction A ON L.Location_ID = A.Status
+LEFT JOIN habitat H ON L.Location_ID = H.Status
+LEFT JOIN vendor V ON L.Location_ID = V.Status
+
+WHERE M.Maintenance_ID = ?;
+
+  */
 
  /*
   addMaintenanceRequest: async (req, res) => {

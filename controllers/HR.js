@@ -167,42 +167,27 @@ const HRController = {
     },
 /*
 function to update the works_at table
-Frontend will need to send Employee_ID, Dept_ID, Habitat_ID. Optional: Attraction_ID or Vend_ID, can also choose neither
+Frontend will need to send Employee_ID, Dept_ID, Location_ID
 Example of what frontend would send:
 {
   "Employee_ID": 3,
   "Dept_ID": 1,
-  "Habitat_ID": 201,
-  "Vend_ID": 6
+  "Location_ID": 401,
 }  */
-updateWorksAt: async (req, res) => {
-    const { Employee_ID, Dept_ID, Habitat_ID, Attraction_ID, Vend_ID } = req.body || {};
+  updateWorksAt: async (req, res) => {
+    const { Employee_ID, Dept_ID, Location_ID } = req.body || {};
 
-    if (!Employee_ID || !Dept_ID || !Habitat_ID) {
-        return sendResponse(res, 400, { error: "Employee ID, Dept_ID, and Habitat_ID are required" });
-    }
-
-    // Determine which field to nullify based on what's provided
-    let finalAttractionID = null;
-    let finalVendID = null;
-
-    if (Attraction_ID) {
-        finalAttractionID = Attraction_ID;
-        finalVendID = null;
-    } else if (Vend_ID) {
-        finalVendID = Vend_ID;
-        finalAttractionID = null;
+    if (!Employee_ID || !Dept_ID || !Location_ID) {
+        return sendResponse(res, 400, { error: "Employee ID, Dept_ID, and Location_ID are required" });
     }
 
     const sql = `
         UPDATE works_at 
         SET Dept_ID = ?, 
-            Habitat_ID = ?, 
-            Attraction_ID = ?, 
-            Vend_ID = ?
+            Location_ID = ?
         WHERE Employee_ID = ?`;
 
-    const values = [Dept_ID, Habitat_ID, finalAttractionID, finalVendID, Employee_ID];
+    const values = [Dept_ID, Location_ID, Employee_ID];
 
     pool.query(sql, values, (err, result) => {
         if (err) {
@@ -218,6 +203,7 @@ updateWorksAt: async (req, res) => {
     });
 },
 
+
 /*
 Function to insert a row into the works_at table for new employees.
 Frontend will need to send Employee_ID, Dept_ID, Habitat_ID. Optional: Attraction_ID or Vend_ID, can also choose neither
@@ -229,11 +215,11 @@ Example of what frontend would send:
   "Attraction_ID": 9
 }   */
 
-createWorksAt: async (req, res) => {
+  createWorksAt: async (req, res) => {
     const { Employee_ID, Dept_ID, Location_ID } = req.body || {};
 
     if (!Employee_ID || !Dept_ID || !Location_ID) {
-        return sendResponse(res, 400, { error: "missing parameter" });
+        return sendResponse(res, 400, { error: "Employee_ID, Dept_ID, and Location_ID are required" });
     }
 
     const sql = `
