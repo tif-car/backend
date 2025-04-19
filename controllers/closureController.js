@@ -19,7 +19,7 @@ const ClosureController = {
      "message": "Closure created successfully.",
      "closure_ID": 5
  } */
-        const { start_date, location_ID, description, mnt_ID } = req.body;
+        const { start_date, location_ID, description, mnt_ID } = req.body.payload || {};
 
         // Now enforcing description as required
         if (!start_date || !location_ID || !description || !mnt_ID) {
@@ -30,7 +30,7 @@ const ClosureController = {
 
         const sql = `
             INSERT INTO closure (start_date, location_ID, description, mnt_ID)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?)
         `;
 
         const values = [start_date, location_ID, description, mnt_ID];

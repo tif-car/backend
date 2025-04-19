@@ -66,7 +66,7 @@ const maintenanceRoutes = {
      // Delete a maintenance record
      "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-      //handleRequestBody(req, res, maintenanceController);
+      handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
      } else {
       sendMethodNotAllowed(res);
     }
