@@ -230,28 +230,16 @@ Example of what frontend would send:
 }   */
 
 createWorksAt: async (req, res) => {
-    const { Employee_ID, Dept_ID, Location_type, Location_ID } = req.body || {};
+    const { Employee_ID, Dept_ID, Location_ID } = req.body || {};
 
-    if (!Employee_ID || !Dept_ID || !Location_type || !Location_ID) {
+    if (!Employee_ID || !Dept_ID || !Location_ID) {
         return sendResponse(res, 400, { error: "missing parameter" });
     }
 
-    if (Location_type.toLowerCase() === "habitat") {
-        const sql = `
-            INSERT INTO works_at (Employee_ID, Dept_ID, Habitat_ID)
-            VALUES (?, ?, ?)
-        `;
-    } else if (Location_type.toLowerCase() === "vendor") {
-        const sql = `
-            INSERT INTO works_at (Employee_ID, Dept_ID, Vend_ID)
-            VALUES (?, ?, ?)
-        `;
-    } else {
-        const sql = `
-            INSERT INTO works_at (Employee_ID, Dept_ID, Attraction_ID)
-            VALUES (?, ?, ?)
-        `;
-    }
+    const sql = `
+        INSERT INTO works_at (Employee_ID, Dept_ID, Location_ID)
+        VALUES (?, ?, ?)
+    `;
 
     const values = [Employee_ID, Dept_ID, Location_ID];
 
