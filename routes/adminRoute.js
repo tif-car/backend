@@ -63,6 +63,15 @@ const adminRoutes = {
         }
     },
 
+    //Route to add a work location to a new employee
+    "/api/HR/deleteWorksAt": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, HRController.deleteWorksAt);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     //vendor trigger
     "/api/getVendorNotifications": (req, res) => {
         if (req.method === "POST") {

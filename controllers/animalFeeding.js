@@ -49,7 +49,7 @@ const animalFeedingController = {
             SELECT a.Animal_ID, a.Animal_Name
             FROM employee e
             JOIN works_at w ON w.Employee_ID = e.Employee_ID
-            JOIN habitat h ON h.Habitat_ID = w.Habitat_ID 
+            JOIN habitat h ON h.Status = w.Location_ID
             JOIN animal a ON a.Habitat_ID = h.Habitat_ID
             WHERE e.Employee_ID = ?;
         `;

@@ -230,6 +230,43 @@ Example of what frontend would send:
     });
 },
 
+deleteWorksAt: async (req, res) => {
+    const { Employee_ID, Location_ID } = req.body || {};
+
+    if (!Employee_ID || !Location_ID) {
+        return sendResponse(res, 400, { 
+            error: "Both Employee_ID and Location_ID are required to delete a work assignment" 
+        });
+    }
+
+    const sql = `
+        DELETE FROM works_at 
+        WHERE Employee_ID = ? 
+        AND Location_ID = ?`;
+
+    const values = [Employee_ID, Location_ID];
+
+    pool.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Database delete error:", err);
+            return sendResponse(res, 500, { 
+                error: "Database error occurred while deleting work assignment" 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return sendResponse(res, 404, { 
+                error: "No matching work assignment found to delete" 
+            });
+        }
+
+        sendResponse(res, 200, { 
+            message: "Work assignment deleted successfully",
+            deletedCount: result.affectedRows 
+        });
+    });
+},
+
 
 /*
 Function to insert a row into the works_at table for new employees.
@@ -243,9 +280,9 @@ Example of what frontend would send:
 }   */
 
   createWorksAt: async (req, res) => {
-    const { Employee_ID, Dept_ID, Location_ID } = req.body || {};
+    const { Employee_ID, Department_ID, Location_ID } = req.body || {};
 
-    if (!Employee_ID || !Dept_ID || !Location_ID) {
+    if (!Employee_ID || !Department_ID || !Location_ID) {
         return sendResponse(res, 400, { error: "Employee_ID, Dept_ID, and Location_ID are required" });
     }
 
@@ -254,7 +291,7 @@ Example of what frontend would send:
         VALUES (?, ?, ?)
     `;
 
-    const values = [Employee_ID, Dept_ID, Location_ID];
+    const values = [Employee_ID, Department_ID, Location_ID];
 
     pool.query(sql, values, (err, result) => {
         if (err) {
