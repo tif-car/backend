@@ -40,6 +40,33 @@ const animalController = {
     });
 },
 
+    deleteAnimal: async (req, res) => {
+        const { Animal_ID } = req.body || {};
+
+        // Ensure Maintenance_ID is provided
+        if (!Animal_ID) {
+        return sendResponse(res, 400, { error: "Animal_ID is required" });
+        }
+
+        const sql = `
+        DELETE FROM animal
+        WHERE Animal_ID = ?
+        `;
+
+        try {
+        const [result] = await pool.promise().query(sql, [Animal_ID]);
+
+        if (result.affectedRows === 0) {
+            return sendResponse(res, 404, { error: "No record found with the given Animal_ID" });
+        }
+
+        sendResponse(res, 200, { message: "Animal deleted successfully" });
+        } catch (err) {
+        console.error("Database delete error:", err);
+        sendResponse(res, 500, { error: "Database error while deleting Animal" });
+        }
+    },
+
 // Create a new animal
     createAnimal: async (req, res) => {
         const { name, Species_ID, Habitat_ID, Birth_Date, wellness_typeID } = req.body.newAnimal || {};
@@ -48,20 +75,37 @@ const animalController = {
             return sendResponse(res, 400, { error: "Animal name, species ID, and habitat ID are required" });
         }
 
-        const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status) 
-                    VALUES (?, ?, ?, ?, ?)`;
+        if (Birth_Date){
+            const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Birth_Date, Wellness_Status) 
+            VALUES (?, ?, ?, ?, ?)`;
 
-        pool.query(sql, [name, Species_ID, Habitat_ID, Birth_Date, wellness_typeID], (err, result) => {
-            if (err) {
-                console.error("Database query error:", err);
-                return sendResponse(res, 500, { error: "Database error" });
-            }
+            pool.query(sql, [name, Species_ID, Habitat_ID, Birth_Date, wellness_typeID], (err, result) => {
+                if (err) {
+                    console.error("Database query error:", err);
+                    return sendResponse(res, 500, { error: "Database error" });
+                }
 
-            sendResponse(res, 201, { 
-                message: "Animal created successfully",
-                Animal_ID: result.insertId
+                sendResponse(res, 201, { 
+                    message: "Animal created successfully",
+                    Animal_ID: result.insertId
+                });
             });
-        });
+        } else {
+            const sql = `INSERT INTO animal (Animal_Name, Species_ID, Habitat_ID, Wellness_Status) 
+            VALUES (?, ?, ?, ?)`;
+
+            pool.query(sql, [name, Species_ID, Habitat_ID, wellness_typeID], (err, result) => {
+                if (err) {
+                    console.error("Database query error:", err);
+                    return sendResponse(res, 500, { error: "Database error" });
+                }
+
+                sendResponse(res, 201, { 
+                    message: "Animal created successfully",
+                    Animal_ID: result.insertId
+                });
+            });
+        }
     },
 
 // Update an animal's information
@@ -155,6 +199,17 @@ const animalController = {
             sendResponse(res, 200, { caretakerData: result });
         });
 
+    },
+
+    getAnimalDropdowns: async (req, res) => {
+
+        const [species] = await pool.promise().query(`select Name, Species_ID from species;`);
+
+        const [wellnessStatuses] = await pool.promise().query(`select * from wellness_type;`);
+        
+        const [habitats] = await pool.promise().query(`select Habitat_ID, Habitat_Name from habitat;`);
+
+        sendResponse(res, 200, { species, habitats, wellnessStatuses });
     },
 
     getSpecies: async (req, res) => {

@@ -66,7 +66,7 @@ const maintenanceRoutes = {
      // Delete a maintenance record
      "/api/deleteMaintenanceRow": async (req, res) => {
       if (req.method === "POST") {
-      //handleRequestBody(req, res, maintenanceController);
+      handleRequestBody(req, res, maintenanceController.deleteMaintenanceRow);
      } else {
       sendMethodNotAllowed(res);
     }
@@ -121,6 +121,15 @@ const maintenanceRoutes = {
   "/api/closure/addClosure": async (req, res) => {
     if (req.method === "POST") {
       handleRequestBody(req, res, ClosureController.addClosure);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
+
+  //Add a new closure row
+  "/api/closure/getClosureInfo": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.getClosureInfo);
     } else {
       sendMethodNotAllowed(res);
     }

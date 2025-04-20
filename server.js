@@ -16,6 +16,7 @@ import purchaseRoutes from "./routes/purchaseroutes.js";
 import merchandiseRoutes from "./routes/merchandiseRoutes.js";
 import orderHistoryRoute from "./routes/orderHistoryRoute.js"; 
 import ticketFormRoutes from "./routes/ticketFormRoutes.js";
+import merchandiseStockRoutes from "./routes/merchandiseStockRoutes.js";
 
 
 
@@ -39,7 +40,7 @@ const routes = {
    ...orderHistoryRoute,
     ...ticketFormRoutes,
     ...orderSummaryRoutes,
-   /* ...merchandiseStockRoutes,*/
+    ...merchandiseStockRoutes,
 };
 
 const corsMiddleware = cors({
