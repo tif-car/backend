@@ -228,9 +228,17 @@ medicalView: async (req, res) => {
         return sendResponse(res, 400, { error: "Employee_ID is required." });
     }
 
-    const sql = `SELECT Record_ID, Animal_ID, Checkup_Date, Diagnosis, Treatment 
-                 FROM MEDICAL_VIEW
-                 WHERE Employee_ID = ?`;
+    const sql = `
+        SELECT 
+            Record_ID, 
+            Animal_ID, 
+            Animal_Name, 
+            Species, 
+            Checkup_Date, 
+            Diagnosis, 
+            Treatment 
+        FROM MEDICAL_VIEW
+        WHERE Employee_ID = ?`;
 
     try {
         const [rows] = await pool.promise().query(sql, [Employee_ID]);
