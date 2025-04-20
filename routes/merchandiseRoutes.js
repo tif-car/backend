@@ -46,6 +46,16 @@ const merchandiseRoutes = {
       res.end("Method Not Allowed");
     }
   },
+
+  "/api/merchandise": (req, res) => {
+  if (req.method === "GET") {
+    merchandiseController.getAllMerchandise(req, res);
+  } else {
+    res.writeHead(405);
+    res.end("Method Not Allowed");
+  }
+},
+
 };
 
 // Helper function to parse request body and call the appropriate controller
