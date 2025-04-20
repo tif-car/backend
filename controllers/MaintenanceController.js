@@ -78,10 +78,7 @@ const maintenanceController = {
         return sendResponse(res, 400, { error: "Maintenance_ID is required" });
       }
       const [request] = await pool.promise().query(`select * from maintenance where Maintenance_ID = ?;`, [requestId]);
-
-      const row = request[0];
-
-      sendResponse(res, 200, {row});
+      sendResponse(res, 200, {request});
     } catch (error) {
       console.error("❌ Error fetching maintenance form info:", error);
       sendResponse(res, 500, { error: "Failed to fetch form data" });
@@ -184,87 +181,135 @@ const maintenanceController = {
         attractionID,
         habitatID,
         workerID,
+        departmentID,
       } = req.body;
-
+  
       const values = [startDate, endDate];
-      const conditions = ["Start_Date BETWEEN ? AND ?"];
-
+      const conditions = [`m.Start_Date BETWEEN ? AND ?`];
+  
+      const joins = [
+        `JOIN maintenance_location ml ON m.maintenance_locationID = ml.Location_ID`,
+        `LEFT JOIN vendor v ON ml.Location_type = 'vendor' AND v.Status = ml.Location_ID`,
+        `LEFT JOIN attraction a ON ml.Location_type = 'attraction' AND a.Status = ml.Location_ID`,
+        `LEFT JOIN habitat h ON ml.Location_type = 'habitat' AND h.Status = ml.Location_ID`,
+      ];
+  
+      // Worker filter
       if (workerID) {
-        conditions.push("Maintenance_EmployeeID = ?");
+        conditions.push(`m.Maintenance_EmployeeID = ?`);
         values.push(workerID);
       }
-      if (includeVendor && vendorID) {
-        conditions.push("Vendor_ID = ?");
-        values.push(vendorID);
+  
+      // Department filter
+      if (departmentID) {
+        conditions.push(`
+          (
+            (ml.Location_type = 'vendor' AND v.Dept_ID = ?)
+            OR (ml.Location_type = 'attraction' AND a.Dept_ID = ?)
+            OR (ml.Location_type = 'habitat' AND h.Dept_ID = ?)
+          )
+        `);
+        values.push(departmentID, departmentID, departmentID);
       }
-      if (includeAttraction && attractionID) {
-        conditions.push("Attraction_ID = ?");
-        values.push(attractionID);
+  
+      // Type filters
+      const typeConditions = [];
+  
+      if (includeVendor) {
+        if (vendorID) {
+          typeConditions.push(`(ml.Location_type = 'vendor' AND v.Vendor_ID = ?)`);
+          values.push(vendorID);
+        } else {
+          typeConditions.push(`ml.Location_type = 'vendor'`);
+        }
       }
-      if (includeHabitat && habitatID) {
-        conditions.push("Habitat_ID = ?");
-        values.push(habitatID);
+  
+      if (includeAttraction) {
+        if (attractionID) {
+          typeConditions.push(`(ml.Location_type = 'attraction' AND a.Attraction_ID = ?)`);
+          values.push(attractionID);
+        } else {
+          typeConditions.push(`ml.Location_type = 'attraction'`);
+        }
       }
-
-      const whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
-
-      // ---------- COST QUERY ----------
+  
+      if (includeHabitat) {
+        if (habitatID) {
+          typeConditions.push(`(ml.Location_type = 'habitat' AND h.Habitat_ID = ?)`);
+          values.push(habitatID);
+        } else {
+          typeConditions.push(`ml.Location_type = 'habitat'`);
+        }
+      }
+  
+      // If no types are selected, return empty result
+      if (typeConditions.length === 0) {
+        return sendResponse(res, 200, {
+          costData: [],
+          durationData: [],
+        });
+      }
+  
+      conditions.push(`(${typeConditions.join(" OR ")})`);
+      const whereClause = `WHERE ${conditions.join(" AND ")}`;
+  
+      // COST QUERY
       const costQuery = `
-        SELECT Start_Date, End_Date, maintenance_locationID AS Location, SUM(cost) AS cost
-        FROM maintenance
+        SELECT 
+          m.Start_Date, 
+          m.End_Date, 
+          ml.Location_type AS Location, 
+          SUM(m.cost) AS cost
+        FROM maintenance m
+        ${joins.join("\n")}
         ${whereClause}
-        GROUP BY Start_Date, End_Date, Location
-        ORDER BY Start_Date
+        GROUP BY m.Start_Date, m.End_Date, ml.Location_type
+        ORDER BY m.Start_Date
       `;
-
+  
       const [costResult] = await pool.promise().query(costQuery, values);
-
-      // ---------- DURATION QUERY ----------
+  
+      // DURATION QUERY
       const durationQuery = `
-        SELECT DATEDIFF(End_Date, Start_Date) AS duration
-        FROM maintenance
+        SELECT DATEDIFF(m.End_Date, m.Start_Date) AS duration
+        FROM maintenance m
+        ${joins.join("\n")}
         ${whereClause}
       `;
-
       const [durationRaw] = await pool.promise().query(durationQuery, values);
-
+  
       const durationBuckets = {
         "0–1 days": 0,
         "2–3 days": 0,
         "4–5 days": 0,
         "6+ days": 0,
       };
-      console.log("🕒 Raw durations returned from SQL:");
-console.log(durationRaw);
-
-      
+  
       for (const row of durationRaw) {
-        // Fix the logic by adding +1 to account for inclusive duration
         const days = (row.duration ?? 0) + 1;
-      
         if (days <= 1) durationBuckets["0–1 days"]++;
         else if (days <= 3) durationBuckets["2–3 days"]++;
         else if (days <= 5) durationBuckets["4–5 days"]++;
         else durationBuckets["6+ days"]++;
       }
-      
-      
+  
       const durationData = Object.entries(durationBuckets).map(([category, count]) => ({
         category,
         duration: count,
       }));
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({
+  
+      sendResponse(res, 200, {
         costData: costResult,
         durationData,
-      }));
+      });
     } catch (error) {
       console.error("❌ Error in getMaintenanceReport:", error);
       res.writeHead(500, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Failed to generate report" }));
     }
   },
+  
+  
 
   // Delete a maintenance record based on Maintenance_ID
   deleteMaintenanceRow: async (req, res) => {
