@@ -19,6 +19,8 @@ import animalController from "../controllers/animalController.js";
     - `PUT /api/animals/:id`: Updates an animal by ID.
     - `POST /api/animalCare/getAnimalById`: Fetches details of a specific animal by ID. Requires `animal_ID` from frontend.
     - `POST /api/animalCare/getCaretakerView`: Fetches the caretaker's view for animal care tasks. Requires `employee_ID` from frontend.
+    - `POST /api/animalHealth/getMedicalView`: Retrieves a caretaker-focused view of animal medical records. Requires `employee_ID` from frontend.
+
 */
 
 const employeeRoutes = {
@@ -181,6 +183,15 @@ const employeeRoutes = {
             sendMethodNotAllowed(res);
         }
     },
+        // Route to get the medical view of animals (requires employee_ID from frontend)
+        "/api/animalHealth/getMedicalView": (req, res) => {
+            if (req.method === "POST") {
+                handleRequestBody(req, res, animalHealthController.getMedicalView);
+            } else {
+                sendMethodNotAllowed(res);
+            }
+        },
+    
 };
 
 
