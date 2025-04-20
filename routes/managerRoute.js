@@ -34,6 +34,14 @@ const managerRoutes = {
         }
     },
 
+"/api/getAllAttractions": (req, res) => {
+    if (req.method === "POST") {
+        handleRequestBody(req, res, attractionController.getAllAttractions);
+    } else {
+        sendMethodNotAllowed(res);
+    }
+},
+
     "/api/getVendMerchReportFormInfo": (req,res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, vendorReportController.getVendorReportFormInfo);
