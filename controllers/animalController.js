@@ -242,6 +242,36 @@ const animalController = {
     
             sendResponse(res, 200, { wellnessData: result });
         });
+    },
+
+    getAnimalsByEID: async (req, res) => {
+        const { employee_ID } = req.body;
+
+        if (!employee_ID) {
+            return sendResponse(res, 400, { error: "employee_ID is required" });
+        }
+
+        const animalSql = `
+            SELECT a.Animal_ID, a.Animal_Name
+            FROM employee e
+            JOIN works_at w ON w.Employee_ID = e.Employee_ID
+            JOIN habitat h ON h.Status = w.Location_ID
+            JOIN animal a ON a.Habitat_ID = h.Habitat_ID
+            WHERE e.Employee_ID = ?;
+        `;
+
+        try {
+            const [aniResult] = await pool.promise().query(animalSql, [employee_ID]);
+
+            if (aniResult.length === 0) {
+                return sendResponse(res, 404, { error: "No animals found for the given employee ID" });
+            }
+
+            sendResponse(res, 200, aniResult);
+        } catch (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
     }
 
 };

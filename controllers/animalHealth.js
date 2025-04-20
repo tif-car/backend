@@ -181,7 +181,7 @@ output:
 
         sendResponse(res, 200, { message: "Medical record updated successfully." });
     });
-}
+},
 
 /*
 Function: editAllMedicalRow
@@ -210,6 +210,45 @@ Expected output:
     12
 ]
  */
+
+medicalView: async (req, res) => {
+    /*
+        Function: medicalView
+        Input from frontend:
+        {
+            "Employee_ID": 2
+        }
+
+        This will query the MEDICAL_VIEW for medical records accessible by this employee.
+    */
+
+    const { Employee_ID } = req.body || {};
+
+    if (!Employee_ID) {
+        return sendResponse(res, 400, { error: "Employee_ID is required." });
+    }
+
+    const sql = `SELECT Record_ID, Animal_ID, Checkup_Date, Diagnosis, Treatment 
+                 FROM MEDICAL_VIEW
+                 WHERE Employee_ID = ?`;
+
+    try {
+        const [rows] = await pool.promise().query(sql, [Employee_ID]);
+
+        if (rows.length === 0) {
+            return sendResponse(res, 404, { message: "No medical records found for this employee." });
+        }
+
+        sendResponse(res, 200, rows);
+    } catch (err) {
+        console.error("Database query error:", err);
+        sendResponse(res, 500, { error: "Database error occurred while retrieving medical records." });
+    }
+}
+
+
+
+
 };
 
 // Helper function to send JSON responses
