@@ -112,6 +112,31 @@ const ClosureController = {
         }
     },
 
+    getClosureInfo: async (req, res) => {
+        const { closure_ID } = req.body;
+
+        if (!closure_ID) {
+            return sendResponse(res, 400, { error: "closure_ID is required" });
+        }
+
+        const sql = `SELECT * FROM CLOSURE_VIEW WHERE closure_ID = ?`;
+
+        try {
+            const [result] = await pool.promise().query(sql, [closure_ID]);
+
+            if (result.affectedRows === 0) {
+                return sendResponse(res, 404, { error: "Closure not found." });
+            }
+
+            const closure = result[0];
+
+            sendResponse(res, 200, { closure });
+        } catch (err) {
+            console.error("Database deletion error:", err);
+            sendResponse(res, 500, { error: "Database error while deleting closure." });
+        }
+    },
+
     // Delete a closure row, frontent will need to provide closure_ID 
     deleteClosure: async (req, res) => {
         const { closure_ID } = req.body;

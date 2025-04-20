@@ -126,6 +126,15 @@ const maintenanceRoutes = {
     }
   },
 
+  //Add a new closure row
+  "/api/closure/getClosureInfo": async (req, res) => {
+    if (req.method === "POST") {
+      handleRequestBody(req, res, ClosureController.getClosureInfo);
+    } else {
+      sendMethodNotAllowed(res);
+    }
+  },
+
   //Edit an existing closure row
   "/api/closure/editClosure": async (req, res) => {
     if (req.method === "POST") {
