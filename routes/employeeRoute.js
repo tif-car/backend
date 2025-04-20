@@ -70,6 +70,15 @@ const employeeRoutes = {
     },
 
     // New route to edit all fields of a medical record (requires Record_ID and all updated fields)
+    "/api/animalHealth/getMedicalView": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.medicalView);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    // New route to edit all fields of a medical record (requires Record_ID and all updated fields)
     "/api/animal/getAnimals": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalController.getAnimalsByEID);

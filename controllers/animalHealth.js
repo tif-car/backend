@@ -228,7 +228,7 @@ medicalView: async (req, res) => {
         return sendResponse(res, 400, { error: "Employee_ID is required." });
     }
 
-    const sql = `SELECT Record_ID, Animal_ID, Checkup_Date, Diagnosis, Treatment, Cost 
+    const sql = `SELECT Record_ID, Animal_ID, Checkup_Date, Diagnosis, Treatment 
                  FROM MEDICAL_VIEW
                  WHERE Employee_ID = ?`;
 
