@@ -59,6 +59,33 @@ const HRController = {
 
     },
 
+    getManagers: async (req,res) => {
+
+
+        const sql = `
+            Select Employee_ID, first_Name as first_name, last_Name as last_name
+            from employee
+            join zoo.role_type rt on employee.Role = rt.role_typeID
+            where role_typeID = '3';
+        `;
+
+        try {
+            const [employees] = await pool.promise().query(sql);
+    
+            if (employees.length === 0) {
+                return sendResponse(res, 404, { message: 'Employees not found' });
+            }
+            
+            // Send as plain object
+            sendResponse(res, 200, {employees});
+
+        } catch {
+            console.error("Database retreval error:", err);
+            sendResponse(res, 500, { error: "Database error while retreving roles." });
+        }
+
+    },
+
     editEmployee: async (req, res) => {
 
 
