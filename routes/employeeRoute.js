@@ -61,7 +61,7 @@ const employeeRoutes = {
     },
 
     // New route to edit all fields of a medical record (requires Record_ID and all updated fields)
-    "/api/animalHealth/editAllMedicalRow": (req, res) => {
+    "/api/animalHealth/editMedical": (req, res) => {
         if (req.method === "POST") {
             handleRequestBody(req, res, animalHealthController.editAllMedicalRow);
         } else {

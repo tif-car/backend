@@ -39,6 +39,16 @@ Output:
     });
 },
 
+getMedicalDetails: async (req, res) => {
+    const {Record_ID} = req.body || {};
+
+    if (!Record_ID) {
+        return sendResponse(res, 400, { error: "Record ID is required" });
+    }
+
+    
+},
+
 // Function to create a new medical record for an animal.
 // Frontend must provide: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment.
      createMedicalRecord: async (req, res) => {
@@ -78,8 +88,8 @@ Output:
 
 //Functoin to edit medical record row
 //Only updates the fields provided by the frontend
-    editMedicalRecord: async (req, res) => {
-    /*
+    /*editMedicalRecord: async (req, res) => {
+    
         Function: editMedicalRecord
         Ex: Frontend provides:
         {
@@ -89,7 +99,7 @@ Output:
         }
         Output:
         { "message": "Medical record updated successfully" }
-    */
+    
     let body = "";
     //reading input from the frontend
     req.on("data", (chunk) => {
@@ -134,7 +144,7 @@ Output:
             sendResponse(res, 500, { error: "Database error while updating medical record." });
         }
     });
-},
+},*/
 
 /*
 Function: EditMedicalRecords
