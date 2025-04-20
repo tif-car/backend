@@ -236,8 +236,7 @@ medicalView: async (req, res) => {
             Species, 
             Checkup_Date, 
             Diagnosis, 
-            Treatment, 
-            Cost
+            Treatment 
         FROM MEDICAL_VIEW
         WHERE Employee_ID = ?`;
 
