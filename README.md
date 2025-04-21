@@ -27,6 +27,9 @@ Employees are divided based on their roles.
 ## Managers
 They would be work be able to view where their employees are working and how their departments are running. 
 
+## Servers
+They would be able to log in and create a maintenance request for their specific vendor location.  
+
 ## caretakers 
 They would be able to sign in and see all the information they would need. This would include any information on the animals they are taking care of. They would be able to add to the feeding log and medical records of the animals. 
 
