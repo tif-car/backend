@@ -36,31 +36,32 @@ They would be able to sign in and see all the information they would need. This 
 # Hosting Locally
 
 - Install git on your machine if you haven't already.
-- Make sure the latest version of [Node.js](https://nodejs.org/en/) is installed on your machine. Some features may not work on older versions of Node.js.
+- Make sure the latest version of [Node.js](https://nodejs.org/en/) is installed on your machine. Some features may not work on older versions of Node.js. 
 
 ### Cloning The Repository
 
-# 
-bash
-mkdir backend
-cd backend
-git init
-git remote add origin https://github.com/tif-car/backend.git
-git pull origin main
-npm i
-(create .env file in root directory)
-npm run start
+```bash
+ mkdir backend
+ cd backend
+ git init
+ git remote add origin https://github.com/tif-car/backend.git
+ git pull origin main
+ npm i
+ (create .env file in root directory)
+ npm run start
+``` 
 
+> [!IMPORTANT]
+ > Ensure that `.env` and is properly implemented so it could function.
 
-# [!IMPORTANT]
-# Ensure that `.env` and is properly implemented so it could function.
-
-#env
-DB_HOST= //url address where mySQL database is hosted
-DB_USER= // valid username 
-DB_PASSWORD=//valid password for DB 
-DB_NAME=zoo
-DB_PORT=3306
-PORT=8080
+ 
+```env
+ DB_HOST= //url address where mySQL database is hosted
+ DB_USER= // valid username 
+ DB_PASSWORD=//valid password for DB 
+ DB_NAME=zoo
+ DB_PORT=3306
+ PORT=8080
+ ```
 
 
