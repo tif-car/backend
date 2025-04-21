@@ -40,7 +40,8 @@ They would be able to sign in and see all the information they would need. This 
 
 ### Cloning The Repository
 
-```bash
+# 
+bash
 mkdir backend
 cd backend
 git init
@@ -49,17 +50,17 @@ git pull origin main
 npm i
 (create .env file in root directory)
 npm run start
-```
 
-> [!IMPORTANT]
-> Ensure that `.env` and is properly implemented so it could function.
 
-```env
+# [!IMPORTANT]
+# Ensure that `.env` and is properly implemented so it could function.
+
+#env
 DB_HOST= //url address where mySQL database is hosted
 DB_USER= // valid username 
 DB_PASSWORD=//valid password for DB 
 DB_NAME=zoo
 DB_PORT=3306
 PORT=8080
-```
+
 
