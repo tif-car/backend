@@ -66,24 +66,25 @@ const attractionController = {
     }
   },
 
-  // ✅ NEW: Fetch all attraction details with status
   async getAllAttractions(req, res) {
     try {
       const [rows] = await pool.promise().query(`
         SELECT 
-          Attraction_ID AS id,
-          Attraction_Name AS name,
-          Annual_Cost,
-          Dept_ID,
-          Habitat_ID,
-          Status
-        FROM attraction
+          a.Attraction_ID AS id,
+          a.Attraction_Name AS name,
+          a.Annual_Cost,
+          a.Dept_ID,
+          a.Habitat_ID,
+          mntstatus_type.status_types AS status
+        FROM attraction a
+        JOIN maintenance_location ml ON a.Status = ml.Location_ID
+        JOIN mntstatus_type ON ml.status_type = mntstatus_type.status_typeID
       `);
   
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(rows));
     } catch (err) {
-      console.error("Error fetching attractions:", err);
+      console.error("Error fetching attractions with status:", err);
       res.writeHead(500, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Internal server error" }));
     }
