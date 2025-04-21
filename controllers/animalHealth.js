@@ -46,8 +46,33 @@ getMedicalDetails: async (req, res) => {
         return sendResponse(res, 400, { error: "Record ID is required" });
     }
 
-    
-},
+    const sql = `
+            select 
+                m.Checkup_Date, 
+                m.Checkup_Date, 
+                m.Diagnosis, 
+                m.Treatment, 
+                m.Animal_ID, 
+                a.Animal_Name
+            from medical_record m
+            join zoo.animal a on m.Animal_ID = a.Animal_ID
+            where m.Record_ID = ?;
+        `;
+
+        try {
+            const [result] = await pool.promise().query(sql, [Record_ID]);
+
+            const row = result[0];
+            if (result.length === 0) {
+                return sendResponse(res, 404, { error: "No feeding details found for the given ID" });
+            }
+            sendResponse(res, 200, row);
+        } catch (err) {
+            console.error("Database query error:", err);
+            return sendResponse(res, 500, { error: "Database error" });
+        }
+
+    },
 
 // Function to create a new medical record for an animal.
 // Frontend must provide: Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment.
@@ -262,6 +287,32 @@ medicalView: async (req, res) => {
         console.error("Database query error:", err);
         sendResponse(res, 500, { error: "Database error occurred while retrieving medical records." });
     }
+},
+
+deleteMedicalRecord: async (req, res) => {
+    const {Record_ID} = req.body;
+
+    if (!Record_ID) {
+        return sendResponse(res, 400, { error: "Record_ID is required" });
+    }
+
+    const sql = `
+        DELETE FROM medical_record
+        WHERE Record_ID = ?`;
+
+    try {
+        const [result] = await pool.promise().query(sql, Record_ID);
+    
+        if (result.affectedRows === 0) {
+            return sendResponse(res, 404, { error: "No record found with the given Record_ID" });
+        }
+    
+        sendResponse(res, 200, { message: "Medical Record Deleted successfully" });
+        } catch (err) {
+        console.error("Error while updating medical record:", err);
+        sendResponse(res, 500, { error: "Internal server error" });
+    }
+
 }
 
 

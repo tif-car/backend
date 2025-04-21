@@ -51,6 +51,24 @@ const employeeRoutes = {
         }
     },
 
+    // Route to create a new medical record (requires Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment)
+    "/api/animalHealth/deleteMedical": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.deleteMedicalRecord);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
+    // Route to create a new medical record (requires Animal_ID, Employee_ID, Checkup_Date, Diagnosis, and Treatment)
+    "/api/animalHealth/getMedicalDetails": (req, res) => {
+        if (req.method === "POST") {
+            handleRequestBody(req, res, animalHealthController.getMedicalDetails);
+        } else {
+            sendMethodNotAllowed(res);
+        }
+    },
+
     // Route to edit an existing medical record (requires Record_ID and updated fields)
     "/api/animalHealth/editMedicalRecord": (req, res) => {
         if (req.method === "POST") {
