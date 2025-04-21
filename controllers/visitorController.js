@@ -76,28 +76,31 @@ const visitorControllers = {
     //This is to show the visitor that they information has been updated
     getMemberByID: async (req, res) => {
         const { Visitor_ID } = req.params;
-    
+      
         if (!Visitor_ID) {
-            return sendResponse(res, 400, { error: "Visitor_ID is required." });
+          return sendResponse(res, 400, { error: "Visitor_ID is required." });
         }
-    
-        const sql = `SELECT * FROM MEMBER_VIEW WHERE Visitor_ID = ?`;
-    
-        try {
-            const [result] = await pool.promise().query(sql, [Visitor_ID]);
-    
-            if (result.length === 0) {
-                return sendResponse(res, 404, { error: "Visitor not found." });
-            }
-    
-            const member = result[0];
-            sendResponse(res, 200, { member });
-        } catch (err) {
-            console.error("Database query error:", err);
-            sendResponse(res, 500, { error: "Error fetching visitor data." });
-        }
-    }
+      
+        // ✅ NEW - includes password
+const sql = `SELECT Visitor_Name, Email, Phone_number, Address, password FROM visitor WHERE Visitor_ID = ?`;
 
+      
+        try {
+          const [result] = await pool.promise().query(sql, [Visitor_ID]);
+      
+          if (result.length === 0) {
+            return sendResponse(res, 404, { error: "Visitor not found." });
+          }
+      
+          const visitor = result[0];
+          sendResponse(res, 200, { member: visitor });
+
+        } catch (err) {
+          console.error("Database query error:", err);
+          sendResponse(res, 500, { error: "Error fetching visitor data." });
+        }
+      }
+      
 };
 
 // Helper function to send JSON responses
